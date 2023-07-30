@@ -1,0 +1,15 @@
+[tool.poetry]
+name = "learnhub-backend"
+version = "0.1.0"
+description = ""
+authors = ["Nhuengzii <32nhueng@gmail.com>"]
+readme = "README.md"
+packages = [{include = "learnhub_backend"}]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
