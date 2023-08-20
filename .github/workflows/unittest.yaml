@@ -8,6 +8,11 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v3
+      - uses: isbang/compose-action@v1.5.1
+        with:
+          compose-file: "./docker-compose.yaml"
+          services: |
+            mongo
       - uses: actions/setup-python@v4
         with:
           python-version: '3.11'
