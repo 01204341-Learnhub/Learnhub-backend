@@ -1,9 +1,14 @@
 import sys
 from fastapi import FastAPI
-from .database import db_client
 import uvicorn
 
+from .database import db_client
+from .program.router import router as program_router
+
 app = FastAPI()
+app.include_router(program_router)
+
+
 try:
     db_client.list_database_names()
 except:
