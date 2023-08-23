@@ -10,5 +10,5 @@ router = APIRouter(
         )
 
 @router.get("/", status_code=200)
-async def list_programs(common_paginations: Annotated[dict, Depends(common_pagination_parameters)]):
+def list_programs(common_paginations: Annotated[dict, Depends(common_pagination_parameters)]):
     return {200: "OK"}
