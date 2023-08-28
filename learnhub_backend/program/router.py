@@ -12,9 +12,9 @@ router = APIRouter(
         dependencies=[Depends(common_pagination_parameters)]
         )
 
-common_page_params = Annotated[dict, Depends(router.dependencies[0].dependency) ]
+common_page_params = Annotated[dict, Depends(router.dependencies[0].dependency)]
 
-@router.get("/", status_code=200)
+@router.get("/", status_code=200, response_model_exclude_none=True)
 def list_programs(common_paginations: common_page_params) -> Programs:
         mock_data = {
                         "programs":[

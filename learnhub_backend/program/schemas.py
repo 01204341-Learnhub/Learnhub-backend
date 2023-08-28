@@ -3,8 +3,8 @@ from pydantic import BaseModel
 
 ## Programs
 class Program(BaseModel):
-    course_id: Optional[str]
-    class_id: Optional[str]
+    course_id: str | None=None
+    class_id: str | None=None
     type: str
     name: str
 
