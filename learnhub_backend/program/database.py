@@ -8,6 +8,8 @@ def query_list_programs(skip: int = 0, limit: int = 100) -> list:
         course["course_id"] = str(course["_id"])
         course["type"] = "program"
         programs.append(course)
+    # TODO: add class query
+
     return programs
 
 

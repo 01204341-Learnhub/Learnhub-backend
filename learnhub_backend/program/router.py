@@ -3,7 +3,8 @@ from typing import Annotated
 from pydantic import TypeAdapter
 
 from ..dependencies import common_pagination_parameters
-from learnhub_backend.program.schemas import Programs,Program
+from .schemas import Programs_model,Program_model
+from .database import query_list_programs
 
 
 router = APIRouter(
@@ -15,16 +16,8 @@ router = APIRouter(
 common_page_params = Annotated[dict, Depends(router.dependencies[0].dependency)]
 
 @router.get("/", status_code=200, response_model_exclude_none=True)
-def list_programs(common_paginations: common_page_params) -> Programs:
-        mock_data = {
-                        "programs":[
-                            {
-                            "course_id": "1234",
-                            "type":"course",
-                            "name":"Discreet Math"
-                                }
-                            ]
-                        }
-        ta = TypeAdapter(list[Program])
-        response_body = Programs(programs=ta.validate_python(mock_data["programs"]))
+def list_programs(common_paginations: common_page_params) -> Programs_model:
+        queried_programs = query_list_programs(common_paginations["skip"], common_paginations["limit"])
+        ta = TypeAdapter(list[Program_model])
+        response_body = Programs_model(programs=ta.validate_python(queried_programs))
         return  response_body
