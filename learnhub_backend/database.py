@@ -3,9 +3,9 @@ from .config import MONGODB_URI, MONGODB_DB_NAME, DB_COURSE_COLLECTION, DB_CHAPT
 
 
 
-class Mongodb_client(MongoClient):
+class DB_client(MongoClient):
     def __init__(self, *args, **kwargs):
-        super(Mongodb_client, self).__init__(*args, **kwargs)
+        super(DB_client, self).__init__(*args, **kwargs)
 
         self.db = self[MONGODB_DB_NAME] 
 
@@ -15,4 +15,4 @@ class Mongodb_client(MongoClient):
         self.lesson_coll = self[DB_LESSON_COLLECTION]
 
 
-db_client = Mongodb_client(MONGODB_URI)
+db_client = DB_client(MONGODB_URI)
