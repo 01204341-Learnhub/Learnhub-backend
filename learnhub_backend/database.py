@@ -1,4 +1,5 @@
 from pymongo import MongoClient
-from .config import MONGODB_URI
+from .config import MONGODB_URI, MONGODB_DB_NAME
 
-db_client = MongoClient(MONGODB_URI)
+mongo_client = MongoClient(MONGODB_URI)
+db_client = mongo_client[MONGODB_DB_NAME]
