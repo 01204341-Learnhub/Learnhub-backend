@@ -2,7 +2,7 @@ from typing import Optional
 from pydantic import BaseModel
 
 ## Programs
-class Program(BaseModel):
+class Program_model(BaseModel):
     course_id: str | None=None
     class_id: str | None=None
     type: str
@@ -20,8 +20,8 @@ class Program(BaseModel):
                 }
             }
 
-class Programs(BaseModel):
-    programs: list[Program]
+class Programs_model(BaseModel):
+    programs: list[Program_model]
     model_config =  {
             "json_schema_extra":{
                 "examples":[
