@@ -9,11 +9,13 @@ from learnhub_backend.program.schemas import Programs,Program
 router = APIRouter(
         prefix="/programs",
         tags=['program'],
-        dependencies=Depends(common_pagination_parameters)
+        dependencies=[Depends(common_pagination_parameters)]
         )
 
+common_page_params = Annotated[dict, Depends(router.dependencies[0].dependency) ]
+
 @router.get("/", status_code=200)
-def list_programs(common_paginations: Annotated[dict, Depends(common_pagination_parameters)]) -> Programs:
+def list_programs(common_paginations: common_page_params) -> Programs:
         mock_data = {
                         "programs":[
                             {
