@@ -11,8 +11,8 @@ class DB_client(MongoClient):
 
         # add collection here
         self.course_coll = self.db[DB_COURSE_COLLECTION]
-        self.chapter_coll = self[DB_CHAPTER_COLLECTION]
-        self.lesson_coll = self[DB_LESSON_COLLECTION]
+        self.chapter_coll = self.db[DB_CHAPTER_COLLECTION]
+        self.lesson_coll = self.db[DB_LESSON_COLLECTION]
 
 
 db_client = DB_client(MONGODB_URI)

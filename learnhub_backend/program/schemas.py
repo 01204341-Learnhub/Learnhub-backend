@@ -37,3 +37,11 @@ class Programs_model(BaseModel):
                     ]
                 }
             }
+    
+class Chapter_model(BaseModel):
+    chapter_id: str
+    chapter_num: int
+    name: str
+
+class Chapters_model(BaseModel):
+    chapters: list[Chapter_model] 
