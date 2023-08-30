@@ -38,10 +38,14 @@ class Programs_model(BaseModel):
                 }
             }
     
-class Chapter_model(BaseModel):
+class List_course_chapters_chapter_model(BaseModel):
     chapter_id: str
     chapter_num: int
     name: str
 
-class Chapters_model(BaseModel):
-    chapters: list[Chapter_model] 
+class List_course_chapters_chapters_model(BaseModel):
+    chapters: list[List_course_chapters_chapter_model]
+
+class Add_course_chapters_chapter_model(BaseModel):
+    chapter_num: int
+    name: str

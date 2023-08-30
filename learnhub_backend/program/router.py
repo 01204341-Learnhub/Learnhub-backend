@@ -2,8 +2,8 @@ from fastapi import APIRouter, Depends
 from typing import Annotated
 
 from ..dependencies import common_pagination_parameters
-from .schemas import Programs_model,Chapters_model
-from .services import list_programs_response,list_course_chapters_response
+from .schemas import Programs_model,List_course_chapters_chapters_model,List_course_chapters_chapter_model,Add_course_chapters_chapter_model
+from .services import list_programs_response,list_course_chapters_response,add_course_chapter_response,get_course_chapter_response
 
 
 router = APIRouter(
@@ -20,6 +20,16 @@ def list_programs(common_paginations: common_page_params) -> Programs_model:
         return  response_body
 
 @router.get("/courses/{course_id}/chapters", status_code=200, response_model_exclude_none=True)
-def list_course_chapters(course_id:str,common_paginations: common_page_params) -> Chapters_model:
+def list_course_chapters(course_id:str,common_paginations: common_page_params) -> List_course_chapters_chapters_model:
         response_body = list_course_chapters_response(skip=common_paginations["skip"],limit=common_paginations["limit"],course_id=course_id)
         return  response_body
+
+@router.post("/courses/{course_id}/chapters", status_code=200, response_model_exclude_none=True)
+def add_course_chapter(course_id: str ,chapter_body:Add_course_chapters_chapter_model):
+        response_body = add_course_chapter_response(course_id=course_id,chapter_body=chapter_body)
+        return  
+
+@router.get("/courses/{course_id}/chapters/{chapter_id}", status_code=200, response_model_exclude_none=True)
+def get_course_chapter(chapter_id:str):
+        response_body=get_course_chapter_response(chapter_id=chapter_id)
+        return response_body
