@@ -5,14 +5,16 @@ from ..dependencies import common_pagination_parameters
 from .schemas import (
     ListProgramsResponseModel,
     ListCourseChaptersResponseModel,
-    AddCourseChaptersModel_in,
+    AddCourseChaptersRequestModel,
     GetCourseChapterResponseModel,
+    EditCourseChapterRequestModel
 )
 from .services import (
     list_programs_response,
     list_course_chapters_response,
     add_course_chapter_response,
     get_course_chapter_response,
+    edit_course_chapter_response,
 )
 
 
@@ -58,7 +60,7 @@ def list_course_chapters(course_id: str, common_paginations: common_page_params)
     response_model_exclude_none=True,
     response_model=ListProgramsResponseModel,
 )
-def add_course_chapter(course_id: str, chapter_body: AddCourseChaptersModel_in) -> dict:
+def add_course_chapter(course_id: str, chapter_body: AddCourseChaptersRequestModel) -> dict:
     response_body = add_course_chapter_response(
         course_id=course_id, chapter_body=chapter_body
     )
@@ -79,8 +81,8 @@ def get_course_chapter(chapter_id: str):
     "/courses/{course_id}/chapters/{chapter_id}",
     status_code=200,
     response_model_exclude_none=True,
-    response_model=fixfixfixfixfix,
+    response_model=dict,#fix
 )
-def edit_course_chapter(chapter_id: str):
-    response_body = edit_course_chapter_response(chapter_id=chapter_id)
+def edit_course_chapter(chapter_id: str, chapter_to_edit: EditCourseChapterRequestModel):
+    response_body = edit_course_chapter_response(chapter_id=chapter_id,chapter_to_edit=chapter_to_edit)
     return response_body

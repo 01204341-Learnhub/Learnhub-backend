@@ -54,7 +54,7 @@ class GetCourseChapterResponseModel(BaseModel):
     name: str
 
 class EditCourseChapterRequestModel(BaseModel):
-    chapter_num: int | None
-    name: str | None
+    chapter_num: Optional[int] = None
+    name: Optional[str] = None
 
 

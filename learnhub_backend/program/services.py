@@ -6,25 +6,27 @@ from .database import (
     query_list_course_chapters,
     query_add_course_chapter,
     query_find_course_chapter,
+    query_edit_course_chapter,
 )
 from .schemas import (
     ListCourseChaptersModelBody,
     ListCourseChaptersResponseModel,
-    AddCourseChaptersModel_in,
+    AddCourseChaptersRequestModel,
     GetCourseChapterResponseModel,
+    EditCourseChapterRequestModel,
 )
 from .database import query_list_programs
 from .schemas import (
     ListProgramsResponseModel,
-    ListProgramsCourseModel,
-    ListProgramsClassModel,
+    ListProgramsCourseModelBody,
+    ListProgramsClassModelBody,
 )
 
 
 def list_programs_response(skip: int = 0, limit: int = 0) -> ListProgramsResponseModel:
     queried_programs = query_list_programs(skip, limit)
     ta = TypeAdapter(
-        list[Union[ListProgramsClassModel, ListProgramsCourseModel]]
+        list[Union[ListProgramsClassModelBody, ListProgramsCourseModelBody]]
     )
     response_body = ListProgramsResponseModel(
         programs=ta.validate_python(queried_programs)
@@ -44,7 +46,7 @@ def list_course_chapters_response(course_id: str = None, skip: int = 0, limit: i
 
 
 def add_course_chapter_response(
-    course_id: str, chapter_body: AddCourseChaptersModel_in
+    course_id: str, chapter_body: AddCourseChaptersRequestModel
 ) -> dict:
     response = query_add_course_chapter(course_id=course_id, chapter_body=chapter_body)
     return response
@@ -58,5 +60,6 @@ def get_course_chapter_response(chapter_id: str):
     )
     return response_body
 
-def edit_course_chapter_response(chapter_id=chapter_id):
-    return
+def edit_course_chapter_response(chapter_id: int, chapter_to_edit: EditCourseChapterRequestModel)->dict:
+    response = query_edit_course_chapter(chapter_id=chapter_id,chapter_to_edit=chapter_to_edit)
+    return response
