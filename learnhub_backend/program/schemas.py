@@ -42,7 +42,7 @@ class ListProgramsModel(BaseModel):
 ## Lessons
 class GetLessonModel(BaseModel):
     lesson_id: str
-    lesson_num: str
+    lesson_num: int
     name: str
     lesson_type: str
     description: str 
@@ -51,7 +51,7 @@ class GetLessonModel(BaseModel):
 
 class ListLessonsModelBody(BaseModel):
     lesson_id: str
-    lesson_num: str
+    lesson_num: int
     name: str
     lesson_type: str 
     video_length: int | None = None

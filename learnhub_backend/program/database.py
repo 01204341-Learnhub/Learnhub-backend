@@ -15,7 +15,7 @@ def query_list_lessons(skip: int = 0, limit: int = 100) -> list:
     lessons_cursor = db_client.lesson_coll.find(skip=skip, limit=limit)
     lessons = []
     for lesson in lessons_cursor:
-        lesson["lesson_id"] = str(lesson["-id"])
+        lesson["lesson_id"] = str(lesson["_id"])
         lessons.append(lesson)
 
     return lessons
