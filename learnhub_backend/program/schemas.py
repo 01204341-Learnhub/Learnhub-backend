@@ -2,7 +2,7 @@ from typing import Optional, Union
 from pydantic import BaseModel
 
 ## Programs
-class List_programs_class_model(BaseModel):
+class ListProgramsClassModel(BaseModel):
     class_id: str 
     type: str
     name: str
@@ -19,7 +19,7 @@ class List_programs_class_model(BaseModel):
                 }
             }
 
-class List_programs_course_model(BaseModel):
+class ListProgramsCourseModel(BaseModel):
     course_id: str
     type: str
     name: str
@@ -36,6 +36,6 @@ class List_programs_course_model(BaseModel):
                 }
             }
 
-class List_programs_model(BaseModel):
-    programs: list[Union[List_programs_course_model, List_programs_class_model]]
+class ListProgramsModel(BaseModel):
+    programs: list[Union[ListProgramsClassModel, ListProgramsCourseModel]]
 
