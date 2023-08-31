@@ -52,7 +52,6 @@ def list_course_chapters(course_id: str, common_paginations: common_page_params)
     )
     return response_body
 
-
 @router.post(
     "/courses/{course_id}/chapters",
     status_code=200,

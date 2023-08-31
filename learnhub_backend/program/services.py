@@ -23,7 +23,9 @@ from .schemas import (
 
 def list_programs_response(skip: int = 0, limit: int = 0) -> ListProgramsResponseModel:
     queried_programs = query_list_programs(skip, limit)
-    ta = TypeAdapter(list[Union[ListProgramsClassModel, ListProgramsCourseModel]])
+    ta = TypeAdapter(
+        list[Union[ListProgramsClassModel, ListProgramsCourseModel]]
+    )
     response_body = ListProgramsResponseModel(
         programs=ta.validate_python(queried_programs)
     )

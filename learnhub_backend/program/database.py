@@ -4,6 +4,7 @@ from .schemas import AddCourseChaptersRequestModel
 import pprint
 
 
+
 def query_list_programs(skip: int = 0, limit: int = 100) -> list:
     courses_cursor = db_client.course_coll.find(skip=skip, limit=limit)
     programs = []

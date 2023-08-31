@@ -3,7 +3,7 @@ from pydantic import BaseModel
 
 
 ## Programs
-class ListProgramsClassModel(BaseModel):
+class ListProgramsClassModelBody(BaseModel):
     class_id: str
     type: str
     name: str
@@ -15,7 +15,7 @@ class ListProgramsClassModel(BaseModel):
     }
 
 
-class ListProgramsCourseModel(BaseModel):
+class ListProgramsCourseModelBody(BaseModel):
     course_id: str
     type: str
     name: str
@@ -30,7 +30,7 @@ class ListProgramsCourseModel(BaseModel):
 
 
 class ListProgramsResponseModel(BaseModel):
-    programs: list[Union[ListProgramsClassModel, ListProgramsCourseModel]]
+    programs: list[Union[ListProgramsClassModelBody, ListProgramsCourseModelBody]]
 
 
 class ListCourseChaptersModelBody(BaseModel):
@@ -56,3 +56,5 @@ class GetCourseChapterResponseModel(BaseModel):
 class EditCourseChapterRequestModel(BaseModel):
     chapter_num: int | None
     name: str | None
+
+
