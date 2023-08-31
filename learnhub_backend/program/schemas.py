@@ -34,7 +34,7 @@ class ListProgramsResponseModel(BaseModel):
 
 
 ## Lessons
-class GetLessonModel(BaseModel):
+class GetLessonResponseModel(BaseModel):
     lesson_id: str
     lesson_num: int
     name: str
@@ -52,5 +52,5 @@ class ListLessonsModelBody(BaseModel):
     video_length: int | None = None
 
 
-class ListLessonsModel(BaseModel):
+class ListLessonsResponseModel(BaseModel):
     lessons: list[ListLessonsModelBody]
