@@ -2,7 +2,7 @@ from typing import Annotated, Union
 from pydantic import TypeAdapter
 
 from .database import query_list_programs,query_list_course_chapters,insert_course_chapter,find_course_chapter
-from .schemas import Programs_model, Program_model,List_course_chapters_chapter_model,List_course_chapters_chapters_model,Add_course_chapters_chapter_model
+from .schemas import List_course_chapters_chapter_model,List_course_chapters_chapters_model,Add_course_chapters_chapter_model
 from .database import query_list_programs
 from .schemas import ListProgramsModel, ListProgramsCourseModel, ListProgramsClassModel
 
