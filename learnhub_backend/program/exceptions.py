@@ -1,6 +1,6 @@
 from fastapi import HTTPException
 
-class Error():
+class Exception():
     bad_request = HTTPException(400, detail="Bad Request")
     unauthorized = HTTPException(401, detail="Unauthorized") 
     forbidden = HTTPException(403, detail="Forbidden") # unlike unauthorized the client's identity is known.
