@@ -7,6 +7,7 @@ from .services import (
                 list_programs_response,
                 list_lessons_response, get_lesson_response
                        )
+from .exceptions import Exception
 
 
 router = APIRouter(
@@ -31,9 +32,7 @@ def list_lessons(course_id: str, chapter_id: str, common_paginations: common_pag
 def get_lesson(course_id: str, chapter_id: str, lesson_id : str, response : Response):
         response_body = get_lesson_response(lesson_id)
         if response_body == None:
-                response.status_code = 404
-                # TODO: implement exceptions
-                return "not found"
+                raise Exception.not_found
         return response_body
                 
 
