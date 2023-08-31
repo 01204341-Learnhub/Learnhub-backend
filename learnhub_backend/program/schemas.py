@@ -1,5 +1,5 @@
 from typing import Optional, Union
-from pydantic import BaseModel
+from pydantic import BaseModel, HttpUrl
 
 ## Programs
 class ListProgramsClassModel(BaseModel):
@@ -38,4 +38,17 @@ class ListProgramsCourseModel(BaseModel):
 
 class ListProgramsModel(BaseModel):
     programs: list[Union[ListProgramsClassModel, ListProgramsCourseModel]]
+
+## Lessons
+class GetLessonModel(BaseModel):
+    lesson_id: str
+    lesson_num: str
+    name: str
+    lesson_type: str
+    description: str 
+    src: HttpUrl
+    progress: float
+
+
+
 
