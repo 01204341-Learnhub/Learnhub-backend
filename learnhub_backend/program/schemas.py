@@ -1,5 +1,5 @@
 from typing import Optional
-from pydantic import BaseModel
+from pydantic import BaseModel, HttpUrl
 
 ## Programs
 class Program_model(BaseModel):
@@ -37,3 +37,13 @@ class Programs_model(BaseModel):
                     ]
                 }
             }
+
+class Lesson_model(BaseModel):
+    lesson_id: str
+    lesson_num: int
+    name: str
+    lesson_type: str
+    description: str
+    src: HttpUrl
+    progress: float
+
