@@ -49,12 +49,15 @@ class GetLessonModel(BaseModel):
     src: HttpUrl
     progress: float
 
-class ListLessonModelBody(BaseModel):
+class ListLessonsModelBody(BaseModel):
     lesson_id: str
     lesson_num: str
     name: str
     lesson_type: str 
     video_length: int | None = None
+
+class ListLessonsModel(BaseModel):
+    lessons: list[ListLessonsModelBody]
 
 
 
