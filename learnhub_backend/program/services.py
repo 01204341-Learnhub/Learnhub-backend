@@ -24,8 +24,10 @@ def list_programs_response(skip: int = 0, limit: int = 0) -> ListProgramsRespons
     return response_body
 
 
-def list_lessons_response(skip: int = 0, limit: int = 0) -> ListLessonsResponseModel:
-    quried_lessons = query_list_lessons(skip, limit)
+def list_lessons_response(
+    course_id: str, chapter_id: str, skip: int = 0, limit: int = 0
+) -> ListLessonsResponseModel:
+    quried_lessons = query_list_lessons(course_id, chapter_id, skip, limit)
     ta = TypeAdapter(list[ListLessonsModelBody])
     response_body = ListLessonsResponseModel(lessons=ta.validate_python(quried_lessons))
     return response_body

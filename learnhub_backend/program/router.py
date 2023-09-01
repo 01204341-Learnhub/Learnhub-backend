@@ -44,7 +44,7 @@ def list_lessons(
     course_id: str, chapter_id: str, common_paginations: common_page_params
 ):
     response_body = list_lessons_response(
-        common_paginations["skip"], common_paginations["limit"]
+        course_id, chapter_id, common_paginations["skip"], common_paginations["limit"]
     )
     return response_body
 

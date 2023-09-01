@@ -14,8 +14,11 @@ def query_list_programs(skip: int = 0, limit: int = 100) -> list:
     return programs
 
 
-def query_list_lessons(skip: int = 0, limit: int = 100) -> list:
-    lessons_cursor = db_client.lesson_coll.find(skip=skip, limit=limit)
+def query_list_lessons(
+    course_id: str, chapter_id: str, skip: int = 0, limit: int = 100
+) -> list:
+    filter = {"course_id": ObjectId(course_id), "chapter_id": ObjectId(chapter_id)}
+    lessons_cursor = db_client.lesson_coll.find(filter=filter, skip=skip, limit=limit)
     lessons = []
     for lesson in lessons_cursor:
         lesson["lesson_id"] = str(lesson["_id"])
