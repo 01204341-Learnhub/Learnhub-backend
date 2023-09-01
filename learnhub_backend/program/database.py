@@ -77,5 +77,21 @@ def patch_course_lesson(
     chapter_id: str,
     lesson_id: str,
     request: PatchCourseLessonRequestModel,
-):
-    pass
+) -> int:
+    filter = {
+        "_id": ObjectId(lesson_id),
+        "course_id": ObjectId(course_id),
+        "chapter_id": ObjectId(chapter_id),
+    }
+
+    update_body = {}
+    if request.name != None:
+        update_body["name"] = request.name
+    if request.description != None:
+        update_body["description"] = request.description
+    if request.src != None:
+        update_body["src"] = str(request.src)
+    update = {"$set": update_body}
+
+    result = db_client.lesson_coll.update_one(filter=filter, update=update)
+    return result.modified_count
