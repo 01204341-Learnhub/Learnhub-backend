@@ -34,7 +34,7 @@ class ListProgramsResponseModel(BaseModel):
 
 
 ## Lessons
-class GetLessonResponseModel(BaseModel):
+class GetCourseLessonResponseModel(BaseModel):
     lesson_id: str
     lesson_num: int
     name: str
@@ -45,7 +45,7 @@ class GetLessonResponseModel(BaseModel):
     progress: float | None = None
 
 
-class ListLessonsModelBody(BaseModel):
+class ListCourseLessonsModelBody(BaseModel):
     lesson_id: str
     lesson_num: int
     name: str
@@ -53,21 +53,21 @@ class ListLessonsModelBody(BaseModel):
     video_length: int | None = None  # only return if lesson type = 'video'
 
 
-class ListLessonsResponseModel(BaseModel):
-    lessons: list[ListLessonsModelBody]
+class ListCourseLessonsResponseModel(BaseModel):
+    lessons: list[ListCourseLessonsModelBody]
 
 
-class PostLessonRequestModel(BaseModel):
+class PostCourseLessonRequestModel(BaseModel):
     name: str
     description: str
     src: HttpUrl
 
 
-class PostLessonResponseModel(BaseModel):
+class PostCourseLessonResponseModel(BaseModel):
     lesson_id: str
 
 
-class PatchLessonRequestModel(BaseModel):
+class PatchCourseLessonRequestModel(BaseModel):
     name: str | None = None
     description: str | None = None
     src: HttpUrl | None = None

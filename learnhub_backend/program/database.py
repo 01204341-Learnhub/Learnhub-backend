@@ -1,6 +1,6 @@
 from ..database import db_client
 from bson import ObjectId
-from .schemas import PostLessonRequestModel
+from .schemas import PatchCourseLessonRequestModel, PostCourseLessonRequestModel
 
 
 def query_list_programs(skip: int = 0, limit: int = 100) -> list:
@@ -43,7 +43,7 @@ def query_get_course_lesson(
 
 
 def create_course_lesson(
-    course_id: str, chapter_id: str, request: PostLessonRequestModel
+    course_id: str, chapter_id: str, request: PostCourseLessonRequestModel
 ) -> str:
     body = {
         "course_id": ObjectId(course_id),
@@ -70,3 +70,12 @@ def create_course_lesson(
 
     object_id = db_client.lesson_coll.insert_one(body)
     return str(object_id.inserted_id)
+
+
+def patch_course_lesson(
+    course_id: str,
+    chapter_id: str,
+    lesson_id: str,
+    request: PatchCourseLessonRequestModel,
+):
+    pass

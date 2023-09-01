@@ -4,10 +4,10 @@ from typing import Annotated, Union
 from ..dependencies import common_pagination_parameters
 from .schemas import (
     ListProgramsResponseModel,
-    GetLessonResponseModel,
-    ListLessonsResponseModel,
-    PostLessonRequestModel,
-    PostLessonResponseModel,
+    GetCourseLessonResponseModel,
+    ListCourseLessonsResponseModel,
+    PostCourseLessonRequestModel,
+    PostCourseLessonResponseModel,
 )
 from .services import (
     list_programs_response,
@@ -43,7 +43,7 @@ def list_programs(common_paginations: common_page_params):
 @router.get(
     "/courses/{course_id}/chapters/{chapter_id}/lessons",
     status_code=200,
-    response_model=ListLessonsResponseModel,
+    response_model=ListCourseLessonsResponseModel,
     response_model_exclude_none=True,
 )
 def list_course_lessons(
@@ -58,11 +58,11 @@ def list_course_lessons(
 @router.post(
     "/courses/{course_id}/chapters/{chapter_id}/lessons",
     status_code=200,
-    response_model=PostLessonResponseModel,
+    response_model=PostCourseLessonResponseModel,
     response_model_exclude_none=True,
 )
 def post_course_lesson(
-    course_id: str, chapter_id: str, requestBody: PostLessonRequestModel
+    course_id: str, chapter_id: str, requestBody: PostCourseLessonRequestModel
 ):
     response_body = post_course_lesson_request(course_id, chapter_id, requestBody)
     return response_body
@@ -71,7 +71,7 @@ def post_course_lesson(
 @router.get(
     "/courses/{course_id}/chapters/{chapter_id}/lessons/{lesson_id}",
     status_code=200,
-    response_model=GetLessonResponseModel,
+    response_model=GetCourseLessonResponseModel,
     response_model_exclude_none=True,
 )
 def get_course_lesson(course_id: str, chapter_id: str, lesson_id: str):
