@@ -34,7 +34,7 @@ def query_get_course_lesson(
     filter = {
         "_id": ObjectId(lesson_id),
         "course_id": ObjectId(course_id),
-        "chapter_id`": ObjectId(chapter_id),
+        "chapter_id": ObjectId(chapter_id),
     }
     lesson = db_client.lesson_coll.find_one(filter=filter)
     if lesson != None:
