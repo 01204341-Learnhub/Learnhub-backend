@@ -8,7 +8,11 @@ from .schemas import (
     ListLessonsResponseModel,
     PostLessonRequestModel,
 )
-from .services import list_programs_response, list_lessons_response, get_lesson_response
+from .services import (
+    list_programs_response,
+    list_course_lessons_response,
+    get_course_lesson_response,
+)
 from .exceptions import Exception
 
 
@@ -43,7 +47,7 @@ def list_programs(common_paginations: common_page_params):
 def list_lessons(
     course_id: str, chapter_id: str, common_paginations: common_page_params
 ):
-    response_body = list_lessons_response(
+    response_body = list_course_lessons_response(
         course_id, chapter_id, common_paginations["skip"], common_paginations["limit"]
     )
     return response_body
@@ -56,7 +60,7 @@ def list_lessons(
     response_model_exclude_none=True,
 )
 def get_lesson(course_id: str, chapter_id: str, lesson_id: str):
-    response_body = get_lesson_response(lesson_id)
+    response_body = get_course_lesson_response(course_id, chapter_id, lesson_id)
     if response_body == None:
         raise Exception.not_found
     return response_body

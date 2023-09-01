@@ -14,7 +14,7 @@ def query_list_programs(skip: int = 0, limit: int = 100) -> list:
     return programs
 
 
-def query_list_lessons(
+def query_list_course_lessons(
     course_id: str, chapter_id: str, skip: int = 0, limit: int = 100
 ) -> list:
     filter = {"course_id": ObjectId(course_id), "chapter_id": ObjectId(chapter_id)}
@@ -27,9 +27,15 @@ def query_list_lessons(
     return lessons
 
 
-def query_get_lesson(lesson_id: str) -> dict | None:
-    lesson_object_id = ObjectId(oid=lesson_id)
-    lesson = db_client.lesson_coll.find_one({"_id": lesson_object_id})
+def query_get_course_lesson(
+    course_id: str, chapter_id: str, lesson_id: str
+) -> dict | None:
+    filter = {
+        "_id": ObjectId(lesson_id),
+        "course_id": ObjectId(course_id),
+        "chapter_id`": ObjectId(chapter_id),
+    }
+    lesson = db_client.lesson_coll.find_one(filter=filter)
     if lesson != None:
         lesson["lesson_id"] = str(lesson["_id"])
     return lesson
