@@ -30,14 +30,14 @@ def query_add_course_chapter(
 ):
     chapter_body_to_inserted = chapter_body.model_dump()
     chapter_body_to_inserted["course_id"] = ObjectId(course_id)
-    chapter_id = db_client.chapter_coll.insert_one(chapter_body_to_inserted).inserted_id
-
-    return {"chapter_id": str(chapter_id)}
+    response = db_client.chapter_coll.insert_one(chapter_body_to_inserted)
+    return response
 
 
 def query_find_course_chapter(chapter_id: str):
     queried_chapter = db_client.chapter_coll.find_one({"_id": ObjectId(chapter_id)})
-    queried_chapter["chapter_id"] = str(queried_chapter["_id"])
+    if queried_chapter != None:
+        queried_chapter["chapter_id"] = str(queried_chapter["_id"])
     return queried_chapter
 
 
@@ -47,13 +47,13 @@ def query_edit_course_chapter(
     # print(chapter_to_edit)
     filter_chapter = {"_id": ObjectId(chapter_id)}
     chapter_to_edit_2 = {"$set": chapter_to_edit.model_dump(exclude_unset=True)}
-    resposne = db_client.chapter_coll.update_one(filter_chapter, chapter_to_edit_2)
-    return resposne
+    response = db_client.chapter_coll.update_one(filter_chapter, chapter_to_edit_2)
+    return response
 
 def query_delete_course_chapter(chapter_id: str):
     filter_chapter = {"_id": ObjectId(chapter_id)}
-    resposne = db_client.chapter_coll.delete_one(filter_chapter)
-    return resposne
+    response = db_client.chapter_coll.delete_one(filter_chapter)
+    return response
 
     # db_client.chapter_coll.update_one()
 

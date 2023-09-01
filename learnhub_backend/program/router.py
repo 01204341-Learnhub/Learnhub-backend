@@ -17,7 +17,7 @@ from .services import (
     edit_course_chapter_response,
     delete_course_chapter_response,
 )
-
+from .exceptions import Exception
 
 router = APIRouter(
     prefix="/programs",
@@ -65,6 +65,8 @@ def add_course_chapter(course_id: str, chapter_body: AddCourseChaptersRequestMod
     response_body = add_course_chapter_response(
         course_id=course_id, chapter_body=chapter_body
     )
+    if response_body == None:
+        raise Exception.bad_request
     return response_body
 
 
@@ -76,6 +78,8 @@ def add_course_chapter(course_id: str, chapter_body: AddCourseChaptersRequestMod
 )
 def get_course_chapter(chapter_id: str):
     response_body = get_course_chapter_response(chapter_id=chapter_id)
+    if response_body == None:
+        raise Exception.not_found
     return response_body
 
 @router.patch(
@@ -86,7 +90,12 @@ def get_course_chapter(chapter_id: str):
 )
 def edit_course_chapter(chapter_id: str, chapter_to_edit: EditCourseChapterRequestModel):
     response_body = edit_course_chapter_response(chapter_id=chapter_id,chapter_to_edit=chapter_to_edit)
-    return response_body
+    if response_body.matched_count == 0:
+        raise Exception.not_found
+    elif response_body.modified_count == 0:
+        return {"message": "OK but no change"}
+    return  {"message": "OK"}
+    
 
 @router.delete(
     "/courses/{course_id}/chapters/{chapter_id}",
@@ -96,4 +105,6 @@ def edit_course_chapter(chapter_id: str, chapter_to_edit: EditCourseChapterReque
 )
 def delete_course_chapter(chapter_id: str):
     response_body = delete_course_chapter_response(chapter_id=chapter_id)
-    return response_body
+    if response_body.deleted_count == 1:
+        raise Exception.not_found
+    return {"message": "OK"}

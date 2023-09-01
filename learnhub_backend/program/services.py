@@ -50,28 +50,26 @@ def add_course_chapter_response(
     course_id: str, chapter_body: AddCourseChaptersRequestModel
 ) -> dict:
     response = query_add_course_chapter(course_id=course_id, chapter_body=chapter_body)
-    return response
+    if response.inserted_id == None:
+        return None
+    return {"chapter_id": str(response.inserted_id)}
 
 
 def get_course_chapter_response(chapter_id: str):
     queried_chapter = query_find_course_chapter(chapter_id=chapter_id)
+    if queried_chapter == None:
+        return None
     ta = TypeAdapter(GetCourseChapterResponseModel)
     response_body = GetCourseChapterResponseModel(
         **ta.validate_python(queried_chapter).model_dump()
     )
     return response_body
 
-def edit_course_chapter_response(chapter_id: int, chapter_to_edit: EditCourseChapterRequestModel)->dict:
+def edit_course_chapter_response(chapter_id: int, chapter_to_edit: EditCourseChapterRequestModel):
     response = query_edit_course_chapter(chapter_id=chapter_id,chapter_to_edit=chapter_to_edit)
-    if response.modified_count == 1:
-        return {"code": 200, "message": "OK"}
-    elif response.matched_count == 1:
-        return {"code": 200, "message": "OK but no change"}
-    return {"code": 400, "message": "Not okay"}
+    return response
 
 def delete_course_chapter_response(chapter_id: int)->dict:
     response = query_delete_course_chapter(chapter_id=chapter_id)
-    if response.deleted_count == 1:
-        return {"code": 200, "message": "OK"}
-    return {"code": 400, "message": "Not okay"} 
+    return response 
 
