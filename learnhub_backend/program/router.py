@@ -15,6 +15,7 @@ from .services import (
     add_course_chapter_response,
     get_course_chapter_response,
     edit_course_chapter_response,
+    delete_course_chapter_response,
 )
 
 
@@ -58,9 +59,9 @@ def list_course_chapters(course_id: str, common_paginations: common_page_params)
     "/courses/{course_id}/chapters",
     status_code=200,
     response_model_exclude_none=True,
-    response_model=ListProgramsResponseModel,
+    response_model=dict,
 )
-def add_course_chapter(course_id: str, chapter_body: AddCourseChaptersRequestModel) -> dict:
+def add_course_chapter(course_id: str, chapter_body: AddCourseChaptersRequestModel):
     response_body = add_course_chapter_response(
         course_id=course_id, chapter_body=chapter_body
     )
@@ -81,8 +82,18 @@ def get_course_chapter(chapter_id: str):
     "/courses/{course_id}/chapters/{chapter_id}",
     status_code=200,
     response_model_exclude_none=True,
-    response_model=dict,#fix
+    response_model=dict,
 )
 def edit_course_chapter(chapter_id: str, chapter_to_edit: EditCourseChapterRequestModel):
     response_body = edit_course_chapter_response(chapter_id=chapter_id,chapter_to_edit=chapter_to_edit)
+    return response_body
+
+@router.delete(
+    "/courses/{course_id}/chapters/{chapter_id}",
+    status_code=200,
+    response_model_exclude_none=True,
+    response_model=dict,
+)
+def delete_course_chapter(chapter_id: str):
+    response_body = delete_course_chapter_response(chapter_id=chapter_id)
     return response_body

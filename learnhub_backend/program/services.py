@@ -7,6 +7,7 @@ from .database import (
     query_add_course_chapter,
     query_find_course_chapter,
     query_edit_course_chapter,
+    query_delete_course_chapter,
 )
 from .schemas import (
     ListCourseChaptersModelBody,
@@ -34,7 +35,7 @@ def list_programs_response(skip: int = 0, limit: int = 0) -> ListProgramsRespons
     return response_body
 
 
-def list_course_chapters_response(course_id: str = None, skip: int = 0, limit: int = 0):
+def list_course_chapters_response(course_id: str, skip: int = 0, limit: int = 0):
     queried_chapters = query_list_course_chapters(
         course_id=course_id, skip=skip, limit=limit
     )
@@ -62,4 +63,15 @@ def get_course_chapter_response(chapter_id: str):
 
 def edit_course_chapter_response(chapter_id: int, chapter_to_edit: EditCourseChapterRequestModel)->dict:
     response = query_edit_course_chapter(chapter_id=chapter_id,chapter_to_edit=chapter_to_edit)
-    return response
+    if response.modified_count == 1:
+        return {"code": 200, "message": "OK"}
+    elif response.matched_count == 1:
+        return {"code": 200, "message": "OK but no change"}
+    return {"code": 400, "message": "Not okay"}
+
+def delete_course_chapter_response(chapter_id: int)->dict:
+    response = query_delete_course_chapter(chapter_id=chapter_id)
+    if response.deleted_count == 1:
+        return {"code": 200, "message": "OK"}
+    return {"code": 400, "message": "Not okay"} 
+
