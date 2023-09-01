@@ -86,6 +86,7 @@ def get_course_lesson(course_id: str, chapter_id: str, lesson_id: str):
 @router.patch(
     "/courses/{course_id}/chapters/{chapter_id}/lessons/{lesson_id}",
     status_code=200,
+    response_model=GenericOKResponse,
     response_model_exclude_none=True,
 )
 def patch_course_lesson(
@@ -101,3 +102,13 @@ def patch_course_lesson(
         raise Exception.bad_request
     response_body = GenericOKResponse()
     return response_body
+
+
+@router.delete(
+    "/courses/{course_id}/chapters/{chapter_id}/lessons/{lesson_id}",
+    status_code=200,
+    response_model=GenericOKResponse,
+    response_model_exclude_none=True,
+)
+def delete_course_lesson(course_id: str, chapter_id: str, lesson_id: str):
+    pass
