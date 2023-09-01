@@ -11,6 +11,7 @@ from .schemas import (
     PostCourseLessonResponseModel,
 )
 from .services import (
+    delete_course_lesson_request,
     list_programs_response,
     list_course_lessons_response,
     get_course_lesson_response,
@@ -111,4 +112,8 @@ def patch_course_lesson(
     response_model_exclude_none=True,
 )
 def delete_course_lesson(course_id: str, chapter_id: str, lesson_id: str):
-    pass
+    delete_count = delete_course_lesson_request(course_id, chapter_id, lesson_id)
+    if delete_count < 1:
+        raise Exception.bad_request
+    response_body = GenericOKResponse()
+    return response_body
