@@ -95,3 +95,29 @@ def edit_course_lesson(
 
     result = db_client.lesson_coll.update_one(filter=filter, update=update)
     return result.modified_count
+
+
+def remove_course_lesson(
+    course_id: str,
+    chapter_id: str,
+    lesson_id: str,
+) -> int:
+    delete_filter = {
+        "_id": ObjectId(lesson_id),
+        "course_id": ObjectId(course_id),
+        "chapter_id": ObjectId(chapter_id),
+    }
+    result = db_client.lesson_coll.find_one_and_delete(delete_filter)
+    if result == None:  # Deletion Failed.
+        return 0
+    lesson_num_threshold = result["lesson_num"]
+
+    update_filter = {
+        "course_id": ObjectId(course_id),
+        "chapter_id": ObjectId(chapter_id),
+        "lesson_num": {"$gt": lesson_num_threshold},
+    }
+
+    update_body = {"$inc": {"lesson_num": -1}}
+    db_client.lesson_coll.update_many(filter=update_filter, update=update_body)
+    return 1
