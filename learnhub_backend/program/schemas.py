@@ -66,3 +66,9 @@ class PostLessonRequestModel(BaseModel):
 
 class PostLessonResponseModel(BaseModel):
     lesson_id: str
+
+
+class PatchLessonRequestModel(BaseModel):
+    name: str | None = None
+    description: str | None = None
+    src: HttpUrl | None = None
