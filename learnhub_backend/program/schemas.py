@@ -41,7 +41,8 @@ class GetLessonResponseModel(BaseModel):
     lesson_type: str
     description: str
     src: HttpUrl
-    progress: Optional[float]  # TODO: only return progress, If student_id is attached.
+    # TODO: only return progress, If student_id is attached.
+    progress: float | None = None
 
 
 class ListLessonsModelBody(BaseModel):
@@ -49,7 +50,7 @@ class ListLessonsModelBody(BaseModel):
     lesson_num: int
     name: str
     lesson_type: str
-    video_length: Optional[int]  # only return if lesson type = 'video'
+    video_length: int | None = None  # only return if lesson type = 'video'
 
 
 class ListLessonsResponseModel(BaseModel):
