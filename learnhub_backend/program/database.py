@@ -72,7 +72,7 @@ def create_course_lesson(
     return str(object_id.inserted_id)
 
 
-def patch_course_lesson(
+def edit_course_lesson(
     course_id: str,
     chapter_id: str,
     lesson_id: str,

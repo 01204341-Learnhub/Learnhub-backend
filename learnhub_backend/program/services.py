@@ -2,7 +2,7 @@ from typing import Annotated, Union
 from pydantic import TypeAdapter
 
 from .database import (
-    patch_course_lesson,
+    edit_course_lesson,
     query_list_programs,
     query_list_course_lessons,
     query_get_course_lesson,
@@ -71,5 +71,5 @@ def patch_course_lesson_request(
     lesson_id: str,
     request: PatchCourseLessonRequestModel,
 ) -> int:
-    modified_count = patch_course_lesson(course_id, chapter_id, lesson_id, request)
+    modified_count = edit_course_lesson(course_id, chapter_id, lesson_id, request)
     return modified_count
