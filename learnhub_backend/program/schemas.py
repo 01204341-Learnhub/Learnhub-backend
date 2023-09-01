@@ -58,7 +58,6 @@ class ListLessonsResponseModel(BaseModel):
 
 
 class PostLessonRequestModel(BaseModel):
-    lesson_num: int
     name: str
     description: str
     src: HttpUrl

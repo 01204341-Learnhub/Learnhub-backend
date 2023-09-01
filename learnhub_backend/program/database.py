@@ -53,9 +53,10 @@ def create_course_lesson(
         "lesson_type": "video",  # TODO: add utils to check for url type
         "src": str(request.src),
     }
+
     filter = {"course_id": ObjectId(course_id), "chapter_id": ObjectId(chapter_id)}
     while True:
-        # Increment lesson_num
+        # Auto increment lesson_num
         cursor = (
             db_client.lesson_coll.find(filter, {"lesson_num": True})
             .sort([("lesson_num", -1)])
