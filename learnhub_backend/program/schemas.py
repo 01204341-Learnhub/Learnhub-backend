@@ -62,3 +62,7 @@ class PostLessonRequestModel(BaseModel):
     name: str
     description: str
     src: HttpUrl
+
+
+class PostLessonResponseModel(BaseModel):
+    lesson_id: str
