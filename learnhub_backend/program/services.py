@@ -7,6 +7,7 @@ from .database import (
     query_list_course_lessons,
     query_get_course_lesson,
     create_course_lesson,
+    remove_course_lesson,
 )
 from .schemas import (
     ListProgramsResponseModel,
@@ -73,3 +74,12 @@ def patch_course_lesson_request(
 ) -> int:
     modified_count = edit_course_lesson(course_id, chapter_id, lesson_id, request)
     return modified_count
+
+
+def delete_course_lesson_request(
+    course_id: str,
+    chapter_id: str,
+    lesson_id: str,
+) -> int:
+    delete_count = remove_course_lesson(course_id, chapter_id, lesson_id)
+    return delete_count
