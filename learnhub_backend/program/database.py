@@ -42,7 +42,7 @@ def query_get_course_lesson(
     return lesson
 
 
-def post_course_lesson(
+def create_course_lesson(
     course_id: str, chapter_id: str, request: PostLessonRequestModel
 ) -> str:
     body = {
