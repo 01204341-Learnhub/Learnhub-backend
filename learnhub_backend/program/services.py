@@ -2,6 +2,7 @@ from typing import Annotated, Union
 from pydantic import TypeAdapter
 
 from .database import (
+    patch_course_lesson,
     query_list_programs,
     query_list_course_lessons,
     query_get_course_lesson,
@@ -14,6 +15,7 @@ from .schemas import (
     ListCourseLessonsResponseModel,
     ListCourseLessonsModelBody,
     GetCourseLessonResponseModel,
+    PatchCourseLessonRequestModel,
     PostCourseLessonRequestModel,
     PostCourseLessonResponseModel,
 )
@@ -61,3 +63,13 @@ def post_course_lesson_request(
     object_id = create_course_lesson(course_id, chapter_id, request)
     response_body = PostCourseLessonResponseModel(lesson_id=object_id)
     return response_body
+
+
+def patch_course_lesson_request(
+    course_id: str,
+    chapter_id: str,
+    lesson_id: str,
+    request: PatchCourseLessonRequestModel,
+) -> int:
+    modified_count = patch_course_lesson(course_id, chapter_id, lesson_id, request)
+    return modified_count
