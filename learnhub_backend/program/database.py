@@ -1,5 +1,6 @@
 from ..database import db_client
 from bson import ObjectId
+from .schemas import PostLessonRequestModel
 
 
 def query_list_programs(skip: int = 0, limit: int = 100) -> list:
@@ -39,3 +40,20 @@ def query_get_course_lesson(
     if lesson != None:
         lesson["lesson_id"] = str(lesson["_id"])
     return lesson
+
+
+def post_course_lesson(
+    course_id: str, chapter_id: str, request: PostLessonRequestModel
+) -> str:
+    body = {
+        "course_id": ObjectId(course_id),
+        "chapter_id": ObjectId(chapter_id),
+        "lesson_num": request.lesson_num,
+        "name": request.name,
+        "description": request.description,
+        "lesson_type": "video",  # TODO: add utils to check for url type
+        "src": request.src,
+    }
+
+    object_id = db_client.lesson_coll.insert_one(body)
+    return object_id.inserted_id
