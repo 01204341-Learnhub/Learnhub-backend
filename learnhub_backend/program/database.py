@@ -52,8 +52,8 @@ def create_course_lesson(
         "name": request.name,
         "description": request.description,
         "lesson_type": "video",  # TODO: add utils to check for url type
-        "src": request.src,
+        "src": str(request.src),
     }
 
     object_id = db_client.lesson_coll.insert_one(body)
-    return object_id.inserted_id
+    return str(object_id.inserted_id)
