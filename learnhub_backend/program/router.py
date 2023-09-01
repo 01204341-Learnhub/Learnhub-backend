@@ -7,11 +7,13 @@ from .schemas import (
     GetLessonResponseModel,
     ListLessonsResponseModel,
     PostLessonRequestModel,
+    PostLessonResponseModel,
 )
 from .services import (
     list_programs_response,
     list_course_lessons_response,
     get_course_lesson_response,
+    post_course_lesson_request,
 )
 from .exceptions import Exception
 
@@ -69,8 +71,9 @@ def get_lesson(course_id: str, chapter_id: str, lesson_id: str):
 @router.post(
     "/courses/{course_id}/chapters/{chapter_id}/lessons",
     status_code=200,
-    response_model=PostLessonRequestModel,
+    response_model=PostLessonResponseModel,
     response_model_exclude_none=True,
 )
 def post_lesson(course_id: str, chapter_id: str, requestBody: PostLessonRequestModel):
-    pass
+    response_body = post_course_lesson_request(course_id, chapter_id, requestBody)
+    return response_body
