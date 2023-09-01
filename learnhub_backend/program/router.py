@@ -105,6 +105,6 @@ def edit_course_chapter(chapter_id: str, chapter_to_edit: EditCourseChapterReque
 )
 def delete_course_chapter(chapter_id: str):
     response_body = delete_course_chapter_response(chapter_id=chapter_id)
-    if response_body.deleted_count == 1:
+    if response_body.deleted_count == 0:
         raise Exception.not_found
     return {"message": "OK"}
