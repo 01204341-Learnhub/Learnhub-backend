@@ -48,12 +48,24 @@ def create_course_lesson(
     body = {
         "course_id": ObjectId(course_id),
         "chapter_id": ObjectId(chapter_id),
-        "lesson_num": request.lesson_num,
         "name": request.name,
         "description": request.description,
         "lesson_type": "video",  # TODO: add utils to check for url type
         "src": str(request.src),
     }
+    filter = {"course_id": ObjectId(course_id), "chapter_id": ObjectId(chapter_id)}
+    while True:
+        # Increment lesson_num
+        cursor = (
+            db_client.lesson_coll.find(filter, {"lesson_num": True})
+            .sort([("lesson_num", -1)])
+            .limit(1)
+        )
+        try:
+            body["lesson_num"] = cursor.next()["lesson_num"] + 1
+        except StopIteration:
+            body["lesson_num"] = 1
+        break
 
     object_id = db_client.lesson_coll.insert_one(body)
     return str(object_id.inserted_id)
