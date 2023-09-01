@@ -5,6 +5,7 @@ from .database import (
     query_list_programs,
     query_list_course_lessons,
     query_get_course_lesson,
+    create_course_lesson,
 )
 from .schemas import (
     ListProgramsResponseModel,
@@ -13,6 +14,8 @@ from .schemas import (
     ListLessonsResponseModel,
     ListLessonsModelBody,
     GetLessonResponseModel,
+    PostLessonRequestModel,
+    PostLessonResponseModel,
 )
 
 
@@ -47,4 +50,12 @@ def get_course_lesson_response(
     if quried_lesson == None:
         return None
     response_body = GetLessonResponseModel(**quried_lesson)
+    return response_body
+
+
+def post_course_lesson_request(
+    course_id: str, chapter_id: str, request: PostLessonRequestModel
+) -> PostLessonResponseModel | None:
+    object_id = create_course_lesson(course_id, chapter_id, request)
+    response_body = PostLessonResponseModel(lesson_id=object_id)
     return response_body
