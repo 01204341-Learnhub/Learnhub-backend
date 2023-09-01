@@ -1,11 +1,12 @@
 from fastapi import APIRouter, Depends
 from typing import Annotated, Union
 
-from ..dependencies import common_pagination_parameters
+from ..dependencies import common_pagination_parameters, GenericOKResponse
 from .schemas import (
     ListProgramsResponseModel,
     GetCourseLessonResponseModel,
     ListCourseLessonsResponseModel,
+    PatchCourseLessonRequestModel,
     PostCourseLessonRequestModel,
     PostCourseLessonResponseModel,
 )
@@ -13,6 +14,7 @@ from .services import (
     list_programs_response,
     list_course_lessons_response,
     get_course_lesson_response,
+    patch_course_lesson_request,
     post_course_lesson_request,
 )
 from .exceptions import Exception
@@ -57,7 +59,7 @@ def list_course_lessons(
 
 @router.post(
     "/courses/{course_id}/chapters/{chapter_id}/lessons",
-    status_code=200,
+    status_code=201,
     response_model=PostCourseLessonResponseModel,
     response_model_exclude_none=True,
 )
@@ -86,5 +88,16 @@ def get_course_lesson(course_id: str, chapter_id: str, lesson_id: str):
     status_code=200,
     response_model_exclude_none=True,
 )
-def patch_course_lesson(course_id: str, chapter_id: str, lesson_id: str):
-    pass
+def patch_course_lesson(
+    course_id: str,
+    chapter_id: str,
+    lesson_id: str,
+    requestBody: PatchCourseLessonRequestModel,
+):
+    modified_count = patch_course_lesson_request(
+        course_id, chapter_id, lesson_id, requestBody
+    )
+    if modified_count < 1:
+        raise Exception.bad_request
+    response_body = GenericOKResponse()
+    return response_body
