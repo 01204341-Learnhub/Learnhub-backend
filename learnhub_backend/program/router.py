@@ -2,7 +2,12 @@ from fastapi import APIRouter, Depends
 from typing import Annotated, Union
 
 from ..dependencies import common_pagination_parameters
-from .schemas import ListProgramsResponseModel
+from .schemas import (
+    ListProgramsResponseModel,
+    GetLessonResponseModel,
+    ListLessonsResponseModel,
+    PostLessonRequestModel,
+)
 from .services import list_programs_response, list_lessons_response, get_lesson_response
 from .exceptions import Exception
 
@@ -32,6 +37,7 @@ def list_programs(common_paginations: common_page_params):
 @router.get(
     "/courses/{course_id}/chapters/{chapter_id}/lessons",
     status_code=200,
+    response_model=ListLessonsResponseModel,
     response_model_exclude_none=True,
 )
 def list_lessons(
@@ -46,6 +52,7 @@ def list_lessons(
 @router.get(
     "/courses/{course_id}/chapters/{chapter_id}/lessons/{lesson_id}",
     status_code=200,
+    response_model=GetLessonResponseModel,
     response_model_exclude_none=True,
 )
 def get_lesson(course_id: str, chapter_id: str, lesson_id: str):
@@ -53,3 +60,13 @@ def get_lesson(course_id: str, chapter_id: str, lesson_id: str):
     if response_body == None:
         raise Exception.not_found
     return response_body
+
+
+@router.post(
+    "/courses/{course_id}/chapters/{chapter_id}/lessons",
+    status_code=200,
+    response_model=PostLessonRequestModel,
+    response_model_exclude_none=True,
+)
+def post_lesson(course_id: str, chapter_id: str, requestBody: PostLessonRequestModel):
+    pass

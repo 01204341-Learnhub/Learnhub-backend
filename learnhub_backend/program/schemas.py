@@ -54,3 +54,10 @@ class ListLessonsModelBody(BaseModel):
 
 class ListLessonsResponseModel(BaseModel):
     lessons: list[ListLessonsModelBody]
+
+
+class PostLessonRequestModel(BaseModel):
+    lesson_num: int
+    name: str
+    description: str
+    src: HttpUrl
