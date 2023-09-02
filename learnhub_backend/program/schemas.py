@@ -1,5 +1,5 @@
 from typing import Optional, Union
-from pydantic import BaseModel
+from pydantic import BaseModel, HttpUrl
 
 
 ## Programs
@@ -31,3 +31,43 @@ class ListProgramsCourseModelBody(BaseModel):
 
 class ListProgramsResponseModel(BaseModel):
     programs: list[Union[ListProgramsClassModelBody, ListProgramsCourseModelBody]]
+
+
+## Lessons
+class GetCourseLessonResponseModel(BaseModel):
+    lesson_id: str
+    lesson_num: int
+    name: str
+    lesson_type: str
+    description: str
+    src: HttpUrl
+    # TODO: only return progress, If student_id is attached.
+    progress: float | None = None
+
+
+class ListCourseLessonsModelBody(BaseModel):
+    lesson_id: str
+    lesson_num: int
+    name: str
+    lesson_type: str
+    video_length: int | None = None  # only return if lesson type = 'video'
+
+
+class ListCourseLessonsResponseModel(BaseModel):
+    lessons: list[ListCourseLessonsModelBody]
+
+
+class PostCourseLessonRequestModel(BaseModel):
+    name: str
+    description: str
+    src: HttpUrl
+
+
+class PostCourseLessonResponseModel(BaseModel):
+    lesson_id: str
+
+
+class PatchCourseLessonRequestModel(BaseModel):
+    name: str | None = None
+    description: str | None = None
+    src: HttpUrl | None = None
