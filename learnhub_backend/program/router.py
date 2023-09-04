@@ -1,7 +1,23 @@
 from fastapi import APIRouter, Depends
 from typing import Annotated, Union
-
 from ..dependencies import common_pagination_parameters, GenericOKResponse
+from .exceptions import Exception
+
+from .schemas import (
+    ListProgramsResponseModel,
+    ListCourseChaptersResponseModel,
+    AddCourseChaptersRequestModel,
+    GetCourseChapterResponseModel,
+    EditCourseChapterRequestModel
+)
+from .services import (
+    list_programs_response,
+    list_course_chapters_response,
+    add_course_chapter_response,
+    get_course_chapter_response,
+    edit_course_chapter_response,
+    delete_course_chapter_response,
+)
 from .schemas import (
     ListProgramsResponseModel,
     GetCourseLessonResponseModel,
@@ -19,6 +35,7 @@ from .services import (
     post_course_lesson_request,
 )
 from .exceptions import Exception
+
 
 
 router = APIRouter(
@@ -42,6 +59,34 @@ def list_programs(common_paginations: common_page_params):
     )
     return response_body
 
+
+@router.get(
+    "/courses/{course_id}/chapters",
+    status_code=200,
+    response_model_exclude_none=True,
+    response_model=ListCourseChaptersResponseModel,
+)
+def list_course_chapters(course_id: str, common_paginations: common_page_params):
+    response_body = list_course_chapters_response(
+        skip=common_paginations["skip"],
+        limit=common_paginations["limit"],
+        course_id=course_id,
+    )
+    return response_body
+
+@router.post(
+    "/courses/{course_id}/chapters",
+    status_code=200,
+    response_model_exclude_none=True,
+    response_model=dict,
+)
+def add_course_chapter(course_id: str, chapter_body: AddCourseChaptersRequestModel):
+    response_body = add_course_chapter_response(
+        course_id=course_id, chapter_body=chapter_body
+    )
+    if response_body == None:
+        raise Exception.bad_request
+    return response_body
 
 @router.get(
     "/courses/{course_id}/chapters/{chapter_id}/lessons",
@@ -72,6 +117,18 @@ def post_course_lesson(
 
 
 @router.get(
+    "/courses/{course_id}/chapters/{chapter_id}",
+    status_code=200,
+    response_model_exclude_none=True,
+    response_model=GetCourseChapterResponseModel,
+)
+def get_course_chapter(chapter_id: str):
+    response_body = get_course_chapter_response(chapter_id=chapter_id)
+    if response_body == None:
+        raise Exception.not_found
+    return response_body
+
+@router.get(
     "/courses/{course_id}/chapters/{chapter_id}/lessons/{lesson_id}",
     status_code=200,
     response_model=GetCourseLessonResponseModel,
@@ -83,6 +140,31 @@ def get_course_lesson(course_id: str, chapter_id: str, lesson_id: str):
         raise Exception.not_found
     return response_body
 
+@router.patch(
+    "/courses/{course_id}/chapters/{chapter_id}",
+    status_code=200,
+    response_model_exclude_none=True,
+    response_model=dict,
+)
+def edit_course_chapter(chapter_id: str, chapter_to_edit: EditCourseChapterRequestModel):
+    response_body = edit_course_chapter_response(chapter_id=chapter_id,chapter_to_edit=chapter_to_edit)
+    if response_body.matched_count == 0:
+        raise Exception.not_found
+    elif response_body.modified_count == 0:
+        return {"message": "OK but no change"}
+    return  {"message": "OK"}
+    
+@router.delete(
+    "/courses/{course_id}/chapters/{chapter_id}",
+    status_code=200,
+    response_model_exclude_none=True,
+    response_model=dict,
+)
+def delete_course_chapter(chapter_id: str, course_id:str):
+    response_body = delete_course_chapter_response(chapter_id=chapter_id,course_id=course_id)
+    if response_body == 0:
+        raise Exception.bad_request
+    return {"message": "OK"}
 
 @router.patch(
     "/courses/{course_id}/chapters/{chapter_id}/lessons/{lesson_id}",
@@ -104,7 +186,6 @@ def patch_course_lesson(
     response_body = GenericOKResponse()
     return response_body
 
-
 @router.delete(
     "/courses/{course_id}/chapters/{chapter_id}/lessons/{lesson_id}",
     status_code=200,
@@ -117,3 +198,4 @@ def delete_course_lesson(course_id: str, chapter_id: str, lesson_id: str):
         raise Exception.bad_request
     response_body = GenericOKResponse()
     return response_body
+

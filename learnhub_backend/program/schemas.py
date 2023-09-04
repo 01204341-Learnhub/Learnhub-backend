@@ -33,6 +33,33 @@ class ListProgramsResponseModel(BaseModel):
     programs: list[Union[ListProgramsClassModelBody, ListProgramsCourseModelBody]]
 
 
+
+#chapters
+class ListCourseChaptersModelBody(BaseModel):
+    chapter_id: str
+    chapter_num: int
+    name: str
+
+
+class ListCourseChaptersResponseModel(BaseModel):
+    chapters: list[ListCourseChaptersModelBody]
+
+
+class AddCourseChaptersRequestModel(BaseModel):
+    name: str
+
+
+class GetCourseChapterResponseModel(BaseModel):
+    chapter_id: str
+    course_id: str
+    chapter_num: int
+    name: str
+
+class EditCourseChapterRequestModel(BaseModel):
+    name: Optional[str] = None
+
+
+
 ## Lessons
 class GetCourseLessonResponseModel(BaseModel):
     lesson_id: str
