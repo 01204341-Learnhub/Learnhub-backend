@@ -65,11 +65,11 @@ def get_course_chapter_response(chapter_id: str):
     )
     return response_body
 
-def edit_course_chapter_response(chapter_id: int, chapter_to_edit: EditCourseChapterRequestModel):
+def edit_course_chapter_response(chapter_id: str, chapter_to_edit: EditCourseChapterRequestModel):
     response = query_edit_course_chapter(chapter_id=chapter_id,chapter_to_edit=chapter_to_edit)
     return response
 
-def delete_course_chapter_response(chapter_id: int)->dict:
-    response = query_delete_course_chapter(chapter_id=chapter_id)
+def delete_course_chapter_response(chapter_id: str,course_id:str)->int:
+    response = query_delete_course_chapter(chapter_id=chapter_id , course_id = course_id)
     return response 
 

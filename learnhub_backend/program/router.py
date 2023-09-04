@@ -103,8 +103,8 @@ def edit_course_chapter(chapter_id: str, chapter_to_edit: EditCourseChapterReque
     response_model_exclude_none=True,
     response_model=dict,
 )
-def delete_course_chapter(chapter_id: str):
-    response_body = delete_course_chapter_response(chapter_id=chapter_id)
-    if response_body.deleted_count == 0:
-        raise Exception.not_found
+def delete_course_chapter(chapter_id: str, course_id:str):
+    response_body = delete_course_chapter_response(chapter_id=chapter_id,course_id=course_id)
+    if response_body == 0:
+        raise Exception.bad_request
     return {"message": "OK"}

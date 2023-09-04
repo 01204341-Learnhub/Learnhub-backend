@@ -44,17 +44,16 @@ class ListCourseChaptersResponseModel(BaseModel):
 
 
 class AddCourseChaptersRequestModel(BaseModel):
-    chapter_num: int
     name: str
 
 
 class GetCourseChapterResponseModel(BaseModel):
     chapter_id: str
+    course_id: str
     chapter_num: int
     name: str
 
 class EditCourseChapterRequestModel(BaseModel):
-    chapter_num: Optional[int] = None
     name: Optional[str] = None
 
 
