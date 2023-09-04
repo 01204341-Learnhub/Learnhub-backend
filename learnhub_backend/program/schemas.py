@@ -2,7 +2,7 @@ from typing import Optional, Union
 from pydantic import BaseModel, HttpUrl
 
 
-## Programs
+## PROGRAMS
 class ListProgramsClassModelBody(BaseModel):
     class_id: str
     type: str
@@ -33,8 +33,7 @@ class ListProgramsResponseModel(BaseModel):
     programs: list[Union[ListProgramsClassModelBody, ListProgramsCourseModelBody]]
 
 
-
-#chapters
+# COURSE CHAPTERS
 class ListCourseChaptersModelBody(BaseModel):
     chapter_id: str
     chapter_num: int
@@ -45,7 +44,7 @@ class ListCourseChaptersResponseModel(BaseModel):
     chapters: list[ListCourseChaptersModelBody]
 
 
-class AddCourseChaptersRequestModel(BaseModel):
+class PostCourseChaptersRequestModel(BaseModel):
     name: str
 
 
@@ -55,9 +54,9 @@ class GetCourseChapterResponseModel(BaseModel):
     chapter_num: int
     name: str
 
-class EditCourseChapterRequestModel(BaseModel):
-    name: Optional[str] = None
 
+class PatchCourseChapterRequestModel(BaseModel):
+    name: Optional[str] = None
 
 
 ## Lessons

@@ -6,9 +6,9 @@ from .exceptions import Exception
 from .schemas import (
     ListProgramsResponseModel,
     ListCourseChaptersResponseModel,
-    AddCourseChaptersRequestModel,
+    PostCourseChaptersRequestModel,
     GetCourseChapterResponseModel,
-    EditCourseChapterRequestModel
+    PatchCourseChapterRequestModel,
 )
 from .services import (
     list_programs_response,
@@ -31,11 +31,10 @@ from .services import (
     list_programs_response,
     list_course_lessons_response,
     get_course_lesson_response,
-    patch_course_lesson_request,
-    post_course_lesson_request,
+    edit_course_lesson_request,
+    add_course_lesson_request,
 )
 from .exceptions import Exception
-
 
 
 router = APIRouter(
@@ -74,19 +73,21 @@ def list_course_chapters(course_id: str, common_paginations: common_page_params)
     )
     return response_body
 
+
 @router.post(
     "/courses/{course_id}/chapters",
     status_code=200,
     response_model_exclude_none=True,
     response_model=dict,
 )
-def add_course_chapter(course_id: str, chapter_body: AddCourseChaptersRequestModel):
+def add_course_chapter(course_id: str, chapter_body: PostCourseChaptersRequestModel):
     response_body = add_course_chapter_response(
         course_id=course_id, chapter_body=chapter_body
     )
     if response_body == None:
         raise Exception.bad_request
     return response_body
+
 
 @router.get(
     "/courses/{course_id}/chapters/{chapter_id}/lessons",
@@ -112,7 +113,7 @@ def list_course_lessons(
 def post_course_lesson(
     course_id: str, chapter_id: str, requestBody: PostCourseLessonRequestModel
 ):
-    response_body = post_course_lesson_request(course_id, chapter_id, requestBody)
+    response_body = add_course_lesson_request(course_id, chapter_id, requestBody)
     return response_body
 
 
@@ -128,6 +129,7 @@ def get_course_chapter(chapter_id: str):
         raise Exception.not_found
     return response_body
 
+
 @router.get(
     "/courses/{course_id}/chapters/{chapter_id}/lessons/{lesson_id}",
     status_code=200,
@@ -140,31 +142,40 @@ def get_course_lesson(course_id: str, chapter_id: str, lesson_id: str):
         raise Exception.not_found
     return response_body
 
+
 @router.patch(
     "/courses/{course_id}/chapters/{chapter_id}",
     status_code=200,
     response_model_exclude_none=True,
     response_model=dict,
 )
-def edit_course_chapter(chapter_id: str, chapter_to_edit: EditCourseChapterRequestModel):
-    response_body = edit_course_chapter_response(chapter_id=chapter_id,chapter_to_edit=chapter_to_edit)
+def edit_course_chapter(
+    chapter_id: str, chapter_to_edit: PatchCourseChapterRequestModel
+):
+    response_body = edit_course_chapter_response(
+        chapter_id=chapter_id, chapter_to_edit=chapter_to_edit
+    )
     if response_body.matched_count == 0:
         raise Exception.not_found
     elif response_body.modified_count == 0:
         return {"message": "OK but no change"}
-    return  {"message": "OK"}
-    
+    return {"message": "OK"}
+
+
 @router.delete(
     "/courses/{course_id}/chapters/{chapter_id}",
     status_code=200,
     response_model_exclude_none=True,
     response_model=dict,
 )
-def delete_course_chapter(chapter_id: str, course_id:str):
-    response_body = delete_course_chapter_response(chapter_id=chapter_id,course_id=course_id)
+def delete_course_chapter(chapter_id: str, course_id: str):
+    response_body = delete_course_chapter_response(
+        chapter_id=chapter_id, course_id=course_id
+    )
     if response_body == 0:
         raise Exception.bad_request
     return {"message": "OK"}
+
 
 @router.patch(
     "/courses/{course_id}/chapters/{chapter_id}/lessons/{lesson_id}",
@@ -178,13 +189,14 @@ def patch_course_lesson(
     lesson_id: str,
     requestBody: PatchCourseLessonRequestModel,
 ):
-    modified_count = patch_course_lesson_request(
+    modified_count = edit_course_lesson_request(
         course_id, chapter_id, lesson_id, requestBody
     )
     if modified_count < 1:
         raise Exception.bad_request
     response_body = GenericOKResponse()
     return response_body
+
 
 @router.delete(
     "/courses/{course_id}/chapters/{chapter_id}/lessons/{lesson_id}",
@@ -198,4 +210,3 @@ def delete_course_lesson(course_id: str, chapter_id: str, lesson_id: str):
         raise Exception.bad_request
     response_body = GenericOKResponse()
     return response_body
-

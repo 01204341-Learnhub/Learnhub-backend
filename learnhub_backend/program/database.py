@@ -1,7 +1,11 @@
 from ..database import db_client
 from bson.objectid import ObjectId
-from .schemas import (AddCourseChaptersRequestModel, EditCourseChapterRequestModel,PatchCourseLessonRequestModel, PostCourseLessonRequestModel)
-
+from .schemas import (
+    PostCourseChaptersRequestModel,
+    PatchCourseChapterRequestModel,
+    PatchCourseLessonRequestModel,
+    PostCourseLessonRequestModel,
+)
 
 
 def query_list_programs(skip: int = 0, limit: int = 100) -> list:
@@ -16,7 +20,6 @@ def query_list_programs(skip: int = 0, limit: int = 100) -> list:
     return programs
 
 
-
 def query_list_course_chapters(course_id: str, skip: int = 0, limit: int = 100) -> list:
     chapters_cursor = db_client.chapter_coll.find({"course_id": ObjectId(course_id)})
     chapters = []
@@ -27,7 +30,7 @@ def query_list_course_chapters(course_id: str, skip: int = 0, limit: int = 100) 
 
 
 def query_add_course_chapter(
-    course_id: str, chapter_body: AddCourseChaptersRequestModel
+    course_id: str, chapter_body: PostCourseChaptersRequestModel
 ):
     chapter_body_to_inserted = chapter_body.model_dump()
     chapter_body_to_inserted["course_id"] = ObjectId(course_id)
@@ -57,7 +60,7 @@ def query_find_course_chapter(chapter_id: str):
 
 
 def query_edit_course_chapter(
-    chapter_id: str, chapter_to_edit: EditCourseChapterRequestModel
+    chapter_id: str, chapter_to_edit: PatchCourseChapterRequestModel
 ):
     # print(chapter_to_edit)
     filter_chapter = {"_id": ObjectId(chapter_id)}
@@ -68,7 +71,9 @@ def query_edit_course_chapter(
 
 def query_delete_course_chapter(chapter_id: str, course_id: str) -> int:
     chapter_delete_filter = {"_id": ObjectId(chapter_id)}
-    delete_response = db_client.chapter_coll.find_one_and_delete(filter=chapter_delete_filter,projection={"chapter_num":True})
+    delete_response = db_client.chapter_coll.find_one_and_delete(
+        filter=chapter_delete_filter, projection={"chapter_num": True}
+    )
     if delete_response == None:  # Deletion Failed.
         return 0
     chapter_num_threshold = delete_response["chapter_num"]
@@ -77,7 +82,9 @@ def query_delete_course_chapter(chapter_id: str, course_id: str) -> int:
         "chapter_num": {"$gt": chapter_num_threshold},
     }
     update_body = {"$inc": {"chapter_num": -1}}
-    update_response = db_client.chapter_coll.update_many(filter=chapter_update_filter, update=update_body)
+    update_response = db_client.chapter_coll.update_many(
+        filter=chapter_update_filter, update=update_body
+    )
     return 1
 
 
@@ -187,4 +194,3 @@ def remove_course_lesson(
     update_body = {"$inc": {"lesson_num": -1}}
     db_client.lesson_coll.update_many(filter=update_filter, update=update_body)
     return 1
-
