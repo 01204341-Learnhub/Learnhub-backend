@@ -1,7 +1,6 @@
 from fastapi import APIRouter, Depends
 from typing import Annotated, Union
-from ..dependencies import common_pagination_parameters, GenericOKResponse
-from .exceptions import Exception
+from ..dependencies import common_pagination_parameters, GenericOKResponse, Exception
 
 from .schemas import (
     ListProgramsResponseModel,
@@ -34,13 +33,16 @@ from .services import (
     edit_course_lesson_request,
     add_course_lesson_request,
 )
-from .exceptions import Exception
 
 
 router = APIRouter(
     prefix="/programs",
     tags=["program"],
-    dependencies=[Depends(common_pagination_parameters), Depends(GenericOKResponse)],
+    dependencies=[
+        Depends(common_pagination_parameters),
+        Depends(GenericOKResponse),
+        Depends(Exception),
+    ],
 )
 
 common_page_params = Annotated[dict, Depends(router.dependencies[0].dependency)]
