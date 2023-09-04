@@ -29,9 +29,7 @@ def query_list_course_chapters(course_id: str, skip: int = 0, limit: int = 100) 
     return chapters
 
 
-def query_add_course_chapter(
-    course_id: str, chapter_body: PostCourseChaptersRequestModel
-):
+def create_course_chapter(course_id: str, chapter_body: PostCourseChaptersRequestModel):
     chapter_body_to_inserted = chapter_body.model_dump()
     chapter_body_to_inserted["course_id"] = ObjectId(course_id)
     response_chapter_num = (
@@ -51,7 +49,7 @@ def query_add_course_chapter(
     return response
 
 
-def query_find_course_chapter(chapter_id: str):
+def query_course_chapter(chapter_id: str):
     queried_chapter = db_client.chapter_coll.find_one({"_id": ObjectId(chapter_id)})
     if queried_chapter != None:
         queried_chapter["chapter_id"] = str(queried_chapter["_id"])
@@ -59,7 +57,7 @@ def query_find_course_chapter(chapter_id: str):
     return queried_chapter
 
 
-def query_edit_course_chapter(
+def edit_course_chapter(
     chapter_id: str, chapter_to_edit: PatchCourseChapterRequestModel
 ):
     # print(chapter_to_edit)
@@ -69,7 +67,7 @@ def query_edit_course_chapter(
     return response
 
 
-def query_delete_course_chapter(chapter_id: str, course_id: str) -> int:
+def delete_course_chapter(chapter_id: str, course_id: str) -> int:
     chapter_delete_filter = {"_id": ObjectId(chapter_id)}
     delete_response = db_client.chapter_coll.find_one_and_delete(
         filter=chapter_delete_filter, projection={"chapter_num": True}

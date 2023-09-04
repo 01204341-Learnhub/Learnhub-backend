@@ -4,10 +4,10 @@ from pydantic import TypeAdapter
 from .database import (
     query_list_programs,
     query_list_course_chapters,
-    query_add_course_chapter,
-    query_find_course_chapter,
-    query_edit_course_chapter,
-    query_delete_course_chapter,
+    create_course_chapter,
+    query_course_chapter,
+    edit_course_chapter,
+    delete_course_chapter,
 )
 from .schemas import (
     ListCourseChaptersModelBody,
@@ -66,14 +66,14 @@ def list_course_chapters_response(course_id: str, skip: int = 0, limit: int = 0)
 def add_course_chapter_response(
     course_id: str, chapter_body: PostCourseChaptersRequestModel
 ) -> dict | None:
-    response = query_add_course_chapter(course_id=course_id, chapter_body=chapter_body)
+    response = create_course_chapter(course_id=course_id, chapter_body=chapter_body)
     if response.inserted_id == None:
         return None
     return {"chapter_id": str(response.inserted_id)}
 
 
 def get_course_chapter_response(chapter_id: str):
-    queried_chapter = query_find_course_chapter(chapter_id=chapter_id)
+    queried_chapter = query_course_chapter(chapter_id=chapter_id)
     if queried_chapter == None:
         return None
     ta = TypeAdapter(GetCourseChapterResponseModel)
@@ -86,14 +86,14 @@ def get_course_chapter_response(chapter_id: str):
 def edit_course_chapter_response(
     chapter_id: str, chapter_to_edit: PatchCourseChapterRequestModel
 ):
-    response = query_edit_course_chapter(
+    response = edit_course_chapter(
         chapter_id=chapter_id, chapter_to_edit=chapter_to_edit
     )
     return response
 
 
 def delete_course_chapter_response(chapter_id: str, course_id: str) -> int:
-    response = query_delete_course_chapter(chapter_id=chapter_id, course_id=course_id)
+    response = delete_course_chapter(chapter_id=chapter_id, course_id=course_id)
     return response
 
 
