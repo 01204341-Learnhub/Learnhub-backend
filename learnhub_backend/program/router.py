@@ -40,7 +40,7 @@ from .exceptions import Exception
 router = APIRouter(
     prefix="/programs",
     tags=["program"],
-    dependencies=[Depends(common_pagination_parameters)],
+    dependencies=[Depends(common_pagination_parameters), Depends(GenericOKResponse)],
 )
 
 common_page_params = Annotated[dict, Depends(router.dependencies[0].dependency)]
