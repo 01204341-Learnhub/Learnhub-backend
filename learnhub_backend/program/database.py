@@ -21,7 +21,9 @@ def query_list_programs(skip: int = 0, limit: int = 100) -> list:
 
 
 def query_list_course_chapters(course_id: str, skip: int = 0, limit: int = 100) -> list:
-    chapters_cursor = db_client.chapter_coll.find({"course_id": ObjectId(course_id)})
+    chapters_cursor = db_client.chapter_coll.find(
+        {"course_id": ObjectId(course_id)}, skip=skip, limit=limit
+    )
     chapters = []
     for chapter in chapters_cursor:
         chapter["chapter_id"] = str(chapter["_id"])
