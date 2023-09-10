@@ -16,6 +16,10 @@ from .services import (
 )
 
 from .schemas import (
+    ListCourseResponseModel, #123
+    ListCourseIdResponseModel, #123
+    ListCourseStudentsResponseModel, #123
+    PostCourseRequestModel, #123
     ListCourseChaptersResponseModel,
     PostCourseChaptersRequestModel,
     GetCourseChapterResponseModel,
@@ -39,6 +43,65 @@ router = APIRouter(
 
 common_page_params = Annotated[dict, Depends(router.dependencies[0].dependency)]
 
+#bun start here
+@router.get(
+    "/",
+    status_code=200,
+    response_model_exclude_none=True,
+    response_model=ListCourseResponseModel, #123
+)
+def list_course(common_paginations: common_page_params):
+    response_body = list_course_response( #123
+        skip=common_paginations["skip"],
+        limit=common_paginations["limit"],
+        
+    )
+    return response_body
+
+@router.post(
+    "/",
+    status_code=200,
+    response_model_exclude_none=True,
+    response_model=dict,
+)
+def add_course(chapter_body: PostCourseRequestModel): #123
+    response_body = add_course_response( #123
+        course_body=course_body    #123
+    )
+    if response_body == None:
+        raise Exception.bad_request
+    return response_body
+
+@router.get(
+    "/{course_id}",
+    status_code=200,
+    response_model_exclude_none=True,
+    response_model=ListCourseIdResponseModel, #123
+)
+def list_course(course_id: str, common_paginations: common_page_params):
+    response_body = list_course_id_response( #123
+        skip=common_paginations["skip"],
+        limit=common_paginations["limit"],
+        course_id=course_id,
+    )
+    return response_body
+
+@router.get(
+    "/{course_id}/students",
+    status_code=200,
+    response_model_exclude_none=True,
+    response_model=ListCourseStudentsResponseModel, #123
+)
+def list_course(course_id: str, common_paginations: common_page_params):
+    response_body = list_course_students_response( #123
+        skip=common_paginations["skip"],
+        limit=common_paginations["limit"],
+        course_id=course_id,
+    )
+    return response_body
+
+
+#bun end here
 
 @router.get(
     "/{course_id}/chapters",

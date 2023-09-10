@@ -5,6 +5,7 @@ from .schemas import (
     PatchCourseChapterRequestModel,
     PatchCourseLessonRequestModel,
     PostCourseLessonRequestModel,
+    PostCourseRequestModel,
 )
 
 

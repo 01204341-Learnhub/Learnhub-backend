@@ -3,6 +3,10 @@ from pydantic import BaseModel, HttpUrl
 
 
 # COURSE CHAPTERS
+
+
+    
+    
 class ListCourseChaptersModelBody(BaseModel):
     chapter_id: str
     chapter_num: int
@@ -66,3 +70,59 @@ class PatchCourseLessonRequestModel(BaseModel):
     name: str | None = None
     description: str | None = None
     src: HttpUrl | None = None
+    
+#bun start
+class ListCourseStudentsModelBody(BaseModel):
+    student_id: str
+    name: str
+    profile_pic: str
+
+class ListCourseModelBody(BaseModel):
+    course_id: str
+    name: str
+    teacher: {
+        "teacher_id": str,
+        "teacher_name": str
+    }
+    rating: int
+    review_count: int
+    price: int
+    course_pic: HttpUrl
+
+
+class ListCourseResponseModel(BaseModel):
+    course: list[ListCourseModelBody]
+    
+class ListCourseIdResponseModel(BaseException):
+    course_id: str
+    name: str
+    course_pic: HttpUrl
+    description: str
+    course_objective: list[str]
+    course_requirement: str
+    difficulty_level: str
+    rating: float
+    review_count: int
+    student_count: int
+    teacher: {
+        "teacher_id": str,
+        "teacher_name": str
+    }
+    price: int
+    total_video_length: int
+    chapter_count: int
+    quiz_count: int
+    file_count: int
+    
+class ListCourseStudentsResponseModel(BaseException):
+    course_students: list[ListCourseStudentsModelBody]
+    
+class PostCourseRequestModel(BaseException):
+    teacher_id: str
+    name: str
+    course_pic: HttpUrl
+    description: str
+    course_objective: list[str]
+    course_requirement: str
+    difficulty_level: str
+    price: int
