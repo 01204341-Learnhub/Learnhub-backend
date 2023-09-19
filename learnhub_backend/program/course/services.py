@@ -7,6 +7,11 @@ from .database import (
     query_course_chapter,
     edit_course_chapter,
     delete_course_chapter,
+    edit_course_lesson,
+    query_list_course_lessons,
+    query_get_course_lesson,
+    create_course_lesson,
+    remove_course_lesson,
 )
 from .schemas import (
     ListCourseChaptersModelBody,
@@ -20,14 +25,6 @@ from .schemas import (
     PatchCourseLessonRequestModel,
     PostCourseLessonRequestModel,
     PostCourseLessonResponseModel,
-)
-
-from .database import (
-    edit_course_lesson,
-    query_list_course_lessons,
-    query_get_course_lesson,
-    create_course_lesson,
-    remove_course_lesson,
 )
 
 

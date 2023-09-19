@@ -6,18 +6,10 @@ from ..dependencies import (
     Exception,
 )
 
-from .schemas import (
-    ListProgramsResponseModel,
-)
-
-from .services import (
-    list_programs_response,
-)
-
 
 router = APIRouter(
-    prefix="/programs",
-    tags=["program"],
+    prefix="/users/teachers",
+    tags=["teacher"],
     dependencies=[
         Depends(common_pagination_parameters),
         Depends(GenericOKResponse),
@@ -31,11 +23,7 @@ common_page_params = Annotated[dict, Depends(router.dependencies[0].dependency)]
 @router.get(
     "/",
     status_code=200,
-    response_model=ListProgramsResponseModel,
-    response_model_exclude_none=True,
 )
-def list_programs(common_paginations: common_page_params):
-    response_body = list_programs_response(
-        common_paginations["skip"], common_paginations["limit"]
-    )
-    return response_body
+def list_teachers(common_paginations: common_page_params):
+    # TODO: Implement actual endpoint
+    return {"200": "OK"}

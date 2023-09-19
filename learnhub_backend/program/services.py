@@ -4,9 +4,6 @@ from pydantic import TypeAdapter
 from .database import (
     query_list_programs,
 )
-from .database import (
-    query_list_programs,
-)
 
 from .schemas import (
     ListProgramsResponseModel,
