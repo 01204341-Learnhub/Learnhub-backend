@@ -1,12 +1,18 @@
 from fastapi import APIRouter, Depends
 from typing import Annotated, Union
-from ..dependencies import common_pagination_parameters, GenericOKResponse, Exception
+from ..dependencies import (
+    common_pagination_parameters,
+    GenericOKResponse,
+    Exception,
+)
 
 from .schemas import (
     ListProgramsResponseModel,
 )
 
-from .services import list_programs_response
+from .services import (
+    list_programs_response,
+)
 
 
 router = APIRouter(

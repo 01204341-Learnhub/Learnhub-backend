@@ -1,6 +1,10 @@
 from fastapi import APIRouter, Depends
 from typing import Annotated, Union
-from ...dependencies import common_pagination_parameters, GenericOKResponse, Exception
+from ...dependencies import (
+    common_pagination_parameters,
+    GenericOKResponse,
+    Exception,
+)
 
 from .services import (
     list_course_chapters_response,
