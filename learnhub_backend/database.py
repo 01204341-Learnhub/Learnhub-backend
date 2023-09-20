@@ -1,5 +1,10 @@
 from pymongo import MongoClient
 from .config import (
+    DB_ANNOUCEMENT_COLLECTION,
+    DB_CLASS_COLLECTION,
+    DB_COURSE_PROGRESS_COLLECTION,
+    DB_TAG_COLLECTION,
+    DB_TRANSACTION_COLLECTION,
     MONGODB_URI,
     MONGODB_DB_NAME,
     DB_COURSE_COLLECTION,
@@ -19,6 +24,14 @@ class DB_client(MongoClient):
         self.course_coll = self.db[DB_COURSE_COLLECTION]
         self.chapter_coll = self.db[DB_CHAPTER_COLLECTION]
         self.lesson_coll = self.db[DB_LESSON_COLLECTION]
+        self.annoucement_coll = self.db[DB_ANNOUCEMENT_COLLECTION]
+        self.course_progress_coll = self.db[DB_COURSE_PROGRESS_COLLECTION]
+
+        self.class_coll = self.db[DB_CLASS_COLLECTION]
+
+        self.tag_coll = self.db[DB_TAG_COLLECTION]
+        self.transaction_coll = self.db[DB_TRANSACTION_COLLECTION]
+
         self.user_coll = self.db[DB_USER_COLLECTION]
 
 
