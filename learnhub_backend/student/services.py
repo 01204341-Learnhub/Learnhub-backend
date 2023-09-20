@@ -1,11 +1,12 @@
 from typing import Annotated, Union
 from pydantic import TypeAdapter
-from pymongo.results import UpdateResult
+from pymongo.results import DeleteResult, UpdateResult
 
 from .database import (
     edit_student,
     query_list_students,
     query_student,
+    remove_student,
 )
 
 from .schemas import (
@@ -43,4 +44,9 @@ def edit_student_request(
     student_id: str, request: PatchStudentRequestModel
 ) -> UpdateResult:
     result = edit_student(student_id, request)
+    return result
+
+
+def delete_student_request(student_id: str) -> DeleteResult:
+    result = remove_student(student_id)
     return result

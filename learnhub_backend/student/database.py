@@ -1,4 +1,4 @@
-from pymongo.results import UpdateResult
+from pymongo.results import DeleteResult, UpdateResult
 from learnhub_backend.student.schemas import PatchStudentRequestModel
 from ..database import db_client
 from bson.objectid import ObjectId
@@ -40,4 +40,11 @@ def edit_student(student_id: str, request: PatchStudentRequestModel) -> UpdateRe
     update = {"$set": update_body}
 
     result = db_client.user_coll.update_one(filter=filter, update=update)
+    return result
+
+
+def remove_student(student_id: str) -> DeleteResult:
+    filter = {"type": student_type, "_id": ObjectId(student_id)}
+
+    result = db_client.user_coll.delete_one(filter=filter)
     return result
