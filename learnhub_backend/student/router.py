@@ -7,6 +7,7 @@ from ..dependencies import (
 )
 
 from .services import (
+    edit_student_request,
     list_students_response,
     get_student_response,
 )
@@ -14,6 +15,7 @@ from .services import (
 from .schemas import (
     GetStudentResponseModel,
     ListStudentsResponseModel,
+    PatchStudentRequestModel,
 )
 
 
@@ -56,3 +58,16 @@ def get_student(student_id: str):
         raise Exception.not_found
 
     return response_body
+
+
+@router.patch(
+    "/{student_id}",
+    status_code=200,
+    response_model_exclude_none=True,
+    response_model=GenericOKResponse,
+)
+def edit_student(student_id: str, request_body: PatchStudentRequestModel):
+    result = edit_student_request(student_id, request_body)
+    if result.matched_count == 0:
+        raise Exception.not_found
+    return GenericOKResponse

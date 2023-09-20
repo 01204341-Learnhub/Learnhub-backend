@@ -1,7 +1,9 @@
 from typing import Annotated, Union
 from pydantic import TypeAdapter
+from pymongo.results import UpdateResult
 
 from .database import (
+    edit_student,
     query_list_students,
     query_student,
 )
@@ -9,6 +11,7 @@ from .database import (
 from .schemas import (
     ListStudentsResponseModel,
     GetStudentResponseModel,
+    PatchStudentRequestModel,
 )
 
 
@@ -34,3 +37,10 @@ def get_student_response(student_id: str) -> GetStudentResponseModel | None:
     response_body = GetStudentResponseModel(**queried_student)
 
     return response_body
+
+
+def edit_student_request(
+    student_id: str, request: PatchStudentRequestModel
+) -> UpdateResult:
+    result = edit_student(student_id, request)
+    return result

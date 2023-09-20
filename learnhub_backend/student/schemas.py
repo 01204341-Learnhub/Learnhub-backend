@@ -13,3 +13,9 @@ class GetStudentResponseModel(BaseModel):
 
 class ListStudentsResponseModel(BaseModel):
     students: list[GetStudentResponseModel]
+
+
+class PatchStudentRequestModel(BaseModel):
+    username: str | None = None
+    fullname: str | None = None
+    profile_pic: HttpUrl | None = None
