@@ -10,6 +10,10 @@ from .services import (
     list_students_response,
 )
 
+from .schemas import (
+    ListStudentsResponseModel,
+)
+
 
 router = APIRouter(
     prefix="/users/students",
@@ -27,6 +31,8 @@ common_page_params = Annotated[dict, Depends(router.dependencies[0].dependency)]
 @router.get(
     "/",
     status_code=200,
+    response_model_exclude_none=True,
+    response_model=ListStudentsResponseModel,
 )
 def list_students(common_paginations: common_page_params):
     response_body = list_students_response(
@@ -34,3 +40,11 @@ def list_students(common_paginations: common_page_params):
         limit=common_paginations["limit"],
     )
     return response_body
+
+
+@router.get(
+    "/{student_id}",
+    status_code=200,
+)
+def get_student(student_id: str, common_paginations: common_page_params):
+    pass
