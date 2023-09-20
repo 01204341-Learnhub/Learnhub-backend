@@ -89,9 +89,7 @@ def query_list_course_lessons(
     return lessons
 
 
-def query_get_course_lesson(
-    course_id: str, chapter_id: str, lesson_id: str
-) -> dict | None:
+def query_course_lesson(course_id: str, chapter_id: str, lesson_id: str) -> dict | None:
     filter = {
         "_id": ObjectId(lesson_id),
         "course_id": ObjectId(course_id),

@@ -9,7 +9,7 @@ from .database import (
     delete_course_chapter,
     edit_course_lesson,
     query_list_course_lessons,
-    query_get_course_lesson,
+    query_course_lesson,
     create_course_lesson,
     remove_course_lesson,
 )
@@ -90,7 +90,7 @@ def get_course_lesson_response(
     course_id: str, chapter_id: str, lesson_id: str
 ) -> GetCourseLessonResponseModel | None:
     try:
-        quried_lesson = query_get_course_lesson(course_id, chapter_id, lesson_id)
+        quried_lesson = query_course_lesson(course_id, chapter_id, lesson_id)
     except:
         return None
     if quried_lesson == None:
