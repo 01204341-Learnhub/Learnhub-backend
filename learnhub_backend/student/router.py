@@ -8,9 +8,11 @@ from ..dependencies import (
 
 from .services import (
     list_students_response,
+    get_student_response,
 )
 
 from .schemas import (
+    GetStudentResponseModel,
     ListStudentsResponseModel,
 )
 
@@ -45,6 +47,12 @@ def list_students(common_paginations: common_page_params):
 @router.get(
     "/{student_id}",
     status_code=200,
+    response_model_exclude_none=True,
+    response_model=GetStudentResponseModel,
 )
-def get_student(student_id: str, common_paginations: common_page_params):
-    pass
+def get_student(student_id: str):
+    response_body = get_student_response(student_id)
+    if response_body == None:
+        raise Exception.not_found
+
+    return response_body

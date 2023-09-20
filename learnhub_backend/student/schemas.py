@@ -3,7 +3,7 @@ from pydantic import BaseModel, HttpUrl
 
 
 ## STUDENTS
-class ListStudentsModelBody(BaseModel):
+class GetStudentResponseModel(BaseModel):
     student_id: str
     username: str
     fullname: str
@@ -12,4 +12,4 @@ class ListStudentsModelBody(BaseModel):
 
 
 class ListStudentsResponseModel(BaseModel):
-    students: list[ListStudentsModelBody]
+    students: list[GetStudentResponseModel]
