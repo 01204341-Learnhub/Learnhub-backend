@@ -174,11 +174,9 @@ def patch_course_lesson(
     lesson_id: str,
     requestBody: PatchCourseLessonRequestModel,
 ):
-    modified_count = edit_course_lesson_request(
-        course_id, chapter_id, lesson_id, requestBody
-    )
-    if modified_count < 1:
-        raise Exception.bad_request
+    result = edit_course_lesson_request(course_id, chapter_id, lesson_id, requestBody)
+    if result.matched_count == 0:
+        raise Exception.not_found
     response_body = GenericOKResponse()
     return response_body
 

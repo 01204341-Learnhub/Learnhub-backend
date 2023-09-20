@@ -1,5 +1,6 @@
 from typing import Annotated, Union
 from pydantic import TypeAdapter
+from pymongo.results import UpdateResult
 
 from .database import (
     query_list_course_chapters,
@@ -112,9 +113,9 @@ def edit_course_lesson_request(
     chapter_id: str,
     lesson_id: str,
     request: PatchCourseLessonRequestModel,
-) -> int:
-    modified_count = edit_course_lesson(course_id, chapter_id, lesson_id, request)
-    return modified_count
+) -> UpdateResult:
+    result = edit_course_lesson(course_id, chapter_id, lesson_id, request)
+    return result
 
 
 def delete_course_lesson_request(

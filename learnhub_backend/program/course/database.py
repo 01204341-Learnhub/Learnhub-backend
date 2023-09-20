@@ -1,3 +1,4 @@
+from pymongo.results import UpdateResult
 from ..database import db_client
 from bson.objectid import ObjectId
 from .schemas import (
@@ -136,7 +137,7 @@ def edit_course_lesson(
     chapter_id: str,
     lesson_id: str,
     request: PatchCourseLessonRequestModel,
-) -> int:
+) -> UpdateResult:
     filter = {
         "_id": ObjectId(lesson_id),
         "course_id": ObjectId(course_id),
@@ -153,7 +154,7 @@ def edit_course_lesson(
     update = {"$set": update_body}
 
     result = db_client.lesson_coll.update_one(filter=filter, update=update)
-    return result.modified_count
+    return result
 
 
 def remove_course_lesson(
