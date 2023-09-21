@@ -15,6 +15,7 @@ from .services import (
 
 from .schemas import (
     GetStudentResponseModel,
+    ListStudentCourseResponseModel,
     ListStudentsResponseModel,
     PatchStudentRequestModel,
 )
@@ -85,3 +86,14 @@ def delete_student(student_id: str):
     if result.deleted_count == 0:
         raise Exception.not_found
     return GenericOKResponse
+
+
+# STUDENT PROGRAMS
+@router.get(
+    "/{student_id}/programs/courses",
+    status_code=200,
+    response_model_exclude_none=True,
+    response_model=ListStudentCourseResponseModel,
+)
+def list_student_courses(student_id: str):
+    pass
