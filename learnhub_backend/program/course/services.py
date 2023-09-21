@@ -35,6 +35,12 @@ from .database import (
     query_get_course_lesson,
     create_course_lesson,
     remove_course_lesson,
+    edit_course,
+    remove_course,
+    create_course,
+    query_get_course_id,
+    query_list_course,
+    query_list_course_students,
 )
 
 
@@ -162,12 +168,12 @@ def get_course_id_response(
     course_id: str
 ) -> GetCourseIdResponseModel | None:
     try:
-        quried_course = query_get_course_id(course_id)
+        quried_course_id = query_get_course_id(course_id)
     except:
         return None
-    if quried_course == None:
+    if quried_course_id == None:
         return None
-    response_body = GetCourseIdResponseModel(**quried_course)
+    response_body = GetCourseIdResponseModel(**quried_course_id)
     return response_body
 
 def list_course_response(

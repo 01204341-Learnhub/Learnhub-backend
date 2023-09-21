@@ -6,6 +6,7 @@ from .schemas import (
     PatchCourseLessonRequestModel,
     PostCourseLessonRequestModel,
     PostCourseRequestModel,
+    PatchCourseRequestModel,
 )
 
 
@@ -183,3 +184,101 @@ def remove_course_lesson(
     update_body = {"$inc": {"lesson_num": -1}}
     db_client.lesson_coll.update_many(filter=update_filter, update=update_body)
     return 1
+
+def remove_course(
+    course_id: str,
+) -> int:
+    delete_filter = {
+        "course_id": ObjectId(course_id),
+    }
+    result = db_client.lesson_coll.find_one_and_delete(delete_filter)
+    if result == None:  # Deletion Failed.
+        return 0
+    
+    update_filter = {
+        "course_id": ObjectId(course_id),   
+    }
+    update_body = {}
+    db_client.lesson_coll.update_many(filter=update_filter,update=update_body)
+    return 1
+
+def edit_course(
+    course_id: str,
+    request: PatchCourseRequestModel,
+) -> int:
+    filter = {
+        "course_id": ObjectId(course_id),
+    }
+
+    update_body = {}
+    if request.name != None:
+        update_body["name"] = request.name
+    if request.course_pic != None:
+        update_body["course_pic"] = str(request.course_pic)
+    if request.description != None:
+        update_body["description"] = request.description
+    if request.course_objective != None:
+        update_body["course_objective"] = request.course_objective
+    if request.course_requirement != None:
+        update_body["course_requirement"] = request.course_requirement
+    if request.difficulty_level != None:
+        update_body["difficulty_level"] = request.difficulty_level
+    if request.price != None:
+        update_body["price"] = request.price
+    
+    update = {"$set": update_body}
+
+    result = db_client.lesson_coll.update_one(filter=filter, update=update)
+    return result.modified_count
+
+def create_course(
+    course_id: str, request: PostCourseRequestModel
+) -> str:
+    body = {
+        "name": request.name,
+        "description": request.description,
+        # "created_date": {
+        #     "$date": "2022-12-31T17:00:00.000Z"
+        # },
+        "course_pic": str(request.course_pic),
+        # "student_count": 1,
+        # "rating": 0,
+        # "review_count": 0,
+        "price": request.price,
+        "teacher_id": request.teacher_id,
+        "course_objective": request.course_objective,
+        "course_requirement": request.course_requirement,
+        "difficulty_level": request.difficulty_level,
+        # "tags": [
+        #     {
+        #     "$oid": "6509b76eda50b4eec1867261"
+        #     },
+        #     {
+        #     "$oid": "6509b79bda50b4eec1867265"
+        #     }
+        # ],
+        # "total_video_length": 600,
+        # "chapter_count": 1,
+        # "file_count": 1,
+        # "quiz_count": 0,
+        # "status": "started"
+
+    }
+    #not finnish
+    filter = {"course_id": ObjectId(course_id),}
+    while True:
+        # Auto increment lesson_num
+        cursor = (
+            db_client.lesson_coll.find(filter, {"lesson_num": True})
+            .sort([("lesson_num", -1)])
+            .limit(1)
+        )
+        try:
+            body["lesson_num"] = cursor.next()["lesson_num"] + 1
+        except StopIteration:
+            body["lesson_num"] = 1
+        break
+
+    object_id = db_client.lesson_coll.insert_one(body)
+    return str(object_id.inserted_id)
+
