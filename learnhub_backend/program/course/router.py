@@ -75,34 +75,6 @@ def add_course_chapter(course_id: str, chapter_body: PostCourseChaptersRequestMo
 
 
 @router.get(
-    "/{course_id}/chapters/{chapter_id}/lessons",
-    status_code=200,
-    response_model=ListCourseLessonsResponseModel,
-    response_model_exclude_none=True,
-)
-def list_course_lessons(
-    course_id: str, chapter_id: str, common_paginations: common_page_params
-):
-    response_body = list_course_lessons_response(
-        course_id, chapter_id, common_paginations["skip"], common_paginations["limit"]
-    )
-    return response_body
-
-
-@router.post(
-    "/{course_id}/chapters/{chapter_id}/lessons",
-    status_code=201,
-    response_model=PostCourseLessonResponseModel,
-    response_model_exclude_none=True,
-)
-def post_course_lesson(
-    course_id: str, chapter_id: str, requestBody: PostCourseLessonRequestModel
-):
-    response_body = add_course_lesson_request(course_id, chapter_id, requestBody)
-    return response_body
-
-
-@router.get(
     "/{course_id}/chapters/{chapter_id}",
     status_code=200,
     response_model_exclude_none=True,
@@ -110,19 +82,6 @@ def post_course_lesson(
 )
 def get_course_chapter(chapter_id: str):
     response_body = get_course_chapter_response(chapter_id=chapter_id)
-    if response_body == None:
-        raise Exception.not_found
-    return response_body
-
-
-@router.get(
-    "/{course_id}/chapters/{chapter_id}/lessons/{lesson_id}",
-    status_code=200,
-    response_model=GetCourseLessonResponseModel,
-    response_model_exclude_none=True,
-)
-def get_course_lesson(course_id: str, chapter_id: str, lesson_id: str):
-    response_body = get_course_lesson_response(course_id, chapter_id, lesson_id)
     if response_body == None:
         raise Exception.not_found
     return response_body
@@ -160,6 +119,47 @@ def delete_course_chapter(chapter_id: str, course_id: str):
     if response_body == 0:
         raise Exception.bad_request
     return {"message": "OK"}
+
+
+@router.get(
+    "/{course_id}/chapters/{chapter_id}/lessons",
+    status_code=200,
+    response_model=ListCourseLessonsResponseModel,
+    response_model_exclude_none=True,
+)
+def list_course_lessons(
+    course_id: str, chapter_id: str, common_paginations: common_page_params
+):
+    response_body = list_course_lessons_response(
+        course_id, chapter_id, common_paginations["skip"], common_paginations["limit"]
+    )
+    return response_body
+
+
+@router.post(
+    "/{course_id}/chapters/{chapter_id}/lessons",
+    status_code=201,
+    response_model=PostCourseLessonResponseModel,
+    response_model_exclude_none=True,
+)
+def post_course_lesson(
+    course_id: str, chapter_id: str, requestBody: PostCourseLessonRequestModel
+):
+    response_body = add_course_lesson_request(course_id, chapter_id, requestBody)
+    return response_body
+
+
+@router.get(
+    "/{course_id}/chapters/{chapter_id}/lessons/{lesson_id}",
+    status_code=200,
+    response_model=GetCourseLessonResponseModel,
+    response_model_exclude_none=True,
+)
+def get_course_lesson(course_id: str, chapter_id: str, lesson_id: str):
+    response_body = get_course_lesson_response(course_id, chapter_id, lesson_id)
+    if response_body == None:
+        raise Exception.not_found
+    return response_body
 
 
 @router.patch(

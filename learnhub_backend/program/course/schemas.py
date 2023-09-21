@@ -25,10 +25,12 @@ class GetCourseChapterResponseModel(BaseModel):
     course_id: str
     chapter_num: int
     name: str
+    description: str
 
 
 class PatchCourseChapterRequestModel(BaseModel):
     name: Optional[str] = None
+    description: Optional[str] = None
 
 
 ## Lessons

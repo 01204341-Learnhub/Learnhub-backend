@@ -24,6 +24,8 @@ def create_course_chapter(course_id: str, chapter_body: PostCourseChaptersReques
     chapter_body_to_inserted = chapter_body.model_dump()
     chapter_body_to_inserted["course_id"] = ObjectId(course_id)
     chapter_body_to_inserted["description"] = chapter_body.description
+    chapter_body_to_inserted["chapter_length"] = 0
+    chapter_body_to_inserted["lesson_count"] = 0  # TODO: Check if need to change
     response_chapter_num = (
         db_client.chapter_coll.find(
             {"course_id": ObjectId(course_id)}, {"chapter_num": True}
