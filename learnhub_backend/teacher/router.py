@@ -6,7 +6,13 @@ from ..dependencies import (
     Exception,
 )
 
+from .services import (
+    list_teachers_response,
+)
 
+from .schemas import (
+    ListTeachersResponseModel,
+)
 router = APIRouter(
     prefix="/users/teachers",
     tags=["teacher"],
@@ -23,7 +29,13 @@ common_page_params = Annotated[dict, Depends(router.dependencies[0].dependency)]
 @router.get(
     "/",
     status_code=200,
+    response_model_exclude_none=True,
+    response_model=ListTeachersResponseModel,
 )
 def list_teachers(common_paginations: common_page_params):
     # TODO: Implement actual endpoint
-    return {"200": "OK"}
+    response_body = list_teachers_response(
+        skip=common_paginations["skip"],
+        limit=common_paginations["limit"],
+    )
+    return response_body
