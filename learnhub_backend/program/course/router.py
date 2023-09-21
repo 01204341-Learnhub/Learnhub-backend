@@ -13,13 +13,19 @@ from .services import (
     get_course_lesson_response,
     edit_course_lesson_request,
     add_course_lesson_request,
+    get_course_id_response,
+    add_course_response,
+    delete_course_response,
+    edit_course_response,
+    list_course_response,
 )
 
 from .schemas import (
     ListCourseResponseModel, #123
-    ListCourseIdResponseModel, #123
+    GetCourseIdResponseModel, #123
     ListCourseStudentsResponseModel, #123
     PostCourseRequestModel, #123
+    PatchCourseRequestModel, #123
     ListCourseChaptersResponseModel,
     PostCourseChaptersRequestModel,
     GetCourseChapterResponseModel,
@@ -64,7 +70,7 @@ def list_course(common_paginations: common_page_params):
     response_model_exclude_none=True,
     response_model=dict,
 )
-def add_course(chapter_body: PostCourseRequestModel): #123
+def add_course(course_body: PostCourseRequestModel): #123
     response_body = add_course_response( #123
         course_body=course_body    #123
     )
@@ -76,14 +82,16 @@ def add_course(chapter_body: PostCourseRequestModel): #123
     "/{course_id}",
     status_code=200,
     response_model_exclude_none=True,
-    response_model=ListCourseIdResponseModel, #123
+    response_model=GetCourseIdResponseModel, #123
 )
-def list_course(course_id: str, common_paginations: common_page_params):
-    response_body = list_course_id_response( #123
+def get_course(course_id: str, common_paginations: common_page_params):
+    response_body = get_course_id_response( #123
         skip=common_paginations["skip"],
         limit=common_paginations["limit"],
         course_id=course_id,
     )
+    if response_body == None:
+        raise Exception.not_found
     return response_body
 
 @router.get(
@@ -100,6 +108,37 @@ def list_course(course_id: str, common_paginations: common_page_params):
     )
     return response_body
 
+@router.patch(
+    "/{course_id}",
+    status_code=200,
+    response_model_exclude_none=True,
+    response_model=dict,
+)
+def edit_course(
+    chapter_id: str, chapter_to_edit: PatchCourseRequestModel #123
+):
+    response_body = edit_course_response(   #123
+        chapter_id=chapter_id, chapter_to_edit=chapter_to_edit
+    )
+    if response_body.matched_count == 0:
+        raise Exception.not_found
+    elif response_body.modified_count == 0:
+        return {"message": "OK but no change"}
+    return {"message": "OK"}
+
+@router.delete(
+    "/{course_id}",
+    status_code=200,
+    response_model_exclude_none=True,
+    response_model=dict,
+)
+def delete_course(chapter_id: str, course_id: str):
+    response_body = delete_course_response(  #123
+        chapter_id=chapter_id, course_id=course_id
+    )
+    if response_body == 0:
+        raise Exception.bad_request
+    return {"message": "OK"}
 
 #bun end here
 

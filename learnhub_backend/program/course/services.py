@@ -10,7 +10,7 @@ from .database import (
 )
 from .schemas import (
     ListCourseResponseModel, #123
-    ListCourseIdResponseModel, #123
+    GetCourseIdResponseModel, #123
     ListCourseStudentsResponseModel, #123
     PostCourseRequestModel, #123
     ListCourseChaptersModelBody,
@@ -24,6 +24,9 @@ from .schemas import (
     PatchCourseLessonRequestModel,
     PostCourseLessonRequestModel,
     PostCourseLessonResponseModel,
+    PatchCourseRequestModel,
+    ListCourseModelBody,
+    ListCourseStudentsModelBody,
 )
 
 from .database import (
@@ -131,3 +134,58 @@ def delete_course_lesson_request(
 ) -> int:
     delete_count = remove_course_lesson(course_id, chapter_id, lesson_id)
     return delete_count
+
+#bun start here
+def edit_course_response(
+    course_id: str,
+    request: PatchCourseRequestModel,
+) -> int:
+    modified_count = edit_course(course_id, request)
+    return modified_count
+
+
+def delete_course_response(
+    course_id: str,
+) -> int:
+    delete_count = remove_course(course_id)
+    return delete_count
+
+def add_course_response(
+    course_body: PostCourseRequestModel
+) -> dict | None:
+    response = create_course(course_body=course_body)
+    if response.inserted_id == None:
+        return None
+    return {"course_id": str(response.inserted_id)}
+
+def get_course_id_response(
+    course_id: str
+) -> GetCourseIdResponseModel | None:
+    try:
+        quried_course = query_get_course_id(course_id)
+    except:
+        return None
+    if quried_course == None:
+        return None
+    response_body = GetCourseIdResponseModel(**quried_course)
+    return response_body
+
+def list_course_response(
+    skip: int = 0, limit: int = 0
+) -> ListCourseResponseModel:
+    quried_course = query_list_course(skip, limit)
+    ta = TypeAdapter(list[ListCourseModelBody])
+    response_body = ListCourseResponseModel(
+        course=ta.validate_python(quried_course)
+    )
+    return response_body
+
+def list_course_students_response(
+    course_id: str, skip: int = 0, limit: int = 0
+) -> ListCourseStudentsResponseModel:
+    quried_students = query_list_course_students(course_id, skip, limit)
+    ta = TypeAdapter(list[ListCourseStudentsModelBody])
+    response_body = ListCourseStudentsResponseModel(
+        students=ta.validate_python(quried_students)
+    )
+    return response_body

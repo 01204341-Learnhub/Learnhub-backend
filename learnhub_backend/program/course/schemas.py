@@ -93,7 +93,7 @@ class ListCourseModelBody(BaseModel):
 class ListCourseResponseModel(BaseModel):
     course: list[ListCourseModelBody]
     
-class ListCourseIdResponseModel(BaseException):
+class GetCourseIdResponseModel(BaseException):
     course_id: str
     name: str
     course_pic: HttpUrl
@@ -123,6 +123,21 @@ class PostCourseRequestModel(BaseException):
     course_pic: HttpUrl
     description: str
     course_objective: list[str]
+    course_requirement: str
+    difficulty_level: str
+    price: int
+    
+class ListCourseRequestModel(BaseModel):
+    op: str
+    old: str
+    value: str
+
+
+class PatchCourseRequestModel(BaseException):
+    name: str
+    course_pic: HttpUrl
+    description: str
+    course_objective: list[ListCourseRequestModel]
     course_requirement: str
     difficulty_level: str
     price: int
