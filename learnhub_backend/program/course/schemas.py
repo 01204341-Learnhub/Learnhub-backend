@@ -7,6 +7,8 @@ class ListCourseChaptersModelBody(BaseModel):
     chapter_id: str
     chapter_num: int
     name: str
+    lesson_count: int
+    chapter_length: int
 
 
 class ListCourseChaptersResponseModel(BaseModel):
@@ -15,6 +17,7 @@ class ListCourseChaptersResponseModel(BaseModel):
 
 class PostCourseChaptersRequestModel(BaseModel):
     name: str
+    description: str
 
 
 class GetCourseChapterResponseModel(BaseModel):

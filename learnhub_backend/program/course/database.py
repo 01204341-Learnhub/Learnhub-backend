@@ -23,6 +23,7 @@ def query_list_course_chapters(course_id: str, skip: int = 0, limit: int = 100) 
 def create_course_chapter(course_id: str, chapter_body: PostCourseChaptersRequestModel):
     chapter_body_to_inserted = chapter_body.model_dump()
     chapter_body_to_inserted["course_id"] = ObjectId(course_id)
+    chapter_body_to_inserted["description"] = chapter_body.description
     response_chapter_num = (
         db_client.chapter_coll.find(
             {"course_id": ObjectId(course_id)}, {"chapter_num": True}
