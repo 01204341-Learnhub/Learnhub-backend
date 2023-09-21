@@ -3,9 +3,7 @@ from learnhub_backend.student.schemas import PatchStudentRequestModel
 from ..database import db_client
 from bson.objectid import ObjectId
 
-from .config import (
-    student_type,
-)
+from .config import student_type, course_type
 
 
 def query_list_students(skip: int = 0, limit: int = 100) -> list:
@@ -48,3 +46,8 @@ def remove_student(student_id: str) -> DeleteResult:
 
     result = db_client.user_coll.delete_one(filter=filter)
     return result
+
+
+def query_list_student_course(student_id: str):
+    filter = {"type": student_type, "_id": ObjectId(student_id)}
+    # TODO: Query course db student list.
