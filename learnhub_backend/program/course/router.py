@@ -91,7 +91,7 @@ def get_course_chapter(chapter_id: str):
     "/{course_id}/chapters/{chapter_id}",
     status_code=200,
     response_model_exclude_none=True,
-    response_model=dict,
+    response_model=GenericOKResponse,
 )
 def edit_course_chapter(
     chapter_id: str, chapter_to_edit: PatchCourseChapterRequestModel
@@ -101,16 +101,14 @@ def edit_course_chapter(
     )
     if response_body.matched_count == 0:
         raise Exception.not_found
-    elif response_body.modified_count == 0:
-        return {"message": "OK but no change"}
-    return {"message": "OK"}
+    return GenericOKResponse
 
 
 @router.delete(
     "/{course_id}/chapters/{chapter_id}",
     status_code=200,
     response_model_exclude_none=True,
-    response_model=dict,
+    response_model=GenericOKResponse,
 )
 def delete_course_chapter(chapter_id: str, course_id: str):
     response_body = delete_course_chapter_response(
@@ -118,7 +116,7 @@ def delete_course_chapter(chapter_id: str, course_id: str):
     )
     if response_body == 0:
         raise Exception.bad_request
-    return {"message": "OK"}
+    return GenericOKResponse
 
 
 @router.get(
