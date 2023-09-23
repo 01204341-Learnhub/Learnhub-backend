@@ -109,6 +109,4 @@ def list_student_courses(student_id: str):
     response_model=GetStudentCourseProgressResponseModel,)
 def get_student_course_progress(student_id: str, course_id: str):
     response_body = get_student_course_progress_response(student_id=student_id, course_id = course_id)
-    if response_body == None:
-        raise Exception.not_found
     return response_body
