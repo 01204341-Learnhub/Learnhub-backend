@@ -3,7 +3,7 @@ from learnhub_backend.student.schemas import PatchStudentRequestModel
 from ..database import db_client
 from bson.objectid import ObjectId
 
-from .config import student_type, course_type
+from ..dependencies import student_type, course_type
 
 
 def query_list_students(skip: int = 0, limit: int = 100) -> list:

@@ -11,6 +11,7 @@ class GenericOKResponse(BaseModel):
 
 
 class Exception:
+    # 4xx
     bad_request = HTTPException(400, detail="Bad Request")
     unauthorized = HTTPException(401, detail="Unauthorized")
     forbidden = HTTPException(
@@ -21,4 +22,14 @@ class Exception:
     request_timeout = HTTPException(408, detail="Request Timeout")
     unprocessable_content = HTTPException(422, detail="Unprocessable Content")
 
+    # 5xx
+    internal_server_error = HTTPException(500, detail="Internal Server Error")
+
+    # MEME
     teapot = HTTPException(418, detail="I'm a teapot")
+
+
+# TYPE
+student_type = "student"
+teacher_type = "teacher"
+course_type = "course"
