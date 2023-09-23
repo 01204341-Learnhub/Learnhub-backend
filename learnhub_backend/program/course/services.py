@@ -1,5 +1,8 @@
 from typing import Annotated, Union
 from pydantic import TypeAdapter
+from pymongo.results import UpdateResult
+
+from learnhub_backend.dependencies import GenericOKResponse
 
 from .database import (
     query_list_course_chapters,
@@ -9,7 +12,7 @@ from .database import (
     delete_course_chapter,
     edit_course_lesson,
     query_list_course_lessons,
-    query_get_course_lesson,
+    query_course_lesson,
     create_course_lesson,
     remove_course_lesson,
 )
@@ -26,6 +29,8 @@ from .schemas import (
     PostCourseLessonRequestModel,
     PostCourseLessonResponseModel,
 )
+
+from ...dependencies import Exception
 
 
 # COURSE CHAPTERS
@@ -45,18 +50,15 @@ def add_course_chapter_response(
 ) -> dict | None:
     response = create_course_chapter(course_id=course_id, chapter_body=chapter_body)
     if response.inserted_id == None:
-        return None
+        raise Exception.bad_request
     return {"chapter_id": str(response.inserted_id)}
 
 
 def get_course_chapter_response(chapter_id: str):
     queried_chapter = query_course_chapter(chapter_id=chapter_id)
     if queried_chapter == None:
-        return None
-    ta = TypeAdapter(GetCourseChapterResponseModel)
-    response_body = GetCourseChapterResponseModel(
-        **ta.validate_python(queried_chapter).model_dump()
-    )
+        raise Exception.not_found
+    response_body = GetCourseChapterResponseModel(**queried_chapter)
     return response_body
 
 
@@ -66,12 +68,12 @@ def edit_course_chapter_response(
     response = edit_course_chapter(
         chapter_id=chapter_id, chapter_to_edit=chapter_to_edit
     )
-    return response
+    return GenericOKResponse
 
 
-def delete_course_chapter_response(chapter_id: str, course_id: str) -> int:
-    response = delete_course_chapter(chapter_id=chapter_id, course_id=course_id)
-    return response
+def delete_course_chapter_response(chapter_id: str, course_id: str):
+    delete_course_chapter(chapter_id=chapter_id, course_id=course_id)
+    return GenericOKResponse
 
 
 # COURSE LESSON
@@ -89,12 +91,9 @@ def list_course_lessons_response(
 def get_course_lesson_response(
     course_id: str, chapter_id: str, lesson_id: str
 ) -> GetCourseLessonResponseModel | None:
-    try:
-        quried_lesson = query_get_course_lesson(course_id, chapter_id, lesson_id)
-    except:
-        return None
+    quried_lesson = query_course_lesson(course_id, chapter_id, lesson_id)
     if quried_lesson == None:
-        return None
+        raise Exception.not_found
     response_body = GetCourseLessonResponseModel(**quried_lesson)
     return response_body
 
@@ -112,15 +111,15 @@ def edit_course_lesson_request(
     chapter_id: str,
     lesson_id: str,
     request: PatchCourseLessonRequestModel,
-) -> int:
-    modified_count = edit_course_lesson(course_id, chapter_id, lesson_id, request)
-    return modified_count
+):
+    result = edit_course_lesson(course_id, chapter_id, lesson_id, request)
+    return GenericOKResponse
 
 
 def delete_course_lesson_request(
     course_id: str,
     chapter_id: str,
     lesson_id: str,
-) -> int:
-    delete_count = remove_course_lesson(course_id, chapter_id, lesson_id)
-    return delete_count
+):
+    remove_course_lesson(course_id, chapter_id, lesson_id)
+    return GenericOKResponse

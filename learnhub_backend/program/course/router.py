@@ -69,8 +69,45 @@ def add_course_chapter(course_id: str, chapter_body: PostCourseChaptersRequestMo
     response_body = add_course_chapter_response(
         course_id=course_id, chapter_body=chapter_body
     )
-    if response_body == None:
-        raise Exception.bad_request
+    return response_body
+
+
+@router.get(
+    "/{course_id}/chapters/{chapter_id}",
+    status_code=200,
+    response_model_exclude_none=True,
+    response_model=GetCourseChapterResponseModel,
+)
+def get_course_chapter(chapter_id: str):
+    response_body = get_course_chapter_response(chapter_id=chapter_id)
+    return response_body
+
+
+@router.patch(
+    "/{course_id}/chapters/{chapter_id}",
+    status_code=200,
+    response_model_exclude_none=True,
+    response_model=GenericOKResponse,
+)
+def edit_course_chapter(
+    chapter_id: str, chapter_to_edit: PatchCourseChapterRequestModel
+):
+    response_body = edit_course_chapter_response(
+        chapter_id=chapter_id, chapter_to_edit=chapter_to_edit
+    )
+    return response_body
+
+
+@router.delete(
+    "/{course_id}/chapters/{chapter_id}",
+    status_code=200,
+    response_model_exclude_none=True,
+    response_model=GenericOKResponse,
+)
+def delete_course_chapter(chapter_id: str, course_id: str):
+    response_body = delete_course_chapter_response(
+        chapter_id=chapter_id, course_id=course_id
+    )
     return response_body
 
 
@@ -103,19 +140,6 @@ def post_course_lesson(
 
 
 @router.get(
-    "/{course_id}/chapters/{chapter_id}",
-    status_code=200,
-    response_model_exclude_none=True,
-    response_model=GetCourseChapterResponseModel,
-)
-def get_course_chapter(chapter_id: str):
-    response_body = get_course_chapter_response(chapter_id=chapter_id)
-    if response_body == None:
-        raise Exception.not_found
-    return response_body
-
-
-@router.get(
     "/{course_id}/chapters/{chapter_id}/lessons/{lesson_id}",
     status_code=200,
     response_model=GetCourseLessonResponseModel,
@@ -123,43 +147,7 @@ def get_course_chapter(chapter_id: str):
 )
 def get_course_lesson(course_id: str, chapter_id: str, lesson_id: str):
     response_body = get_course_lesson_response(course_id, chapter_id, lesson_id)
-    if response_body == None:
-        raise Exception.not_found
     return response_body
-
-
-@router.patch(
-    "/{course_id}/chapters/{chapter_id}",
-    status_code=200,
-    response_model_exclude_none=True,
-    response_model=dict,
-)
-def edit_course_chapter(
-    chapter_id: str, chapter_to_edit: PatchCourseChapterRequestModel
-):
-    response_body = edit_course_chapter_response(
-        chapter_id=chapter_id, chapter_to_edit=chapter_to_edit
-    )
-    if response_body.matched_count == 0:
-        raise Exception.not_found
-    elif response_body.modified_count == 0:
-        return {"message": "OK but no change"}
-    return {"message": "OK"}
-
-
-@router.delete(
-    "/{course_id}/chapters/{chapter_id}",
-    status_code=200,
-    response_model_exclude_none=True,
-    response_model=dict,
-)
-def delete_course_chapter(chapter_id: str, course_id: str):
-    response_body = delete_course_chapter_response(
-        chapter_id=chapter_id, course_id=course_id
-    )
-    if response_body == 0:
-        raise Exception.bad_request
-    return {"message": "OK"}
 
 
 @router.patch(
@@ -174,12 +162,9 @@ def patch_course_lesson(
     lesson_id: str,
     requestBody: PatchCourseLessonRequestModel,
 ):
-    modified_count = edit_course_lesson_request(
+    response_body = edit_course_lesson_request(
         course_id, chapter_id, lesson_id, requestBody
     )
-    if modified_count < 1:
-        raise Exception.bad_request
-    response_body = GenericOKResponse()
     return response_body
 
 
@@ -190,8 +175,5 @@ def patch_course_lesson(
     response_model_exclude_none=True,
 )
 def delete_course_lesson(course_id: str, chapter_id: str, lesson_id: str):
-    delete_count = delete_course_lesson_request(course_id, chapter_id, lesson_id)
-    if delete_count < 1:
-        raise Exception.bad_request
-    response_body = GenericOKResponse()
+    response_body = delete_course_lesson_request(course_id, chapter_id, lesson_id)
     return response_body
