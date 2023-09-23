@@ -123,6 +123,16 @@ def query_course_lesson(course_id: str, chapter_id: str, lesson_id: str) -> dict
 def create_course_lesson(
     course_id: str, chapter_id: str, request: PostCourseLessonRequestModel
 ) -> str:
+    # Check for valid course and chapter
+    valid_course_filter = {"_id": ObjectId(course_id)}
+    course_result = db_client.course_coll.find_one(filter=valid_course_filter)
+    if course_result == None:
+        raise Exception.not_found
+    valid_chapter_filter = {"_id": ObjectId(chapter_id)}
+    chapter_result = db_client.chapter_coll.find_one(filter=valid_chapter_filter)
+    if chapter_result == None:
+        raise Exception.not_found
+
     body = {
         "course_id": ObjectId(course_id),
         "chapter_id": ObjectId(chapter_id),
