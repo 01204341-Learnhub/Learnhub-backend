@@ -2,6 +2,8 @@ from typing import Optional, Union
 from pydantic import BaseModel, HttpUrl
 
 
+class placeHolder(BaseModel):
+    pass
 ## STUDENTS
 class GetStudentResponseModel(BaseModel):
     student_id: str
