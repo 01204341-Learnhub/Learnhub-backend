@@ -2,9 +2,13 @@ from pymongo.results import DeleteResult, UpdateResult
 from learnhub_backend.student.schemas import PatchStudentRequestModel
 from ..database import db_client
 from bson.objectid import ObjectId
+from bson.errors import InvalidId
 
 from .config import student_type, course_type
 
+from ..dependencies import (
+    Exception,
+)
 
 def query_list_students(skip: int = 0, limit: int = 100) -> list:
     filter = {"type": student_type}
@@ -51,3 +55,18 @@ def remove_student(student_id: str) -> DeleteResult:
 def query_list_student_course(student_id: str):
     filter = {"type": student_type, "_id": ObjectId(student_id)}
     # TODO: Query course db student list.
+
+
+# STUDENT COURSE PROGRESS
+def query_student_course_progress(student_id: str, course_id: str) -> dict:
+    try:
+        filter = {"student_id":ObjectId(student_id), "course_id":ObjectId(course_id)}
+        student_course_progress = db_client.course_progress_coll.find_one(filter=filter)
+        if student_course_progress == None:
+            raise Exception.not_found
+        for i in range(len(student_course_progress["lessons"])): 
+            student_course_progress["lessons"][i]["lesson_id"] = str(student_course_progress["lessons"][i]["lesson_id"])
+            student_course_progress["lessons"][i]["chapter_id"] = str(student_course_progress["lessons"][i]["chapter_id"])
+    except InvalidId:
+        raise Exception.bad_request
+    return student_course_progress

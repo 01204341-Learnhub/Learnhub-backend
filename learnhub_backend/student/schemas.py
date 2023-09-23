@@ -39,3 +39,14 @@ class ListStudentCoursesModelBody(BaseModel):
 
 class ListStudentCourseResponseModel(BaseModel):
     courses: list[ListStudentCoursesModelBody]
+
+
+# STUDENT COURSE PROGRESS
+class LessonProgressModelBody(BaseModel):
+    lesson_id: str
+    chapter_id: str
+    finished: bool
+    lesson_completed: int
+class GetStudentCourseProgressResponseModel(BaseModel):
+    progress: float
+    lessons: list[LessonProgressModelBody]

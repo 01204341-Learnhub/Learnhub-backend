@@ -11,6 +11,7 @@ from .services import (
     edit_student_request,
     list_students_response,
     get_student_response,
+    get_student_course_progress_response,
 )
 
 from .schemas import (
@@ -18,6 +19,7 @@ from .schemas import (
     ListStudentCourseResponseModel,
     ListStudentsResponseModel,
     PatchStudentRequestModel,
+    GetStudentCourseProgressResponseModel,
 )
 
 
@@ -97,3 +99,16 @@ def delete_student(student_id: str):
 )
 def list_student_courses(student_id: str):
     pass
+
+
+# STUDENT COURSE PROGRESS
+@router.get(
+    "/{student_id}/programs/courses/{course_id}/progress",
+    status_code=200,
+    response_model_exclude_none=True,
+    response_model=GetStudentCourseProgressResponseModel,)
+def get_student_course_progress(student_id: str, course_id: str):
+    response_body = get_student_course_progress_response(student_id=student_id, course_id = course_id)
+    if response_body == None:
+        raise Exception.not_found
+    return response_body
