@@ -49,6 +49,10 @@ class LessonProgressModelBody(BaseModel):
     chapter_id: str
     finished: bool
     lesson_completed: int
+    # TODO: Add quiz score
+    #quiz_score: int | None = None
 class GetStudentCourseProgressResponseModel(BaseModel):
     progress: float
     lessons: list[LessonProgressModelBody]
+
+
