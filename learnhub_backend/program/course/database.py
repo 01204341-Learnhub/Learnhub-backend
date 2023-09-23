@@ -8,6 +8,8 @@ from .schemas import (
     PostCourseLessonRequestModel,
 )
 
+from ...dependencies import Exception
+
 
 def query_list_course_chapters(course_id: str, skip: int = 0, limit: int = 100) -> list:
     chapters_cursor = db_client.chapter_coll.find(
@@ -26,6 +28,13 @@ def create_course_chapter(course_id: str, chapter_body: PostCourseChaptersReques
     chapter_body_to_inserted["description"] = chapter_body.description
     chapter_body_to_inserted["chapter_length"] = 0
     chapter_body_to_inserted["lesson_count"] = 0  # TODO: Check if need to change
+
+    # No matching course
+    valid_course_id_filter = {"_id": ObjectId(course_id)}
+    result = db_client.course_coll.find_one(filter=valid_course_id_filter)
+    if result == None:
+        raise Exception.not_found
+
     response_chapter_num = (
         db_client.chapter_coll.find(
             {"course_id": ObjectId(course_id)}, {"chapter_num": True}
