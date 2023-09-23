@@ -60,7 +60,7 @@ def get_student_course_progress_response(
     student_id: str, course_id: str
 ) -> GetStudentCourseProgressResponseModel | None | dict:
     queried_course_progress = query_student_course_progress(student_id = student_id, course_id = course_id)
-    """ response_body = GetStudentCourseProgressResponseModel(**queried_course_progress) """
+    #response_body = GetStudentCourseProgressResponseModel(**queried_course_progress)
     ta = TypeAdapter(list[LessonProgressModelBody])
     response_body = GetStudentCourseProgressResponseModel(
         progress=queried_course_progress["progress"],
