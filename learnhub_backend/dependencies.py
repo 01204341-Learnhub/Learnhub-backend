@@ -19,4 +19,6 @@ class Exception:
     not_found = HTTPException(404, detail="Not Found")
     method_not_allowed = HTTPException(405, detail="Method Not Allowed")
     request_timeout = HTTPException(408, detail="Request Timeout")
+    unprocessable_content = HTTPException(422, detail="Unprocessable Content")
+
     teapot = HTTPException(418, detail="I'm a teapot")

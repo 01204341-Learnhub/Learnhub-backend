@@ -69,8 +69,6 @@ def add_course_chapter(course_id: str, chapter_body: PostCourseChaptersRequestMo
     response_body = add_course_chapter_response(
         course_id=course_id, chapter_body=chapter_body
     )
-    if response_body == None:
-        raise Exception.bad_request
     return response_body
 
 
@@ -82,8 +80,6 @@ def add_course_chapter(course_id: str, chapter_body: PostCourseChaptersRequestMo
 )
 def get_course_chapter(chapter_id: str):
     response_body = get_course_chapter_response(chapter_id=chapter_id)
-    if response_body == None:
-        raise Exception.not_found
     return response_body
 
 
@@ -99,9 +95,7 @@ def edit_course_chapter(
     response_body = edit_course_chapter_response(
         chapter_id=chapter_id, chapter_to_edit=chapter_to_edit
     )
-    if response_body.matched_count == 0:
-        raise Exception.not_found
-    return GenericOKResponse
+    return response_body
 
 
 @router.delete(
@@ -114,9 +108,7 @@ def delete_course_chapter(chapter_id: str, course_id: str):
     response_body = delete_course_chapter_response(
         chapter_id=chapter_id, course_id=course_id
     )
-    if response_body == 0:
-        raise Exception.bad_request
-    return GenericOKResponse
+    return response_body
 
 
 @router.get(
@@ -155,8 +147,6 @@ def post_course_lesson(
 )
 def get_course_lesson(course_id: str, chapter_id: str, lesson_id: str):
     response_body = get_course_lesson_response(course_id, chapter_id, lesson_id)
-    if response_body == None:
-        raise Exception.not_found
     return response_body
 
 
@@ -172,10 +162,9 @@ def patch_course_lesson(
     lesson_id: str,
     requestBody: PatchCourseLessonRequestModel,
 ):
-    result = edit_course_lesson_request(course_id, chapter_id, lesson_id, requestBody)
-    if result.matched_count == 0:
-        raise Exception.not_found
-    response_body = GenericOKResponse()
+    response_body = edit_course_lesson_request(
+        course_id, chapter_id, lesson_id, requestBody
+    )
     return response_body
 
 
@@ -186,8 +175,5 @@ def patch_course_lesson(
     response_model_exclude_none=True,
 )
 def delete_course_lesson(course_id: str, chapter_id: str, lesson_id: str):
-    delete_count = delete_course_lesson_request(course_id, chapter_id, lesson_id)
-    if delete_count < 1:
-        raise Exception.bad_request
-    response_body = GenericOKResponse()
+    response_body = delete_course_lesson_request(course_id, chapter_id, lesson_id)
     return response_body
