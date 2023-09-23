@@ -266,19 +266,41 @@ def create_course(
     }
     #not finnish
     filter = {"course_id": ObjectId(course_id),}
-    while True:
-        # Auto increment lesson_num
-        cursor = (
-            db_client.lesson_coll.find(filter, {"lesson_num": True})
-            .sort([("lesson_num", -1)])
-            .limit(1)
-        )
-        try:
-            body["lesson_num"] = cursor.next()["lesson_num"] + 1
-        except StopIteration:
-            body["lesson_num"] = 1
-        break
-
     object_id = db_client.lesson_coll.insert_one(body)
     return str(object_id.inserted_id)
 
+def query_list_course_students(
+    course_id: str, skip: int = 0, limit: int = 100
+) -> list:
+    filter = {"course_id": ObjectId(course_id)}
+    students_cursor = db_client.user_coll.find(filter=filter, skip=skip, limit=limit)
+    students = []
+    for student in students_cursor:
+        student["student_id"] = str(student["_id"])
+        students.append(student)
+
+    return students
+
+def query_list_course(
+    skip: int = 0, limit: int = 100
+) -> list:
+    courses_cursor = db_client.course_coll.find(
+         skip=skip, limit=limit
+    )
+    courses = []
+    for course in courses_cursor:
+        course["course_id"] = str(course["_id"])
+        courses.append(course)
+
+    return courses
+
+def query_get_course_id(
+    course_id: str
+) -> dict | None:
+    filter = {
+        "course_id": ObjectId(course_id),
+    }
+    course = db_client.course_coll.find_one(filter=filter)
+    if course != None:
+        course["course_id"] = str(course["course_id"])
+    return course
