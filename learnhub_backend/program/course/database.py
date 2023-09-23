@@ -77,6 +77,12 @@ def delete_course_chapter(chapter_id: str, course_id: str) -> int:
     update_response = db_client.chapter_coll.update_many(
         filter=chapter_update_filter, update=update_body
     )
+
+    lesson_delete_filter = {
+        "course_id": ObjectId(course_id),
+        "chapter_id": ObjectId(chapter_id),
+    }
+    delete_response = db_client.lesson_coll.delete_many(filter=lesson_delete_filter)
     return 1
 
 
