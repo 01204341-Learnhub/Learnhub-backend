@@ -1,6 +1,7 @@
 from typing import Optional, Union
 from pydantic import BaseModel, HttpUrl
 from datetime import datetime
+from bson import ObjectId
 
 class placeholder(BaseModel):
     pass
@@ -16,9 +17,9 @@ class ListClassesModelBody(BaseModel):
     class_id: str
     name: str
     class_pic: HttpUrl
-    teacher_id: TeacherModelBody
+    teacher: str #TODO: change to TeacherModelBody
     status: str
-    tags: list[TagModelBody]
+    tags: list[str] #TODO: change to list[TagModelBody]
     registration_ended_date: datetime
     price: float
 

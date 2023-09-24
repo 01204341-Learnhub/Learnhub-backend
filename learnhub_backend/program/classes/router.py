@@ -7,11 +7,13 @@ from ...dependencies import (
 )
 
 from .services import (
-    service_placeholder
+    service_placeholder,
+    list_classes_response,
 )
 
 from .schemas import (
-    placeholder
+    placeholder,
+    ListClassesResponseModel,
 )
 
 router = APIRouter(
@@ -26,6 +28,16 @@ router = APIRouter(
 
 common_page_params = Annotated[dict, Depends(router.dependencies[0].dependency)]
 
-@router.get("/")
-def test():
-    return {"Hello": "World"}
+# CLASSES
+@router.get(
+    "/",
+    status_code=200,
+    response_model_exclude_none=True,
+    response_model=ListClassesResponseModel,
+)
+def list_classes(common_paginations: common_page_params):
+    response_body = list_classes_response(
+        skip=common_paginations["skip"],
+        limit=common_paginations["limit"],
+    )
+    return response_body
