@@ -46,5 +46,4 @@ def CheckHttpFileType(url: str) -> str:
         ]  # ex. 'texts/html; charset=utf-8' or 'application/pdf'
         result = response.split(";")[0]
     file_type, extension = result.split("/")  # 'video/mp4'
-    # TODO: allow only some file_types
     return file_type

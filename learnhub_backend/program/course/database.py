@@ -20,6 +20,8 @@ from ...dependencies import (
     teacher_type,
 )
 
+from ..dependencies import CheckLessonType
+
 
 # AUXILARY
 def query_teacher_by_id(id: str | ObjectId):
@@ -271,12 +273,13 @@ def create_course_lesson(
         if chapter_result == None:
             raise Exception.unprocessable_content
 
+        lessontype = CheckLessonType(str(request.src))
         body = {
             "course_id": ObjectId(course_id),
             "chapter_id": ObjectId(chapter_id),
             "name": request.name,
-            "description": request.description,
-            "lesson_type": CheckHttpFileType(str(request.src)),
+            "lesson_length": request.lesson_length,
+            "lesson_type": lessontype,
             "src": str(request.src),
         }
 
@@ -296,7 +299,29 @@ def create_course_lesson(
 
         object_id = db_client.lesson_coll.insert_one(body)
 
-        # TODO: Increment chapter's lesson_count, chapter_length and course's fields
+        # chapter
+        chapter_filter = {"_id": ObjectId(chapter_id)}
+        chapter_update = {
+            "$inc": {"chapter_length": request.lesson_length, "lesson_count": 1}
+        }
+        result = db_client.chapter_coll.update_one(
+            filter=chapter_filter, update=chapter_update
+        )
+
+        # course
+        course_update = dict()
+        course_filter = {"_id": ObjectId(course_id)}
+        if lessontype == "video":
+            course_update = {
+                "$inc": {"total_video_length": request.lesson_length, "video_count": 1}
+            }
+        elif lessontype == "file":  # other filetype count as file
+            course_update = {"$inc": {"file_count": 1}}
+
+        result = db_client.course_coll.update_one(
+            filter=course_filter, update=course_update
+        )
+
         return str(object_id.inserted_id)
     except InvalidId:
         raise Exception.bad_request
@@ -318,12 +343,13 @@ def edit_course_lesson(
         update_body = {}
         if request.name != None:
             update_body["name"] = request.name
-        if request.description != None:
-            update_body["description"] = request.description
+        if request.lesson_length != None:
+            update_body["lesson_length"] = request.lesson_length
+            # TODO: Calculate new chapter length
         if request.src != None:
             update_body["src"] = str(request.src)
+            # TODO: If change lesson type return error
         update = {"$set": update_body}
-
         result = db_client.lesson_coll.update_one(filter=filter, update=update)
         if result.matched_count == 0:
             raise Exception.not_found

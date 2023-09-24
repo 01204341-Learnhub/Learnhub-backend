@@ -62,6 +62,7 @@ class GetCourseResponseModel(BaseModel):
     chapter_count: int
     quiz_count: int
     file_count: int
+    video_count: int
 
 
 # COURSE CHAPTERS
@@ -105,7 +106,7 @@ class GetCourseLessonResponseModel(BaseModel):
     lesson_num: int
     name: str
     lesson_type: str
-    description: str
+    lesson_length: int
     src: HttpUrl
 
 
@@ -114,7 +115,7 @@ class ListCourseLessonsModelBody(BaseModel):
     lesson_num: int
     name: str
     lesson_type: str
-    video_length: int | None = None  # only return if lesson type = 'video'
+    lesson_length: int
 
 
 class ListCourseLessonsResponseModel(BaseModel):
@@ -123,8 +124,8 @@ class ListCourseLessonsResponseModel(BaseModel):
 
 class PostCourseLessonRequestModel(BaseModel):
     name: str
-    description: str
     src: HttpUrl
+    lesson_length: int
 
 
 class PostCourseLessonResponseModel(BaseModel):
@@ -133,5 +134,5 @@ class PostCourseLessonResponseModel(BaseModel):
 
 class PatchCourseLessonRequestModel(BaseModel):
     name: str | None = None
-    description: str | None = None
     src: HttpUrl | None = None
+    lesson_length: int
