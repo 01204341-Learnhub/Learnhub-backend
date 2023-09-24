@@ -1,6 +1,6 @@
 from pydantic import TypeAdapter
-from ..database import create_course_announcement, list_course_announcement
-from ..schemas import (
+from .database import create_course_announcement, list_course_announcement
+from .schemas import (
     ListCourseAnnouncementsModelBody,
     ListCourseAnnouncementsResponseModel,
     PostCourseAnnouncementRequestModel,

@@ -6,18 +6,18 @@ from learnhub_backend.dependencies import (
     common_pagination_parameters,
     Exception,
 )
-from learnhub_backend.program.announcements.schemas import (
+from .schemas import (
     ListCourseAnnouncementsResponseModel,
     PostCourseAnnouncementRequestModel,
 )
-from learnhub_backend.program.announcements.services import (
+from .services import (
     create_course_announcements_response,
     list_course_announcements_response,
 )
 
 
 router = APIRouter(
-    prefix="/programs/announcements",
+    prefix="/programs/courses",
     tags=["announcements"],
     dependencies=[
         Depends(common_pagination_parameters),

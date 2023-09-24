@@ -1,22 +1,29 @@
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
 from bson.objectid import ObjectId
+from bson.errors import InvalidId
 
-from ..schemas import PostCourseAnnouncementRequestModel
-from ..database import db_client
+from .schemas import PostCourseAnnouncementRequestModel
+from learnhub_backend.database import db_client
+from learnhub_backend.dependencies import (
+    Exception,
+)
 
 
 def list_course_announcement(course_id: str, skip: int = 0, limit: int = 100):
-    q = {"course_id": ObjectId(course_id)}
+    try:
+        q = {"course_id": ObjectId(course_id)}
 
-    annoucements_cursor = db_client.annoucement_coll.find(q, skip=skip, limit=limit)
-    annoucements = []
-    for annoucement in annoucements_cursor:
-        annoucement["announcement_id"] = str(annoucement["_id"])
-        annoucement["course_id"] = str(annoucement["course_id"])
-        annoucement["teacher_id"] = str(annoucement["teacher_id"])
-        del annoucement["_id"]
-        annoucements.append(annoucement)
-    return annoucements
+        announcements_cursor = db_client.annoucement_coll.find(
+            q, skip=skip, limit=limit
+        )
+        announcements = []
+        for announcement in announcements_cursor:
+            announcement["announcement_id"] = str(announcement["_id"])
+            announcement["last_edit"] = int(datetime.timestamp(announcement["last_edit"]))
+            announcements.append(announcement)
+    except InvalidId:
+        raise Exception.bad_request
+    return announcements
 
 
 def create_course_announcement(
@@ -24,7 +31,7 @@ def create_course_announcement(
 ):
     announcement_body_to_inserted = announcement_body.model_dump()
     announcement_body_to_inserted["course_id"] = ObjectId(course_id)
-    announcement_body_to_inserted["last_edit"] = datetime.now()
+    announcement_body_to_inserted["last_edit"] = datetime.now(tz=timezone(timedelta(hours=7)))
     response = db_client.annoucement_coll.insert_one(announcement_body_to_inserted)
     created_id = response.inserted_id
     return str(created_id)
