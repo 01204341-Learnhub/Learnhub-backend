@@ -100,7 +100,7 @@ class PatchCourseChapterRequestModel(BaseModel):
     description: Optional[str] = None
 
 
-## Lessons
+## LESSON
 class GetCourseLessonResponseModel(BaseModel):
     lesson_id: str
     lesson_num: int

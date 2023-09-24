@@ -220,7 +220,7 @@ def delete_course_chapter(chapter_id: str, course_id: str):
         }
         delete_response = db_client.lesson_coll.delete_many(filter=lesson_delete_filter)
 
-        # TODO: decrement course's chapter_count, (file_count | video_count | quiz_count)
+        # TODO: decrement course's chapter_count, (file_count | video_count | quiz_count) base on lessons deleted
         return
     except InvalidId:
         raise Exception.bad_request
@@ -404,10 +404,12 @@ def remove_course_lesson(
             "course_id": ObjectId(course_id),
             "chapter_id": ObjectId(chapter_id),
         }
-        result = db_client.lesson_coll.find_one_and_delete(delete_filter)
-        if result == None:  # Deletion Failed.
+        original = db_client.lesson_coll.find_one_and_delete(delete_filter)
+        if original == None:  # Deletion Failed.
             raise Exception.not_found
-        lesson_num_threshold = result["lesson_num"]
+
+        # update lesson num
+        lesson_num_threshold = original["lesson_num"]
 
         update_filter = {
             "course_id": ObjectId(course_id),
@@ -421,7 +423,33 @@ def remove_course_lesson(
         )
 
         # TODO: Decrement chapter's lesson_count, chapter_length and course's fields
-        return
+        # update chapter
+        chapter_filter = {"_id": ObjectId(chapter_id)}
+        chapter_update = {
+            "$inc": {"lesson_count": -1, "chapter_length": -original["lesson_length"]}
+        }
+        result = db_client.chapter_coll.update_one(chapter_filter, chapter_update)
+
+        # update course
+        course_filter = {"_id": ObjectId(course_id)}
+        match original["lesson_type"]:
+            case "video":
+                course_update = {
+                    "$inc": {
+                        "video_count": -1,
+                        "total_video_length": -original["lesson_length"],
+                    }
+                }
+            case "file":
+                course_update = {
+                    "$inc": {
+                        "file_count": -1,
+                    }
+                }
+            # TODO: case "quiz":
+            case _:
+                course_update = dict()
+        result = db_client.course_coll.update_one(course_filter, course_update)
 
     except InvalidId:
         raise Exception.bad_request
