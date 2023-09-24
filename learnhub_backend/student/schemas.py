@@ -2,6 +2,8 @@ from typing import Optional, Union
 from pydantic import BaseModel, HttpUrl
 
 
+class placeHolder(BaseModel):
+    pass
 ## STUDENTS
 class GetStudentResponseModel(BaseModel):
     student_id: str
@@ -39,3 +41,18 @@ class ListStudentCoursesModelBody(BaseModel):
 
 class ListStudentCourseResponseModel(BaseModel):
     courses: list[ListStudentCoursesModelBody]
+
+
+# STUDENT COURSE PROGRESS
+class LessonProgressModelBody(BaseModel):
+    lesson_id: str
+    chapter_id: str
+    finished: bool
+    lesson_completed: int
+    # TODO: Add quiz score
+    #quiz_score: int | None = None
+class GetStudentCourseProgressResponseModel(BaseModel):
+    progress: float
+    lessons: list[LessonProgressModelBody]
+
+

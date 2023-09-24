@@ -7,12 +7,16 @@ from .database import (
     query_list_students,
     query_student,
     remove_student,
+    query_student_course_progress,
+    edit_student_course_progress,
 )
 
 from .schemas import (
     ListStudentsResponseModel,
     GetStudentResponseModel,
     PatchStudentRequestModel,
+    GetStudentCourseProgressResponseModel,
+    LessonProgressModelBody,
 )
 
 
@@ -50,3 +54,27 @@ def edit_student_request(
 def delete_student_request(student_id: str) -> DeleteResult:
     result = remove_student(student_id)
     return result
+
+
+# STUDENT COURSE PROGRESS
+def get_student_course_progress_response(
+    student_id: str, course_id: str
+) -> GetStudentCourseProgressResponseModel:
+    queried_course_progress = query_student_course_progress(
+        student_id=student_id, course_id=course_id
+    )
+    # response_body = GetStudentCourseProgressResponseModel(**queried_course_progress)
+    ta = TypeAdapter(list[LessonProgressModelBody])
+    response_body = GetStudentCourseProgressResponseModel(
+        progress=queried_course_progress["progress"],
+        lessons=ta.validate_python(queried_course_progress["lessons"]),
+    )
+    return response_body
+
+
+def patch_student_course_progress_request(
+    student_id: str, course_id: str, requested_lesson: LessonProgressModelBody
+) -> dict:
+    # TODO: Validate response (not nessessary)
+    response  = edit_student_course_progress(student_id = student_id, course_id = course_id, requested_lesson = requested_lesson )
+    return response
