@@ -1,5 +1,7 @@
 from pydantic import BaseModel
 from fastapi import HTTPException
+import mimetypes
+import httpx
 
 
 def common_pagination_parameters(skip: int = 0, limit: int = 100):
@@ -33,3 +35,16 @@ class Exception:
 student_type = "student"
 teacher_type = "teacher"
 course_type = "course"
+
+
+def CheckHttpFileType(url: str):
+    result = mimetypes.guess_type(url)[0]  # ('audio/mpeg', None)
+    if result == None:  # no extension url
+        # only download metadata
+        response = httpx.head(url).headers[
+            "Content-Type"
+        ]  # ex. 'texts/html; charset=utf-8'
+        result = response.split(";")[0]
+    file_type, extension = result.split("/")  # 'video/mp4'
+    # TODO: allow only some file_types
+    return file_type
