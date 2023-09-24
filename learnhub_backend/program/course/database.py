@@ -16,6 +16,7 @@ from .schemas import (
 
 from ...dependencies import (
     Exception,
+    CheckHttpFileType,
     teacher_type,
 )
 
@@ -275,7 +276,7 @@ def create_course_lesson(
             "chapter_id": ObjectId(chapter_id),
             "name": request.name,
             "description": request.description,
-            "lesson_type": "video",  # TODO: add utils to check for url type
+            "lesson_type": CheckHttpFileType(str(request.src)),
             "src": str(request.src),
         }
 

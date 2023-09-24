@@ -37,13 +37,13 @@ teacher_type = "teacher"
 course_type = "course"
 
 
-def CheckHttpFileType(url: str):
+def CheckHttpFileType(url: str) -> str:
     result = mimetypes.guess_type(url)[0]  # ('audio/mpeg', None)
     if result == None:  # no extension url
-        # only download metadata
+        # download only 'Content-Type' metadata
         response = httpx.head(url).headers[
             "Content-Type"
-        ]  # ex. 'texts/html; charset=utf-8'
+        ]  # ex. 'texts/html; charset=utf-8' or 'application/pdf'
         result = response.split(";")[0]
     file_type, extension = result.split("/")  # 'video/mp4'
     # TODO: allow only some file_types
