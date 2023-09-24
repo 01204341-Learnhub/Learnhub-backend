@@ -15,7 +15,7 @@ def db_placeholder():
 
 
 # CLASSES
-def query_list_classes(skip: int, limit: int):
+def query_list_classes(skip: int, limit: int):# TODO: add return type
     try:
         classes_corsor = db_client.class_coll.find(skip=skip, limit=limit)
     except InvalidId:
