@@ -1,8 +1,13 @@
-from pymongo.results import UpdateResult
-from ..database import db_client
+from datetime import datetime, timezone
+
+from pymongo.results import InsertOneResult, UpdateResult
 from bson.objectid import ObjectId
 from bson.errors import InvalidId
+
+from ..database import db_client
+
 from .schemas import (
+    PostCourseRequestModel,
     PostCourseChaptersRequestModel,
     PatchCourseChapterRequestModel,
     PatchCourseLessonRequestModel,
@@ -17,6 +22,7 @@ from ...dependencies import (
 )
 
 
+# AUXILARY
 def query_teacher_by_id(id: str | ObjectId):
     try:
         filter = {"type": teacher_type, "_id": id}
@@ -32,6 +38,7 @@ def query_teacher_by_id(id: str | ObjectId):
 def query_list_tags_by_id(ids: list[str | ObjectId]):
     try:
         object_ids = []
+        # TODO: use map to convert type instead
         for id in ids:
             if type(id) == ObjectId:
                 object_ids.append(id)
@@ -45,6 +52,7 @@ def query_list_tags_by_id(ids: list[str | ObjectId]):
         raise Exception.bad_request
 
 
+# COURSE
 def query_list_courses(skip: int = 0, limit: int = 100) -> list:
     try:
         courses_cursor = db_client.course_coll.find(skip=skip, limit=limit)
@@ -57,6 +65,50 @@ def query_list_courses(skip: int = 0, limit: int = 100) -> list:
         raise Exception.bad_request
 
 
+def create_course(course_body: PostCourseRequestModel) -> InsertOneResult:
+    try:
+        # Check valid teacher
+        teacher_filter = {"type": teacher_type, "_id": ObjectId(course_body.teacher_id)}
+        teacher_result = db_client.user_coll.find_one(filter=teacher_filter)
+        if teacher_result == None:
+            raise Exception.unprocessable_content
+
+        # Check valid tag
+        for tag_id in course_body.tag_ids:
+            tag_result = db_client.tag_coll.find_one(ObjectId(tag_id))
+            if tag_result == None:
+                raise Exception.unprocessable_content
+
+        body = {
+            "name": course_body.name,
+            "teacher_id": ObjectId(course_body.teacher_id),
+            "description": course_body.description,
+            "created_date": datetime.now(),
+            "course_pic": str(course_body.course_pic),
+            "student_count": 0,
+            "rating": 0,
+            "review_count": 0,
+            "price": course_body.price,
+            "course_objective": course_body.course_objective,
+            "course_requirement": course_body.course_requirement,
+            "difficulty_level": course_body.difficulty_level,
+            "tags": list(map(ObjectId, course_body.tag_ids)),
+            "total_video_length": 0,
+            "chapter_count": 0,
+            "file_count": 0,
+            "quiz_count": 0,
+            "video_count": 0,
+            "status": "started",  # TODO: add not deployed status
+        }
+
+        result = db_client.course_coll.insert_one(document=body)
+        return result
+
+    except InvalidId:
+        raise Exception.bad_request
+
+
+# CHAPTER
 def query_list_course_chapters(course_id: str, skip: int = 0, limit: int = 100) -> list:
     try:
         chapters_cursor = db_client.chapter_coll.find(
@@ -83,7 +135,7 @@ def create_course_chapter(course_id: str, chapter_body: PostCourseChaptersReques
         valid_course_id_filter = {"_id": ObjectId(course_id)}
         result = db_client.course_coll.find_one(filter=valid_course_id_filter)
         if result == None:
-            raise Exception.not_found
+            raise Exception.unprocessable_content
 
         response_chapter_num = (
             db_client.chapter_coll.find(
@@ -158,6 +210,7 @@ def delete_course_chapter(chapter_id: str, course_id: str):
         raise Exception.bad_request
 
 
+# LESSON
 def query_list_course_lessons(
     course_id: str, chapter_id: str, skip: int = 0, limit: int = 100
 ) -> list:
@@ -198,11 +251,11 @@ def create_course_lesson(
         valid_course_filter = {"_id": ObjectId(course_id)}
         course_result = db_client.course_coll.find_one(filter=valid_course_filter)
         if course_result == None:
-            raise Exception.not_found
+            raise Exception.unprocessable_content
         valid_chapter_filter = {"_id": ObjectId(chapter_id)}
         chapter_result = db_client.chapter_coll.find_one(filter=valid_chapter_filter)
         if chapter_result == None:
-            raise Exception.not_found
+            raise Exception.unprocessable_content
 
         body = {
             "course_id": ObjectId(course_id),

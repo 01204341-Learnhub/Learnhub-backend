@@ -5,6 +5,7 @@ from pymongo.results import UpdateResult
 from learnhub_backend.dependencies import GenericOKResponse
 
 from .database import (
+    create_course,
     query_list_tags_by_id,
     query_teacher_by_id,
     query_list_courses,
@@ -20,6 +21,8 @@ from .database import (
     remove_course_lesson,
 )
 from .schemas import (
+    PostCourseRequestModel,
+    PostCourseResponseModel,
     TagModelBody,
     TeacherModelBody,
     ListCoursesModelBody,
@@ -74,6 +77,12 @@ def list_courses_response(skip: int = 0, limit: int = 100):
     return ListCoursesResponseModel(courses=list_courses_response)
 
 
+def add_course_request(request: PostCourseRequestModel) -> PostCourseResponseModel:
+    result = create_course(request)
+    response_body = PostCourseResponseModel(course_id=str(result.inserted_id))
+    return response_body
+
+
 # COURSE CHAPTERS
 def list_course_chapters_response(course_id: str, skip: int = 0, limit: int = 0):
     queried_chapters = query_list_course_chapters(
@@ -89,6 +98,7 @@ def list_course_chapters_response(course_id: str, skip: int = 0, limit: int = 0)
 def add_course_chapter_response(
     course_id: str, chapter_body: PostCourseChaptersRequestModel
 ) -> dict | None:
+    # TODO: clean
     response = create_course_chapter(course_id=course_id, chapter_body=chapter_body)
     if response.inserted_id == None:
         raise Exception.bad_request

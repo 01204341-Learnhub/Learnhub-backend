@@ -7,6 +7,7 @@ from ...dependencies import (
 )
 
 from .services import (
+    add_course_request,
     list_course_chapters_response,
     add_course_chapter_response,
     get_course_chapter_response,
@@ -70,7 +71,8 @@ def list_courses(common_paginations: common_page_params):
     response_model=PostCourseResponseModel,
 )
 def add_course(course_body: PostCourseRequestModel):
-    pass
+    response_body = add_course_request(course_body)
+    return response_body
 
 
 # CHAPTER
