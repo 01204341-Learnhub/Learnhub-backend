@@ -2,6 +2,32 @@ from typing import Optional, Union
 from pydantic import BaseModel, HttpUrl
 
 
+class TeacherModelBody(BaseModel):
+    teacher_id: str
+    teacher_name: str
+
+
+class TagModelBody(BaseModel):
+    tag_id: str
+    tag_name: str
+
+
+# COURSE
+class ListCoursesModelBody(BaseModel):
+    course_id: str
+    name: str
+    teacher: TeacherModelBody
+    tags: list[TagModelBody]
+    rating: float
+    review_count: int
+    price: float
+    course_pic: HttpUrl
+
+
+class ListCoursesResponseModel(BaseModel):
+    courses: list[ListCoursesModelBody]
+
+
 # COURSE CHAPTERS
 class ListCourseChaptersModelBody(BaseModel):
     chapter_id: str

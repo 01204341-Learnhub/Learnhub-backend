@@ -9,7 +9,47 @@ from .schemas import (
     PostCourseLessonRequestModel,
 )
 
-from ...dependencies import Exception
+from ...dependencies import Exception, student_type, teacher_type, course_type
+
+
+def query_teacher_by_id(id: str | ObjectId):
+    try:
+        filter = {"type": teacher_type, "_id": id}
+        if type(id) == str:
+            filter["_id"] = ObjectId(id)
+        teacher = db_client.user_coll.find_one(filter=filter)
+        return teacher
+
+    except InvalidId:
+        raise Exception.bad_request
+
+
+def query_list_tags_by_id(ids: list[str | ObjectId]):
+    try:
+        object_ids = []
+        for id in ids:
+            if type(id) == ObjectId:
+                object_ids.append(id)
+            else:
+                object_ids.append(ObjectId(id))
+        filter = {"_id": {"$in": object_ids}}
+        tags = db_client.tag_coll.find(filter)
+        return tags
+
+    except InvalidId:
+        raise Exception.bad_request
+
+
+def query_list_courses(skip: int = 0, limit: int = 100) -> list:
+    try:
+        courses_cursor = db_client.course_coll.find(skip=skip, limit=limit)
+        courses = []
+        for course in courses_cursor:
+            course["course_id"] = str(course["_id"])
+            courses.append(course)
+        return courses
+    except InvalidId:
+        raise Exception.bad_request
 
 
 def query_list_course_chapters(course_id: str, skip: int = 0, limit: int = 100) -> list:

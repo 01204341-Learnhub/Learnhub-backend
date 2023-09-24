@@ -5,6 +5,7 @@ from pymongo.results import UpdateResult
 from learnhub_backend.dependencies import GenericOKResponse
 
 from .database import (
+    query_list_courses,
     query_list_course_chapters,
     create_course_chapter,
     query_course_chapter,
@@ -14,9 +15,13 @@ from .database import (
     query_list_course_lessons,
     query_course_lesson,
     create_course_lesson,
+    query_list_tags_by_id,
+    query_teacher_by_id,
     remove_course_lesson,
 )
 from .schemas import (
+    ListCoursesModelBody,
+    ListCoursesResponseModel,
     ListCourseChaptersModelBody,
     ListCourseChaptersResponseModel,
     PostCourseChaptersRequestModel,
@@ -28,9 +33,45 @@ from .schemas import (
     PatchCourseLessonRequestModel,
     PostCourseLessonRequestModel,
     PostCourseLessonResponseModel,
+    TagModelBody,
+    TeacherModelBody,
 )
 
 from ...dependencies import Exception
+
+
+# COURSE
+def list_courses_response(skip: int = 0, limit: int = 100):
+    queried_courses = query_list_courses(skip, limit)
+    list_courses_response = list()
+    course_response = dict()
+    for course in queried_courses:
+        course_response["course_id"] = course["course_id"]
+        course_response["name"] = course["name"]
+        course_response["rating"] = course["rating"]
+        course_response["review_count"] = course["review_count"]
+        course_response["price"] = course["price"]
+        course_response["course_pic"] = course["course_pic"]
+
+        # teacher
+        teacher = query_teacher_by_id(course["teacher_id"])
+        if teacher == None:
+            raise Exception.internal_server_error  # No teacher was found
+        teacher["teacher_id"] = str(teacher["_id"])
+        teacher["teacher_name"] = teacher["fullname"]
+        course_response["teacher"] = TeacherModelBody(**teacher)
+
+        # tags
+        tags = []
+        tags_cursor = query_list_tags_by_id(course["tags"])
+        for tag in tags_cursor:
+            tag["tag_id"] = str(tag["_id"])
+            tag["tag_name"] = tag["name"]
+            tags.append(TagModelBody(**tag))
+        course_response["tags"] = tags
+
+        list_courses_response.append(ListCoursesModelBody(**course_response))
+    return ListCoursesResponseModel(courses=list_courses_response)
 
 
 # COURSE CHAPTERS
