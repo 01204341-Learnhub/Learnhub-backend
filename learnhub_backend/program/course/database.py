@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+from datetime import datetime
 
 from pymongo.results import InsertOneResult, UpdateResult
 from bson.objectid import ObjectId
@@ -8,7 +8,7 @@ from ..database import db_client
 
 from .schemas import (
     PostCourseRequestModel,
-    PostCourseChaptersRequestModel,
+    PostCourseChapterRequestModel,
     PatchCourseChapterRequestModel,
     PatchCourseLessonRequestModel,
     PostCourseLessonRequestModel,
@@ -16,9 +16,7 @@ from .schemas import (
 
 from ...dependencies import (
     Exception,
-    student_type,
     teacher_type,
-    course_type,
 )
 
 
@@ -37,13 +35,8 @@ def query_teacher_by_id(id: str | ObjectId):
 
 def query_list_tags_by_id(ids: list[str | ObjectId]):
     try:
-        object_ids = []
-        # TODO: use map to convert type instead
-        for id in ids:
-            if type(id) == ObjectId:
-                object_ids.append(id)
-            else:
-                object_ids.append(ObjectId(id))
+        object_ids = list(map(ObjectId, ids))
+
         filter = {"_id": {"$in": object_ids}}
         tags = db_client.tag_coll.find(filter)
         return tags
@@ -123,7 +116,7 @@ def query_list_course_chapters(course_id: str, skip: int = 0, limit: int = 100) 
         raise Exception.bad_request
 
 
-def create_course_chapter(course_id: str, chapter_body: PostCourseChaptersRequestModel):
+def create_course_chapter(course_id: str, chapter_body: PostCourseChapterRequestModel):
     try:
         chapter_body_to_inserted = chapter_body.model_dump()
         chapter_body_to_inserted["course_id"] = ObjectId(course_id)

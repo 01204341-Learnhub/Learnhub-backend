@@ -9,7 +9,7 @@ from ...dependencies import (
 from .services import (
     add_course_request,
     list_course_chapters_response,
-    add_course_chapter_response,
+    add_course_chapter_request,
     get_course_chapter_response,
     edit_course_chapter_response,
     delete_course_chapter_response,
@@ -26,7 +26,8 @@ from .schemas import (
     PostCourseRequestModel,
     PostCourseResponseModel,
     ListCourseChaptersResponseModel,
-    PostCourseChaptersRequestModel,
+    PostCourseChapterRequestModel,
+    PostCourseChapterResponseModel,
     GetCourseChapterResponseModel,
     PatchCourseChapterRequestModel,
     ListCourseLessonsResponseModel,
@@ -95,10 +96,10 @@ def list_course_chapters(course_id: str, common_paginations: common_page_params)
     "/{course_id}/chapters",
     status_code=200,
     response_model_exclude_none=True,
-    response_model=dict,
+    response_model=PostCourseChapterResponseModel,
 )
-def add_course_chapter(course_id: str, chapter_body: PostCourseChaptersRequestModel):
-    response_body = add_course_chapter_response(
+def add_course_chapter(course_id: str, chapter_body: PostCourseChapterRequestModel):
+    response_body = add_course_chapter_request(
         course_id=course_id, chapter_body=chapter_body
     )
     return response_body

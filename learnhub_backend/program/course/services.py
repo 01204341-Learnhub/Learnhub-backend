@@ -29,7 +29,8 @@ from .schemas import (
     ListCoursesResponseModel,
     ListCourseChaptersModelBody,
     ListCourseChaptersResponseModel,
-    PostCourseChaptersRequestModel,
+    PostCourseChapterRequestModel,
+    PostCourseChapterResponseModel,
     GetCourseChapterResponseModel,
     PatchCourseChapterRequestModel,
     ListCourseLessonsResponseModel,
@@ -95,14 +96,15 @@ def list_course_chapters_response(course_id: str, skip: int = 0, limit: int = 0)
     return response_body
 
 
-def add_course_chapter_response(
-    course_id: str, chapter_body: PostCourseChaptersRequestModel
-) -> dict | None:
-    # TODO: clean
-    response = create_course_chapter(course_id=course_id, chapter_body=chapter_body)
-    if response.inserted_id == None:
+def add_course_chapter_request(
+    course_id: str, chapter_body: PostCourseChapterRequestModel
+) -> PostCourseChapterResponseModel:
+    result = create_course_chapter(course_id=course_id, chapter_body=chapter_body)
+    if result.inserted_id == None:
         raise Exception.bad_request
-    return {"chapter_id": str(response.inserted_id)}
+    response_body = PostCourseChapterResponseModel(chapter_id=str(result.inserted_id))
+
+    return response_body
 
 
 def get_course_chapter_response(chapter_id: str):

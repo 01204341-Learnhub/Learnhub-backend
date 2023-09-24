@@ -57,9 +57,13 @@ class ListCourseChaptersResponseModel(BaseModel):
     chapters: list[ListCourseChaptersModelBody]
 
 
-class PostCourseChaptersRequestModel(BaseModel):
+class PostCourseChapterRequestModel(BaseModel):
     name: str
     description: str
+
+
+class PostCourseChapterResponseModel(BaseModel):
+    chapter_id: str
 
 
 class GetCourseChapterResponseModel(BaseModel):
