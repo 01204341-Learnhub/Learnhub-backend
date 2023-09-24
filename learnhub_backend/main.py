@@ -6,7 +6,7 @@ import uvicorn
 from .database import db_client
 from .program.router import router as program_router
 from .program.course.router import router as course_router
-from .program.announcements.router import router as announcements_router
+from .program.course.announcements.router import router as announcements_router
 from .student.router import router as student_router
 from .teacher.router import router as teacher_router
 
