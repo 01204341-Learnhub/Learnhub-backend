@@ -131,7 +131,7 @@ def create_course_chapter(course_id: str, chapter_body: PostCourseChapterRequest
         chapter_body_to_inserted["course_id"] = ObjectId(course_id)
         chapter_body_to_inserted["description"] = chapter_body.description
         chapter_body_to_inserted["chapter_length"] = 0
-        chapter_body_to_inserted["lesson_count"] = 0  # TODO: Check if need to change
+        chapter_body_to_inserted["lesson_count"] = 0
 
         # No matching course
         valid_course_id_filter = {"_id": ObjectId(course_id)}
@@ -152,7 +152,16 @@ def create_course_chapter(course_id: str, chapter_body: PostCourseChapterRequest
             )
         except StopIteration:
             chapter_body_to_inserted["chapter_num"] = 1
+
         response = db_client.chapter_coll.insert_one(chapter_body_to_inserted)
+
+        # increase course chapter count
+        course_filter = {"_id": ObjectId(course_id)}
+        course_update = {"$inc": {"chapter_count": 1}}
+        update_response = db_client.course_coll.update_one(
+            filter=course_filter, update=course_update
+        )
+
         return response
     except InvalidId:
         raise Exception.bad_request
@@ -207,6 +216,8 @@ def delete_course_chapter(chapter_id: str, course_id: str):
             "chapter_id": ObjectId(chapter_id),
         }
         delete_response = db_client.lesson_coll.delete_many(filter=lesson_delete_filter)
+
+        # TODO: decrement course's chapter_count, (file_count | video_count | quiz_count)
         return
     except InvalidId:
         raise Exception.bad_request
@@ -283,6 +294,8 @@ def create_course_lesson(
             break
 
         object_id = db_client.lesson_coll.insert_one(body)
+
+        # TODO: Increment chapter's lesson_count, chapter_length and course's fields
         return str(object_id.inserted_id)
     except InvalidId:
         raise Exception.bad_request
@@ -344,6 +357,8 @@ def remove_course_lesson(
         result = db_client.lesson_coll.update_many(
             filter=update_filter, update=update_body
         )
+
+        # TODO: Decrement chapter's lesson_count, chapter_length and course's fields
         return
 
     except InvalidId:
