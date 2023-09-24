@@ -194,7 +194,7 @@ def edit_course_lesson_request(
     lesson_id: str,
     request: PatchCourseLessonRequestModel,
 ):
-    result = edit_course_lesson(course_id, chapter_id, lesson_id, request)
+    edit_course_lesson(course_id, chapter_id, lesson_id, request)
     return GenericOKResponse
 
 

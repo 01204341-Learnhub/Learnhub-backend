@@ -332,7 +332,7 @@ def edit_course_lesson(
     chapter_id: str,
     lesson_id: str,
     request: PatchCourseLessonRequestModel,
-) -> UpdateResult:
+):
     try:
         filter = {
             "_id": ObjectId(lesson_id),
@@ -340,20 +340,55 @@ def edit_course_lesson(
             "chapter_id": ObjectId(chapter_id),
         }
 
+        original = db_client.lesson_coll.find_one(filter=filter)
+        if original == None:
+            raise Exception.not_found
+
         update_body = {}
         if request.name != None:
             update_body["name"] = request.name
         if request.lesson_length != None:
             update_body["lesson_length"] = request.lesson_length
-            # TODO: Calculate new chapter length
         if request.src != None:
             update_body["src"] = str(request.src)
-            # TODO: If change lesson type return error
+            if (
+                CheckLessonType(str(request.src)) != original["lesson_type"]
+            ):  # Changing lesson type is not allowed
+                raise Exception.unprocessable_content
+
         update = {"$set": update_body}
-        result = db_client.lesson_coll.update_one(filter=filter, update=update)
+        result = db_client.lesson_coll.update_one(
+            filter=filter, update=update
+        )  # returns original doc
         if result.matched_count == 0:
             raise Exception.not_found
-        return result
+
+        if (
+            request.lesson_length != None
+            and request.lesson_length != original["lesson_length"]
+        ):
+            chapter_filter = {"_id": ObjectId(chapter_id)}
+            chapter_update = {
+                "$inc": {
+                    "chapter_length": request.lesson_length - original["lesson_length"]
+                }
+            }
+            chapter_result = db_client.chapter_coll.update_one(
+                filter=chapter_filter, update=chapter_update
+            )
+
+            if original["lesson_type"] == "video":
+                course_filter = {"_id": ObjectId(course_id)}
+                course_update = {
+                    "$inc": {
+                        "total_video_length": request.lesson_length
+                        - original["lesson_length"]
+                    }
+                }
+                course_result = db_client.course_coll.update_one(
+                    filter=course_filter, update=course_update
+                )
+
     except InvalidId:
         raise Exception.bad_request
 
