@@ -18,7 +18,7 @@ def service_placeholder():
 
 
 # CLASSES
-def list_classes_response(skip: int, limit: int):
+def list_classes_response(skip: int, limit: int): # TODO: add return type
     classes_corsor = query_list_classes(skip=skip, limit=limit)
     quried_classes = []
     for class_ in classes_corsor:
