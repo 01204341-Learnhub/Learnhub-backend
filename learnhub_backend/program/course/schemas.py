@@ -28,6 +28,22 @@ class ListCoursesResponseModel(BaseModel):
     courses: list[ListCoursesModelBody]
 
 
+class PostCourseRequestModel(BaseModel):
+    name: str
+    teacher_id: str
+    course_pic: HttpUrl
+    description: str
+    course_objective: list[str]
+    tag_ids: list[str]
+    course_requirement: str
+    difficulty_level: str
+    price: float
+
+
+class PostCourseResponseModel(BaseModel):
+    course_id: str
+
+
 # COURSE CHAPTERS
 class ListCourseChaptersModelBody(BaseModel):
     chapter_id: str
@@ -67,8 +83,6 @@ class GetCourseLessonResponseModel(BaseModel):
     lesson_type: str
     description: str
     src: HttpUrl
-    # TODO: only return progress, If student_id is attached.
-    progress: float | None = None
 
 
 class ListCourseLessonsModelBody(BaseModel):

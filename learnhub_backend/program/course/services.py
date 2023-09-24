@@ -5,6 +5,8 @@ from pymongo.results import UpdateResult
 from learnhub_backend.dependencies import GenericOKResponse
 
 from .database import (
+    query_list_tags_by_id,
+    query_teacher_by_id,
     query_list_courses,
     query_list_course_chapters,
     create_course_chapter,
@@ -15,11 +17,11 @@ from .database import (
     query_list_course_lessons,
     query_course_lesson,
     create_course_lesson,
-    query_list_tags_by_id,
-    query_teacher_by_id,
     remove_course_lesson,
 )
 from .schemas import (
+    TagModelBody,
+    TeacherModelBody,
     ListCoursesModelBody,
     ListCoursesResponseModel,
     ListCourseChaptersModelBody,
@@ -33,8 +35,6 @@ from .schemas import (
     PatchCourseLessonRequestModel,
     PostCourseLessonRequestModel,
     PostCourseLessonResponseModel,
-    TagModelBody,
-    TeacherModelBody,
 )
 
 from ...dependencies import Exception

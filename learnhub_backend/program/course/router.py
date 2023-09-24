@@ -22,6 +22,8 @@ from .services import (
 
 from .schemas import (
     ListCoursesResponseModel,
+    PostCourseRequestModel,
+    PostCourseResponseModel,
     ListCourseChaptersResponseModel,
     PostCourseChaptersRequestModel,
     GetCourseChapterResponseModel,
@@ -46,6 +48,7 @@ router = APIRouter(
 common_page_params = Annotated[dict, Depends(router.dependencies[0].dependency)]
 
 
+# COURSE
 @router.get(
     "/",
     status_code=200,
@@ -60,6 +63,17 @@ def list_courses(common_paginations: common_page_params):
     return response_body
 
 
+@router.post(
+    "/",
+    status_code=200,
+    response_model_exclude_none=True,
+    response_model=PostCourseResponseModel,
+)
+def add_course(course_body: PostCourseRequestModel):
+    pass
+
+
+# CHAPTER
 @router.get(
     "/{course_id}/chapters",
     status_code=200,
@@ -127,6 +141,7 @@ def delete_course_chapter(chapter_id: str, course_id: str):
     return response_body
 
 
+# LESSON
 @router.get(
     "/{course_id}/chapters/{chapter_id}/lessons",
     status_code=200,

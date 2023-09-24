@@ -9,7 +9,12 @@ from .schemas import (
     PostCourseLessonRequestModel,
 )
 
-from ...dependencies import Exception, student_type, teacher_type, course_type
+from ...dependencies import (
+    Exception,
+    student_type,
+    teacher_type,
+    course_type,
+)
 
 
 def query_teacher_by_id(id: str | ObjectId):
