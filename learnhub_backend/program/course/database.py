@@ -58,6 +58,15 @@ def query_list_courses(skip: int = 0, limit: int = 100) -> list:
         raise Exception.bad_request
 
 
+def query_course(course_id: str):
+    try:
+        filter = {"_id": ObjectId(course_id)}
+        course = db_client.course_coll.find_one(filter=filter)
+        return course
+    except InvalidId:
+        raise Exception.bad_request
+
+
 def create_course(course_body: PostCourseRequestModel) -> InsertOneResult:
     try:
         # Check valid teacher

@@ -8,6 +8,7 @@ from ...dependencies import (
 
 from .services import (
     add_course_request,
+    get_course_response,
     list_course_chapters_response,
     add_course_chapter_request,
     get_course_chapter_response,
@@ -22,6 +23,7 @@ from .services import (
 )
 
 from .schemas import (
+    GetCourseResponseModel,
     ListCoursesResponseModel,
     PostCourseRequestModel,
     PostCourseResponseModel,
@@ -73,6 +75,17 @@ def list_courses(common_paginations: common_page_params):
 )
 def add_course(course_body: PostCourseRequestModel):
     response_body = add_course_request(course_body)
+    return response_body
+
+
+@router.get(
+    "/{course_id}",
+    status_code=200,
+    response_model_exclude_none=True,
+    response_model=GetCourseResponseModel,
+)
+def get_course(course_id: str):
+    response_body = get_course_response(course_id)
     return response_body
 
 

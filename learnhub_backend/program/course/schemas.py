@@ -16,12 +16,12 @@ class TagModelBody(BaseModel):
 class ListCoursesModelBody(BaseModel):
     course_id: str
     name: str
+    course_pic: HttpUrl
     teacher: TeacherModelBody
     tags: list[TagModelBody]
     rating: float
     review_count: int
     price: float
-    course_pic: HttpUrl
 
 
 class ListCoursesResponseModel(BaseModel):
@@ -42,6 +42,26 @@ class PostCourseRequestModel(BaseModel):
 
 class PostCourseResponseModel(BaseModel):
     course_id: str
+
+
+class GetCourseResponseModel(BaseModel):
+    course_id: str
+    name: str
+    course_pic: HttpUrl
+    tags: list[TagModelBody]
+    description: str
+    course_objective: list[str]
+    course_requirement: str
+    difficulty_level: str
+    rating: float
+    review_count: int
+    student_count: int
+    teacher: TeacherModelBody
+    price: float
+    total_video_length: int
+    chapter_count: int
+    quiz_count: int
+    file_count: int
 
 
 # COURSE CHAPTERS

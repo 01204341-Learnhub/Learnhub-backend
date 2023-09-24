@@ -6,6 +6,7 @@ from learnhub_backend.dependencies import GenericOKResponse
 
 from .database import (
     create_course,
+    query_course,
     query_list_tags_by_id,
     query_teacher_by_id,
     query_list_courses,
@@ -21,6 +22,7 @@ from .database import (
     remove_course_lesson,
 )
 from .schemas import (
+    GetCourseResponseModel,
     PostCourseRequestModel,
     PostCourseResponseModel,
     TagModelBody,
@@ -82,6 +84,33 @@ def add_course_request(request: PostCourseRequestModel) -> PostCourseResponseMod
     result = create_course(request)
     response_body = PostCourseResponseModel(course_id=str(result.inserted_id))
     return response_body
+
+
+def get_course_response(course_id: str):
+    course = query_course(course_id)
+    if course == None:
+        raise Exception.not_found
+
+    course["course_id"] = str(course["_id"])
+
+    # teacher
+    teacher = query_teacher_by_id(course["teacher_id"])
+    if teacher == None:
+        raise Exception.internal_server_error  # No teacher was found
+    teacher["teacher_id"] = str(teacher["_id"])
+    teacher["teacher_name"] = teacher["fullname"]
+    course["teacher"] = TeacherModelBody(**teacher)
+
+    # tags
+    tags_cursor = query_list_tags_by_id(course["tags"])
+    tags = []
+    for tag in tags_cursor:
+        tag["tag_id"] = str(tag["_id"])
+        tag["tag_name"] = tag["name"]
+        tags.append(TagModelBody(**tag))
+    course["tags"] = tags
+
+    return GetCourseResponseModel(**course)
 
 
 # COURSE CHAPTERS
