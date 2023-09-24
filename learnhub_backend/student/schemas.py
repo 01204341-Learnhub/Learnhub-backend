@@ -56,3 +56,11 @@ class GetStudentCourseProgressResponseModel(BaseModel):
     lessons: list[LessonProgressModelBody]
 
 
+# STUDENT CONFIG
+class GetStudentConfigResponseModel(BaseModel):
+    theme: str
+    
+class PatchStudentConfigRequestModel(BaseModel):
+    theme: str | None = None
+
+

@@ -9,6 +9,8 @@ from .database import (
     remove_student,
     query_student_course_progress,
     edit_student_course_progress,
+    edit_student_config,
+    query_student_config
 )
 
 from .schemas import (
@@ -17,6 +19,8 @@ from .schemas import (
     PatchStudentRequestModel,
     GetStudentCourseProgressResponseModel,
     LessonProgressModelBody,
+    PatchStudentConfigRequestModel,
+    GetStudentConfigResponseModel,
 )
 
 
@@ -78,3 +82,22 @@ def patch_student_course_progress_request(
     # TODO: Validate response (not nessessary)
     response  = edit_student_course_progress(student_id = student_id, course_id = course_id, requested_lesson = requested_lesson )
     return response
+
+# STUDENT CONFIG
+def edit_student_config_request(
+    student_id: str, request: PatchStudentConfigRequestModel
+) -> UpdateResult:
+    result = edit_student_config(student_id, request)
+    return result
+
+def get_student_config_response(student_id: str) -> GetStudentConfigResponseModel | None:
+    queried_student_config = query_student_config(student_id)
+    try:
+        queried_student_config = query_student_config(student_id)
+    except:
+        return None
+    if queried_student_config == None:
+        return None
+    response_body = GetStudentConfigResponseModel(**queried_student_config)
+
+    return response_body
