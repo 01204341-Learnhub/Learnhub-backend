@@ -32,7 +32,7 @@ def create_course_announcement(
 ):
     announcement_body_to_inserted = announcement_body.model_dump()
     announcement_body_to_inserted["course_id"] = ObjectId(course_id)
-    announcement_body_to_inserted["last_edit"] = datetime.now(tz=timezone(timedelta(hours=7)))
+    announcement_body_to_inserted["last_edit"] = datetime.now(tz=timezone(timedelta(hours=7))) # bangkok time
     response = db_client.annoucement_coll.insert_one(announcement_body_to_inserted)
     created_id = response.inserted_id
     return str(created_id)
