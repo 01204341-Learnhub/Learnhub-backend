@@ -7,8 +7,10 @@ from ...dependencies import (
 )
 
 from .services import (
+    add_course_request,
+    get_course_response,
     list_course_chapters_response,
-    add_course_chapter_response,
+    add_course_chapter_request,
     get_course_chapter_response,
     edit_course_chapter_response,
     delete_course_chapter_response,
@@ -17,11 +19,17 @@ from .services import (
     get_course_lesson_response,
     edit_course_lesson_request,
     add_course_lesson_request,
+    list_courses_response,
 )
 
 from .schemas import (
+    GetCourseResponseModel,
+    ListCoursesResponseModel,
+    PostCourseRequestModel,
+    PostCourseResponseModel,
     ListCourseChaptersResponseModel,
-    PostCourseChaptersRequestModel,
+    PostCourseChapterRequestModel,
+    PostCourseChapterResponseModel,
     GetCourseChapterResponseModel,
     PatchCourseChapterRequestModel,
     ListCourseLessonsResponseModel,
@@ -44,6 +52,44 @@ router = APIRouter(
 common_page_params = Annotated[dict, Depends(router.dependencies[0].dependency)]
 
 
+# COURSE
+@router.get(
+    "/",
+    status_code=200,
+    response_model_exclude_none=True,
+    response_model=ListCoursesResponseModel,
+)
+def list_courses(common_paginations: common_page_params):
+    response_body = list_courses_response(
+        skip=common_paginations["skip"],
+        limit=common_paginations["limit"],
+    )
+    return response_body
+
+
+@router.post(
+    "/",
+    status_code=200,
+    response_model_exclude_none=True,
+    response_model=PostCourseResponseModel,
+)
+def add_course(course_body: PostCourseRequestModel):
+    response_body = add_course_request(course_body)
+    return response_body
+
+
+@router.get(
+    "/{course_id}",
+    status_code=200,
+    response_model_exclude_none=True,
+    response_model=GetCourseResponseModel,
+)
+def get_course(course_id: str):
+    response_body = get_course_response(course_id)
+    return response_body
+
+
+# CHAPTER
 @router.get(
     "/{course_id}/chapters",
     status_code=200,
@@ -63,10 +109,10 @@ def list_course_chapters(course_id: str, common_paginations: common_page_params)
     "/{course_id}/chapters",
     status_code=200,
     response_model_exclude_none=True,
-    response_model=dict,
+    response_model=PostCourseChapterResponseModel,
 )
-def add_course_chapter(course_id: str, chapter_body: PostCourseChaptersRequestModel):
-    response_body = add_course_chapter_response(
+def add_course_chapter(course_id: str, chapter_body: PostCourseChapterRequestModel):
+    response_body = add_course_chapter_request(
         course_id=course_id, chapter_body=chapter_body
     )
     return response_body
@@ -111,6 +157,7 @@ def delete_course_chapter(chapter_id: str, course_id: str):
     return response_body
 
 
+# LESSON
 @router.get(
     "/{course_id}/chapters/{chapter_id}/lessons",
     status_code=200,
