@@ -27,6 +27,7 @@ def list_course_announcement(course_id: str, skip: int = 0, limit: int = 100):
 
 
 def create_course_announcement(
+    # TODO: unfinished
     course_id: str, announcement_body: PostCourseAnnouncementRequestModel
 ):
     announcement_body_to_inserted = announcement_body.model_dump()
