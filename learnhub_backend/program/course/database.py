@@ -204,23 +204,54 @@ def delete_course_chapter(chapter_id: str, course_id: str):
         )
         if delete_response == None:  # Deletion Failed.
             raise Exception.not_found
+
         chapter_num_threshold = delete_response["chapter_num"]
         chapter_update_filter = {
             "course_id": ObjectId(course_id),
             "chapter_num": {"$gt": chapter_num_threshold},
         }
-        update_body = {"$inc": {"chapter_num": -1}}
+        update_chapter = {"$inc": {"chapter_num": -1}}
         update_response = db_client.chapter_coll.update_many(
-            filter=chapter_update_filter, update=update_body
+            filter=chapter_update_filter, update=update_chapter
         )
 
-        lesson_delete_filter = {
+        # update course
+        course_filter = {
+            "course_id": ObjectId(course_id),
+        }
+        update_course = {
+            "$inc": {
+                "chapter_count": -1,
+                "video_count": 0,
+                "total_video_length": 0,
+                "file_count": 0,
+                "quiz_count": 0,
+            }
+        }
+
+        lesson_filter = {
             "course_id": ObjectId(course_id),
             "chapter_id": ObjectId(chapter_id),
         }
-        delete_response = db_client.lesson_coll.delete_many(filter=lesson_delete_filter)
+        # find lessons
+        lessons_cursor = db_client.lesson_coll.find(filter=lesson_filter)
+        for lesson in lessons_cursor:
+            if lesson["lesson_type"] == "video":
+                update_course["$inc"]["video_count"] -= 1
+                update_course["$inc"]["total_video_length"] -= lesson["lesson_length"]
+            elif lesson["lesson_type"] == "file":
+                update_course["$inc"]["file_count"] -= 1
+            # TODO: update quiz count
 
-        # TODO: decrement course's chapter_count, (file_count | video_count | quiz_count) base on lessons deleted
+        # lesson delete
+        delete_response = db_client.lesson_coll.delete_many(filter=lesson_filter)
+
+        course_response = db_client.course_coll.update_one(
+            filter=course_filter, update=update_course
+        )
+        if course_response.matched_count == 0:
+            raise Exception.internal_server_error
+
         return
     except InvalidId:
         raise Exception.bad_request
@@ -422,7 +453,6 @@ def remove_course_lesson(
             filter=update_filter, update=update_body
         )
 
-        # TODO: Decrement chapter's lesson_count, chapter_length and course's fields
         # update chapter
         chapter_filter = {"_id": ObjectId(chapter_id)}
         chapter_update = {
