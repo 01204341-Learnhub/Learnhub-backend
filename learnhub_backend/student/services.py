@@ -90,12 +90,9 @@ def edit_student_config_request(
     result = edit_student_config(student_id, request)
     return result
 
-def get_student_config_response(student_id: str) -> GetStudentConfigResponseModel | None:
+def get_student_config_response(student_id: str) -> GetStudentConfigResponseModel :
     queried_student_config = query_student_config(student_id)
-    try:
-        queried_student_config = query_student_config(student_id)
-    except:
-        return None
+    
     if queried_student_config == None:
         return None
     response_body = GetStudentConfigResponseModel(**queried_student_config)

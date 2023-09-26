@@ -171,19 +171,30 @@ def edit_student_course_progress(
 
 # STUDENT CONFIG
 def edit_student_config(student_id: str, request: PatchStudentConfigRequestModel) -> UpdateResult:
-    filter = {"type": student_type, "_id": ObjectId(student_id)}
+    try:
+        filter = {"type": student_type, "_id": ObjectId(student_id)}
 
-    update_body = {}
-    if request.theme != None:
-        update_body["theme"] = request.theme
-    update = {"$set": update_body}
+        update_body = {}
+        if request.theme != None:
+            update_body["theme"] = request.theme
+        update = {"$set": update_body}
 
-    result = db_client.user_coll.update_one(filter=filter, update=update)
+        result = db_client.user_coll.update_one(filter=filter, update=update)
+    
+    except InvalidId:
+        raise Exception.bad_request
+    
     return result
 
-def query_student_config(student_id: str, config: GetStudentConfigResponseModel) -> dict | None:
-    filter = {"_id": ObjectId(student_id), "type": student_type,}
-    student = db_client.user_coll.find_one(filter=filter)
-    if student != None:
-        student["theme"] = str(student[config.theme])
+def query_student_config(student_id: str) -> dict:
+    try:
+        filter = {"_id": ObjectId(student_id), "type": student_type,}
+        student = db_client.user_coll.find_one(filter=filter)
+        if student != None:
+            student["theme"] = str(student["theme"])
+        
+    except InvalidId:
+        raise Exception.bad_request
+    
     return student
+    

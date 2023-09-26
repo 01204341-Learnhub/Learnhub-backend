@@ -128,6 +128,7 @@ def patch_student_course_progress(student_id: str, course_id: str, request_body:
     response_body = patch_student_course_progress_request(student_id=student_id, course_id = course_id, requested_lesson=request_body)
     return response_body
 
+# STUDENT CONFIG
 @router.get(
     "/{student_id}/config",
     status_code=200,
@@ -144,5 +145,5 @@ def get_student_config(student_id: str):
     response_model_exclude_none=True,
     response_model=dict,)
 def edit_student_config(student_id: str, request_body:PatchStudentConfigRequestModel):
-    response_body = edit_student_config_request(student_id=student_id)
+    response_body = edit_student_config_request(student_id=student_id, request=request_body)
     return response_body
