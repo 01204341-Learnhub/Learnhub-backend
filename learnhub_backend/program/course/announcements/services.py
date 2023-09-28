@@ -20,6 +20,6 @@ def list_course_announcements_response(
 
 def create_course_announcements_response(
     course_id: str, requestBody: PostCourseAnnouncementRequestModel
-):
+)-> str:
     created_id = create_course_announcement(course_id, requestBody)
     return created_id

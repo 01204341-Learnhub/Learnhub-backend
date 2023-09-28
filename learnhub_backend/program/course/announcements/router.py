@@ -48,6 +48,7 @@ def list_course_annoucements(course_id: str, common_paginations: common_page_par
     "/{course_id}/announcements",
     status_code=200,
     response_model_exclude_none=True,
+    response_model=dict,
 )
 def create_course_annoucement(
     course_id: str, annoucement_body: PostCourseAnnouncementRequestModel

@@ -27,9 +27,8 @@ def list_course_announcement(course_id: str, skip: int = 0, limit: int = 100):
 
 
 def create_course_announcement(
-    # TODO: unfinished
     course_id: str, announcement_body: PostCourseAnnouncementRequestModel
-):
+) -> str:
     announcement_body_to_inserted = announcement_body.model_dump()
     announcement_body_to_inserted["course_id"] = ObjectId(course_id)
     announcement_body_to_inserted["last_edit"] = datetime.now(tz=timezone(timedelta(hours=7))) # bangkok time
