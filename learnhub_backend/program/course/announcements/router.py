@@ -9,6 +9,7 @@ from learnhub_backend.dependencies import (
 from .schemas import (
     ListCourseAnnouncementsResponseModel,
     PostCourseAnnouncementRequestModel,
+    PostCourseAnnouncementResponseModel,
 )
 from .services import (
     create_course_announcements_response,
@@ -48,10 +49,10 @@ def list_course_annoucements(course_id: str, common_paginations: common_page_par
     "/{course_id}/announcements",
     status_code=200,
     response_model_exclude_none=True,
-    response_model=dict,
+    response_model=PostCourseAnnouncementResponseModel,
 )
 def create_course_annoucement(
     course_id: str, annoucement_body: PostCourseAnnouncementRequestModel
 ):
-    created_id = create_course_announcements_response(course_id, annoucement_body)
-    return {"announcement_id": created_id}
+    response_body = create_course_announcements_response(course_id, annoucement_body)
+    return response_body

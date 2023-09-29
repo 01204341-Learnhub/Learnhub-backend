@@ -4,6 +4,7 @@ from .schemas import (
     ListCourseAnnouncementsModelBody,
     ListCourseAnnouncementsResponseModel,
     PostCourseAnnouncementRequestModel,
+    PostCourseAnnouncementResponseModel,
 )
 
 
@@ -19,7 +20,8 @@ def list_course_announcements_response(
 
 
 def create_course_announcements_response(
-    course_id: str, requestBody: PostCourseAnnouncementRequestModel
-)-> str:
-    created_id = create_course_announcement(course_id, requestBody)
-    return created_id
+    course_id: str, request_body: PostCourseAnnouncementRequestModel
+)-> PostCourseAnnouncementResponseModel:
+    created_id = create_course_announcement(course_id=course_id, announcement_body=request_body)
+    response_body = PostCourseAnnouncementResponseModel(announcement_id=created_id)
+    return response_body
