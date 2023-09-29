@@ -31,6 +31,13 @@ def list_course_announcement(course_id: str, skip: int = 0, limit: int = 100):
 def create_course_announcement(
     course_id: str, announcement_body: PostCourseAnnouncementRequestModel
 ) -> str:
+    # Check for valid course
+    valid_course_filter = {"_id": ObjectId(course_id)}
+    course_result = db_client.course_coll.find_one(filter=valid_course_filter)
+    if course_result == None:
+        raise Exception.unprocessable_content
+    
+    # Insert new announcement
     announcement_body_to_inserted = announcement_body.model_dump()
     announcement_body_to_inserted["course_id"] = ObjectId(course_id)
     announcement_body_to_inserted["last_edit"] = datetime.now(
