@@ -1,9 +1,11 @@
 from pydantic import TypeAdapter
 from datetime import datetime
+from learnhub_backend.dependencies import GenericOKResponse, Exception
 from .database import (
     create_course_announcement,
     list_course_announcement,
     query_course_announcement,
+    remove_course_announcement,
 )
 from .schemas import (
     ListCourseAnnouncementsModelBody,
@@ -51,3 +53,8 @@ def get_course_announcement_response(course_id: str, announcement_id: str)->GetC
 def patch_course_annoucement_request(course_id: str, announcement_id: str):
     #TODO: implement patch_course_annoucement_request
     pass
+
+
+def delete_course_annoucement_request(course_id: str, announcement_id: str):
+    responese = remove_course_announcement(course_id=course_id, announcement_id=announcement_id)
+    return GenericOKResponse
