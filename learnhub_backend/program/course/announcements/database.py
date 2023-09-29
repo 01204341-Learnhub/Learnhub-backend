@@ -61,3 +61,15 @@ def query_course_announcement(course_id: str, announcement_id: str) -> dict:
         return announcement
     except InvalidId:
         raise Exception.bad_request
+
+
+def remove_course_announcement(course_id: str, announcement_id: str)->bool:
+    try:
+        filter = {"_id": ObjectId(announcement_id), "course_id": ObjectId(course_id)}
+        result = db_client.annoucement_coll.delete_one(filter=filter)
+        if result.deleted_count == 0:
+            raise Exception.not_found
+        return True
+    except InvalidId:
+        raise Exception.bad_request
+    #TODO: check

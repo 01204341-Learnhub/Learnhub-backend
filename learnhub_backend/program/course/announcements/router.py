@@ -17,6 +17,7 @@ from .services import (
     list_course_announcements_response,
     get_course_announcement_response,
     patch_course_annoucement_request,
+    delete_course_annoucement_request,
 )
 
 
@@ -73,6 +74,7 @@ def get_course_annoucement(course_id: str, announcement_id: str):
     )
     return response_body
 
+
 @router.patch(
     "/{course_id}/announcements/{announcement_id}",
     status_code=200,
@@ -82,6 +84,19 @@ def get_course_annoucement(course_id: str, announcement_id: str):
 def patch_course_annoucement(course_id: str, announcement_id: str):
     #TODO: implement patch_course_annoucement
     response_body = patch_course_annoucement_request(
+        course_id=course_id, announcement_id=announcement_id
+    )
+    return response_body
+
+
+@router.delete(
+    "/{course_id}/announcements/{announcement_id}",
+    status_code=200,
+    response_model_exclude_none=True,
+    response_model=GenericOKResponse,
+)
+def delete_course_annoucement(course_id: str, announcement_id: str):
+    response_body = delete_course_annoucement_request(
         course_id=course_id, announcement_id=announcement_id
     )
     return response_body
