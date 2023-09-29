@@ -10,10 +10,12 @@ from .schemas import (
     ListCourseAnnouncementsResponseModel,
     PostCourseAnnouncementRequestModel,
     PostCourseAnnouncementResponseModel,
+    GetCourseAnnouncementResponseModel,
 )
 from .services import (
     create_course_announcements_response,
     list_course_announcements_response,
+    get_course_announcement_response,
 )
 
 
@@ -55,4 +57,17 @@ def create_course_annoucement(
     course_id: str, annoucement_body: PostCourseAnnouncementRequestModel
 ):
     response_body = create_course_announcements_response(course_id, annoucement_body)
+    return response_body
+
+
+@router.get(
+    "/{course_id}/announcements/{announcement_id}",
+    status_code=200,
+    response_model_exclude_none=True,
+    response_model=GetCourseAnnouncementResponseModel,#TODO:
+)
+def get_course_annoucement(course_id: str, announcement_id: str):
+    response_body = get_course_announcement_response(
+        course_id=course_id, announcement_id=announcement_id
+    )
     return response_body
