@@ -25,7 +25,7 @@ def list_course_announcements_response(
     return response_body
 
 
-def create_course_announcements_response(
+def create_course_announcements_request(
     course_id: str, request_body: PostCourseAnnouncementRequestModel
 ) -> PostCourseAnnouncementResponseModel:
     created_id = create_course_announcement(
@@ -46,3 +46,8 @@ def get_course_announcement_response(course_id: str, announcement_id: str)->GetC
     response_body["last_edit"] = int(datetime.timestamp(response_body["last_edit"]))
 
     return GetCourseAnnouncementResponseModel(**response_body)
+
+
+def patch_course_annoucement_request(course_id: str, announcement_id: str):
+    #TODO: implement patch_course_annoucement_request
+    pass
