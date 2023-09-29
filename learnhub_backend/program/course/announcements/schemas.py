@@ -13,9 +13,13 @@ class ListCourseAnnouncementsResponseModel(BaseModel):
 class AttachmentModelBody(BaseModel):
     attachment_type: str
     src: HttpUrl
+
 class PostCourseAnnouncementRequestModel(BaseModel):
     name: str
     text: str
-    attachments: list[Any]
+    attachments: list[AttachmentModelBody]
     #teacher_id: str
+
+class PostCourseAnnouncementResponseModel(BaseModel):
+    announcement_id: str
 
