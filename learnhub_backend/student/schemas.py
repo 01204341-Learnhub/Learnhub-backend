@@ -4,6 +4,7 @@ from pydantic import BaseModel, HttpUrl
 
 ## STUDENTS
 class GetStudentResponseModel(BaseModel):
+    uid: str
     student_id: str
     username: str
     fullname: str
