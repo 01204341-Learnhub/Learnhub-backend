@@ -9,7 +9,7 @@ from ..database import db_client
 from bson.objectid import ObjectId
 from bson.errors import InvalidId
 
-from .config import student_type, course_type
+from ..dependencies import student_type, course_type
 
 from ..dependencies import (
     Exception,

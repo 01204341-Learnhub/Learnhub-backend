@@ -2,7 +2,14 @@ from typing import Annotated, Union
 from pydantic import TypeAdapter
 from pymongo.results import UpdateResult
 
+from learnhub_backend.dependencies import GenericOKResponse
+
 from .database import (
+    create_course,
+    query_course,
+    query_list_tags_by_id,
+    query_teacher_by_id,
+    query_list_courses,
     query_list_course_chapters,
     create_course_chapter,
     query_course_chapter,
@@ -15,9 +22,17 @@ from .database import (
     remove_course_lesson,
 )
 from .schemas import (
+    GetCourseResponseModel,
+    PostCourseRequestModel,
+    PostCourseResponseModel,
+    TagModelBody,
+    TeacherModelBody,
+    ListCoursesModelBody,
+    ListCoursesResponseModel,
     ListCourseChaptersModelBody,
     ListCourseChaptersResponseModel,
-    PostCourseChaptersRequestModel,
+    PostCourseChapterRequestModel,
+    PostCourseChapterResponseModel,
     GetCourseChapterResponseModel,
     PatchCourseChapterRequestModel,
     ListCourseLessonsResponseModel,
@@ -27,6 +42,75 @@ from .schemas import (
     PostCourseLessonRequestModel,
     PostCourseLessonResponseModel,
 )
+
+from ...dependencies import Exception
+
+
+# COURSE
+def list_courses_response(skip: int = 0, limit: int = 100):
+    queried_courses = query_list_courses(skip, limit)
+    list_courses_response = list()
+    course_response = dict()
+    for course in queried_courses:
+        course_response["course_id"] = course["course_id"]
+        course_response["name"] = course["name"]
+        course_response["rating"] = course["rating"]
+        course_response["review_count"] = course["review_count"]
+        course_response["price"] = course["price"]
+        course_response["course_pic"] = course["course_pic"]
+
+        # teacher
+        teacher = query_teacher_by_id(course["teacher_id"])
+        if teacher == None:
+            raise Exception.internal_server_error  # No teacher was found
+        teacher["teacher_id"] = str(teacher["_id"])
+        teacher["teacher_name"] = teacher["fullname"]
+        course_response["teacher"] = TeacherModelBody(**teacher)
+
+        # tags
+        tags = []
+        tags_cursor = query_list_tags_by_id(course["tags"])
+        for tag in tags_cursor:
+            tag["tag_id"] = str(tag["_id"])
+            tag["tag_name"] = tag["name"]
+            tags.append(TagModelBody(**tag))
+        course_response["tags"] = tags
+
+        list_courses_response.append(ListCoursesModelBody(**course_response))
+    return ListCoursesResponseModel(courses=list_courses_response)
+
+
+def add_course_request(request: PostCourseRequestModel) -> PostCourseResponseModel:
+    result = create_course(request)
+    response_body = PostCourseResponseModel(course_id=str(result.inserted_id))
+    return response_body
+
+
+def get_course_response(course_id: str):
+    course = query_course(course_id)
+    if course == None:
+        raise Exception.not_found
+
+    course["course_id"] = str(course["_id"])
+
+    # teacher
+    teacher = query_teacher_by_id(course["teacher_id"])
+    if teacher == None:
+        raise Exception.internal_server_error  # No teacher was found
+    teacher["teacher_id"] = str(teacher["_id"])
+    teacher["teacher_name"] = teacher["fullname"]
+    course["teacher"] = TeacherModelBody(**teacher)
+
+    # tags
+    tags_cursor = query_list_tags_by_id(course["tags"])
+    tags = []
+    for tag in tags_cursor:
+        tag["tag_id"] = str(tag["_id"])
+        tag["tag_name"] = tag["name"]
+        tags.append(TagModelBody(**tag))
+    course["tags"] = tags
+
+    return GetCourseResponseModel(**course)
 
 
 # COURSE CHAPTERS
@@ -41,23 +125,22 @@ def list_course_chapters_response(course_id: str, skip: int = 0, limit: int = 0)
     return response_body
 
 
-def add_course_chapter_response(
-    course_id: str, chapter_body: PostCourseChaptersRequestModel
-) -> dict | None:
-    response = create_course_chapter(course_id=course_id, chapter_body=chapter_body)
-    if response.inserted_id == None:
-        return None
-    return {"chapter_id": str(response.inserted_id)}
+def add_course_chapter_request(
+    course_id: str, chapter_body: PostCourseChapterRequestModel
+) -> PostCourseChapterResponseModel:
+    result = create_course_chapter(course_id=course_id, chapter_body=chapter_body)
+    if result.inserted_id == None:
+        raise Exception.bad_request
+    response_body = PostCourseChapterResponseModel(chapter_id=str(result.inserted_id))
+
+    return response_body
 
 
 def get_course_chapter_response(chapter_id: str):
     queried_chapter = query_course_chapter(chapter_id=chapter_id)
     if queried_chapter == None:
-        return None
-    ta = TypeAdapter(GetCourseChapterResponseModel)
-    response_body = GetCourseChapterResponseModel(
-        **ta.validate_python(queried_chapter).model_dump()
-    )
+        raise Exception.not_found
+    response_body = GetCourseChapterResponseModel(**queried_chapter)
     return response_body
 
 
@@ -67,12 +150,12 @@ def edit_course_chapter_response(
     response = edit_course_chapter(
         chapter_id=chapter_id, chapter_to_edit=chapter_to_edit
     )
-    return response
+    return GenericOKResponse
 
 
-def delete_course_chapter_response(chapter_id: str, course_id: str) -> int:
-    response = delete_course_chapter(chapter_id=chapter_id, course_id=course_id)
-    return response
+def delete_course_chapter_response(chapter_id: str, course_id: str):
+    delete_course_chapter(chapter_id=chapter_id, course_id=course_id)
+    return GenericOKResponse
 
 
 # COURSE LESSON
@@ -90,12 +173,9 @@ def list_course_lessons_response(
 def get_course_lesson_response(
     course_id: str, chapter_id: str, lesson_id: str
 ) -> GetCourseLessonResponseModel | None:
-    try:
-        quried_lesson = query_course_lesson(course_id, chapter_id, lesson_id)
-    except:
-        return None
+    quried_lesson = query_course_lesson(course_id, chapter_id, lesson_id)
     if quried_lesson == None:
-        return None
+        raise Exception.not_found
     response_body = GetCourseLessonResponseModel(**quried_lesson)
     return response_body
 
@@ -113,15 +193,15 @@ def edit_course_lesson_request(
     chapter_id: str,
     lesson_id: str,
     request: PatchCourseLessonRequestModel,
-) -> UpdateResult:
-    result = edit_course_lesson(course_id, chapter_id, lesson_id, request)
-    return result
+):
+    edit_course_lesson(course_id, chapter_id, lesson_id, request)
+    return GenericOKResponse
 
 
 def delete_course_lesson_request(
     course_id: str,
     chapter_id: str,
     lesson_id: str,
-) -> int:
-    delete_count = remove_course_lesson(course_id, chapter_id, lesson_id)
-    return delete_count
+):
+    remove_course_lesson(course_id, chapter_id, lesson_id)
+    return GenericOKResponse

@@ -1,5 +1,6 @@
 import sys
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 
 from .database import db_client
@@ -13,6 +14,13 @@ app.include_router(program_router)
 app.include_router(course_router)
 app.include_router(student_router)
 app.include_router(teacher_router)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 try:
