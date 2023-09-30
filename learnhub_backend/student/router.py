@@ -13,6 +13,7 @@ from .services import (
     get_student_response,
     get_student_course_progress_response,
     patch_student_course_progress_request,
+    post_student_request,
 )
 
 from .schemas import (
@@ -22,7 +23,8 @@ from .schemas import (
     PatchStudentRequestModel,
     GetStudentCourseProgressResponseModel,
     LessonProgressModelBody,
-    placeHolder,
+    PostStudentRequestModel,
+    PostStudentResponseModel,
 )
 
 
@@ -50,6 +52,17 @@ def list_students(common_paginations: common_page_params):
         skip=common_paginations["skip"],
         limit=common_paginations["limit"],
     )
+    return response_body
+
+
+@router.post(
+    "/",
+    status_code=200,
+    response_model_exclude_none=True,
+    response_model=PostStudentResponseModel,
+)
+def post_student(request_body: PostStudentRequestModel):
+    response_body = post_student_request(request_body)
     return response_body
 
 
@@ -109,9 +122,12 @@ def list_student_courses(student_id: str):
     "/{student_id}/programs/courses/{course_id}/progress",
     status_code=200,
     response_model_exclude_none=True,
-    response_model=GetStudentCourseProgressResponseModel,)
+    response_model=GetStudentCourseProgressResponseModel,
+)
 def get_student_course_progress(student_id: str, course_id: str):
-    response_body = get_student_course_progress_response(student_id=student_id, course_id = course_id)
+    response_body = get_student_course_progress_response(
+        student_id=student_id, course_id=course_id
+    )
     return response_body
 
 
@@ -119,7 +135,12 @@ def get_student_course_progress(student_id: str, course_id: str):
     "/{student_id}/programs/courses/{course_id}/progress",
     status_code=200,
     response_model_exclude_none=True,
-    response_model=dict,)
-def patch_student_course_progress(student_id: str, course_id: str, request_body:LessonProgressModelBody):
-    response_body = patch_student_course_progress_request(student_id=student_id, course_id = course_id, requested_lesson=request_body)
+    response_model=dict,
+)
+def patch_student_course_progress(
+    student_id: str, course_id: str, request_body: LessonProgressModelBody
+):
+    response_body = patch_student_course_progress_request(
+        student_id=student_id, course_id=course_id, requested_lesson=request_body
+    )
     return response_body
