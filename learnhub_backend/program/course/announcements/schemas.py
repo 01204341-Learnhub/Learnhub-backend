@@ -32,11 +32,14 @@ class PostCourseAnnouncementResponseModel(BaseModel):
 class TeacherModelBody(BaseModel):
     teacher_id: str
     teacher_name: str
+    profic_pic: HttpUrl # TODO: make sure this works
 
 
 class AttachmentModelBody(BaseModel):
     attachment_type: str
     src: HttpUrl
+
+
 class GetCourseAnnouncementResponseModel(BaseModel):
     announcement_id: str
     teacher: str # TODO: change to TeacherModelBody
@@ -44,3 +47,14 @@ class GetCourseAnnouncementResponseModel(BaseModel):
     last_edit: int
     text: str
     attachments: list[AttachmentModelBody]
+
+
+class AttachmentPatchModelBody(BaseModel):
+    op: str # add | delete | edit
+    old_src: str | None = None
+    new_src: str | None = None
+
+class PatchCourseAnnouncementRequestModel(BaseModel):
+    name: str | None = None
+    text: str | None = None
+    attachments: list[AttachmentPatchModelBody] | None = None

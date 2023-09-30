@@ -36,6 +36,7 @@ def list_course_announcement(course_id: str, skip: int = 0, limit: int = 100):
 def create_course_announcement(
     course_id: str, announcement_body: PostCourseAnnouncementRequestModel
 ) -> str:
+    #TODO: add teacher_id from course_id
     # Check for valid course
     valid_course_filter = {"_id": ObjectId(course_id)}
     course_result = db_client.course_coll.find_one(filter=valid_course_filter)

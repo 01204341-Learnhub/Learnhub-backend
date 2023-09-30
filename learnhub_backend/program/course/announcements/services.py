@@ -6,6 +6,7 @@ from .database import (
     list_course_announcement,
     query_course_announcement,
     remove_course_announcement,
+    edit_course_announcement,
 )
 from .schemas import (
     ListCourseAnnouncementsModelBody,
@@ -13,6 +14,7 @@ from .schemas import (
     PostCourseAnnouncementRequestModel,
     PostCourseAnnouncementResponseModel,
     GetCourseAnnouncementResponseModel,
+    PatchCourseAnnouncementRequestModel,
 )
 
 
@@ -50,9 +52,10 @@ def get_course_announcement_response(course_id: str, announcement_id: str)->GetC
     return GetCourseAnnouncementResponseModel(**response_body)
 
 
-def patch_course_annoucement_request(course_id: str, announcement_id: str):
+def patch_course_annoucement_request(course_id: str, announcement_id: str, request_body: PatchCourseAnnouncementRequestModel):
     #TODO: implement patch_course_annoucement_request
-    pass
+    responese = edit_course_announcement(course_id=course_id, announcement_id=announcement_id, request_body=request_body)
+    return GenericOKResponse
 
 
 def delete_course_annoucement_request(course_id: str, announcement_id: str):

@@ -11,6 +11,7 @@ from .schemas import (
     PostCourseAnnouncementRequestModel,
     PostCourseAnnouncementResponseModel,
     GetCourseAnnouncementResponseModel,
+    PatchCourseAnnouncementRequestModel,
 )
 from .services import (
     create_course_announcements_request,
@@ -79,12 +80,11 @@ def get_course_annoucement(course_id: str, announcement_id: str):
     "/{course_id}/announcements/{announcement_id}",
     status_code=200,
     response_model_exclude_none=True,
-    response_model=None,
+    response_model=GenericOKResponse,
 )
-def patch_course_annoucement(course_id: str, announcement_id: str):
-    #TODO: implement patch_course_annoucement
+def patch_course_annoucement(course_id: str, announcement_id: str, request_body: PatchCourseAnnouncementRequestModel):
     response_body = patch_course_annoucement_request(
-        course_id=course_id, announcement_id=announcement_id
+        course_id=course_id, announcement_id=announcement_id, request_body=request_body
     )
     return response_body
 
