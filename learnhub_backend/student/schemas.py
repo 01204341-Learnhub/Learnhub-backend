@@ -68,3 +68,12 @@ class LessonProgressModelBody(BaseModel):
 class GetStudentCourseProgressResponseModel(BaseModel):
     progress: float
     lessons: list[LessonProgressModelBody]
+
+
+# STUDENT CONFIG
+class GetStudentConfigResponseModel(BaseModel):
+    theme: str
+
+
+class PatchStudentConfigRequestModel(BaseModel):
+    theme: str | None = None

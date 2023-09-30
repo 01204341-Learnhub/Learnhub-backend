@@ -7,24 +7,28 @@ from ..dependencies import (
 )
 
 from .services import (
-    delete_student_request,
-    edit_student_request,
     list_students_response,
     get_student_response,
+    post_student_request,
+    delete_student_request,
+    edit_student_request,
     get_student_course_progress_response,
     patch_student_course_progress_request,
-    post_student_request,
+    get_student_config_response,
+    edit_student_config_request,
 )
 
 from .schemas import (
     GetStudentResponseModel,
-    ListStudentCourseResponseModel,
-    ListStudentsResponseModel,
-    PatchStudentRequestModel,
-    GetStudentCourseProgressResponseModel,
-    LessonProgressModelBody,
     PostStudentRequestModel,
     PostStudentResponseModel,
+    ListStudentsResponseModel,
+    PatchStudentRequestModel,
+    ListStudentCourseResponseModel,
+    GetStudentCourseProgressResponseModel,
+    LessonProgressModelBody,
+    GetStudentConfigResponseModel,
+    PatchStudentConfigRequestModel,
 )
 
 
@@ -143,5 +147,30 @@ def patch_student_course_progress(
 ):
     response_body = patch_student_course_progress_request(
         student_id=student_id, course_id=course_id, requested_lesson=request_body
+    )
+    return response_body
+
+
+# STUDENT CONFIG
+@router.get(
+    "/{student_id}/config",
+    status_code=200,
+    response_model_exclude_none=True,
+    response_model=GetStudentConfigResponseModel,
+)
+def get_student_config(student_id: str):
+    response_body = get_student_config_response(student_id=student_id)
+    return response_body
+
+
+@router.patch(
+    "/{student_id}/config",
+    status_code=200,
+    response_model_exclude_none=True,
+    response_model=GenericOKResponse,
+)
+def edit_student_config(student_id: str, request_body: PatchStudentConfigRequestModel):
+    response_body = edit_student_config_request(
+        student_id=student_id, request=request_body
     )
     return response_body

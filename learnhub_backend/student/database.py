@@ -1,9 +1,11 @@
 from fastapi import HTTPException
 from pymongo.results import DeleteResult, UpdateResult
 from learnhub_backend.student.schemas import (
+    PostStudentRequestModel,
     PatchStudentRequestModel,
     LessonProgressModelBody,
-    PostStudentRequestModel,
+    GetStudentConfigResponseModel,
+    PatchStudentConfigRequestModel,
 )
 from ..database import db_client
 from bson.objectid import ObjectId
@@ -216,3 +218,38 @@ def edit_student_course_progress(
     except InvalidId:
         raise Exception.bad_request
     return {"progress": (response["finished_count"] / total_lessons) * 100}
+
+
+# STUDENT CONFIG
+def query_student_config(student_id: str) -> dict:
+    try:
+        filter = {
+            "_id": ObjectId(student_id),
+            "type": student_type,
+        }
+        student = db_client.user_coll.find_one(filter=filter)
+        if student == None:
+            raise Exception.not_found
+        return student
+
+    except InvalidId:
+        raise Exception.bad_request
+
+
+def edit_student_config(
+    student_id: str, request: PatchStudentConfigRequestModel
+) -> UpdateResult:
+    try:
+        filter = {"type": student_type, "_id": ObjectId(student_id)}
+
+        update_body = {}
+        if request.theme != None:
+            update_body["config"] = {}
+            update_body["config"]["theme"] = request.theme
+        update = {"$set": update_body}
+
+        result = db_client.user_coll.update_one(filter=filter, update=update)
+        return result
+
+    except InvalidId:
+        raise Exception.bad_request
