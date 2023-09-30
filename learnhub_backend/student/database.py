@@ -45,7 +45,8 @@ def create_student(request: PostStudentRequestModel):
         student_body["username"] = request.username
         student_body["email"] = request.email
         student_body["fullname"] = request.fullname
-        student_body["profile_pic"] = str(request.profile_pic)
+        if request.profile_pic != None:
+            student_body["profile_pic"] = str(request.profile_pic)
         student_body["config"] = {"theme": "light"}
         student_body["type"] = "student"
         student_body["wishlist"] = []

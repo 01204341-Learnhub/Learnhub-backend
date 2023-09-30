@@ -8,7 +8,7 @@ class ListTeachersModelBody(BaseModel):
     username: str
     fullname: str
     email: str
-    profile_pic: HttpUrl
+    profile_pic: HttpUrl | None = None
 
 
 class ListTeachersResponseModel(BaseModel):
@@ -20,7 +20,7 @@ class PostTeacherRequestModel(BaseModel):
     username: str
     fullname: str
     email: str
-    profile_pic: HttpUrl | None
+    profile_pic: HttpUrl | None = None
 
 
 class PostTeacherResponseModel(BaseModel):
