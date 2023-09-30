@@ -30,7 +30,8 @@ def create_teacher(request: PostTeacherRequestModel):
         teacher_body["username"] = request.username
         teacher_body["email"] = request.email
         teacher_body["fullname"] = request.fullname
-        teacher_body["profile_pic"] = str(request.profile_pic)
+        if request.profile_pic != None:
+            teacher_body["profile_pic"] = str(request.profile_pic)
         teacher_body["config"] = {"theme": "light"}
         teacher_body["type"] = teacher_type
         teacher_body["owned_programs"] = []
