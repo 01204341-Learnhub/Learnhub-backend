@@ -10,7 +10,7 @@ from .database import (
     query_student_course_progress,
     edit_student_course_progress,
     edit_student_config,
-    query_student_config
+    query_student_config,
 )
 
 from .schemas import (
@@ -80,21 +80,25 @@ def patch_student_course_progress_request(
     student_id: str, course_id: str, requested_lesson: LessonProgressModelBody
 ) -> dict:
     # TODO: Validate response (not nessessary)
-    response  = edit_student_course_progress(student_id = student_id, course_id = course_id, requested_lesson = requested_lesson )
+    response = edit_student_course_progress(
+        student_id=student_id, course_id=course_id, requested_lesson=requested_lesson
+    )
     return response
 
+
 # STUDENT CONFIG
+def get_student_config_response(student_id: str) -> GetStudentConfigResponseModel:
+    student_config = query_student_config(student_id)
+
+    response_body = GetStudentConfigResponseModel(
+        theme=student_config["config"]["theme"]
+    )
+
+    return response_body
+
+
 def edit_student_config_request(
     student_id: str, request: PatchStudentConfigRequestModel
 ) -> UpdateResult:
     result = edit_student_config(student_id, request)
     return result
-
-def get_student_config_response(student_id: str) -> GetStudentConfigResponseModel :
-    queried_student_config = query_student_config(student_id)
-    
-    if queried_student_config == None:
-        return None
-    response_body = GetStudentConfigResponseModel(**queried_student_config)
-
-    return response_body
