@@ -14,7 +14,7 @@ from .services import (
     get_student_course_progress_response,
     patch_student_course_progress_request,
     edit_student_config_request,
-    get_student_config_response
+    get_student_config_response,
 )
 
 from .schemas import (
@@ -113,9 +113,12 @@ def list_student_courses(student_id: str):
     "/{student_id}/programs/courses/{course_id}/progress",
     status_code=200,
     response_model_exclude_none=True,
-    response_model=GetStudentCourseProgressResponseModel,)
+    response_model=GetStudentCourseProgressResponseModel,
+)
 def get_student_course_progress(student_id: str, course_id: str):
-    response_body = get_student_course_progress_response(student_id=student_id, course_id = course_id)
+    response_body = get_student_course_progress_response(
+        student_id=student_id, course_id=course_id
+    )
     return response_body
 
 
@@ -123,10 +126,16 @@ def get_student_course_progress(student_id: str, course_id: str):
     "/{student_id}/programs/courses/{course_id}/progress",
     status_code=200,
     response_model_exclude_none=True,
-    response_model=dict,)
-def patch_student_course_progress(student_id: str, course_id: str, request_body:LessonProgressModelBody):
-    response_body = patch_student_course_progress_request(student_id=student_id, course_id = course_id, requested_lesson=request_body)
+    response_model=dict,
+)
+def patch_student_course_progress(
+    student_id: str, course_id: str, request_body: LessonProgressModelBody
+):
+    response_body = patch_student_course_progress_request(
+        student_id=student_id, course_id=course_id, requested_lesson=request_body
+    )
     return response_body
+
 
 # STUDENT CONFIG
 @router.get(
@@ -134,16 +143,20 @@ def patch_student_course_progress(student_id: str, course_id: str, request_body:
     status_code=200,
     response_model_exclude_none=True,
     response_model=GetStudentConfigResponseModel,
-    )
+)
 def get_student_config(student_id: str):
     response_body = get_student_config_response(student_id=student_id)
     return response_body
+
 
 @router.patch(
     "/{student_id}/config",
     status_code=200,
     response_model_exclude_none=True,
-    response_model=dict,)
-def edit_student_config(student_id: str, request_body:PatchStudentConfigRequestModel):
-    response_body = edit_student_config_request(student_id=student_id, request=request_body)
+    response_model=GenericOKResponse,
+)
+def edit_student_config(student_id: str, request_body: PatchStudentConfigRequestModel):
+    response_body = edit_student_config_request(
+        student_id=student_id, request=request_body
+    )
     return response_body

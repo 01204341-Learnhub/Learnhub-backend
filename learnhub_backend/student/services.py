@@ -2,6 +2,8 @@ from typing import Annotated, Union
 from pydantic import TypeAdapter
 from pymongo.results import DeleteResult, UpdateResult
 
+from learnhub_backend.dependencies import GenericOKResponse
+
 from .database import (
     edit_student,
     query_list_students,
@@ -22,6 +24,8 @@ from .schemas import (
     PatchStudentConfigRequestModel,
     GetStudentConfigResponseModel,
 )
+
+from ..dependencies import Exception
 
 
 # STUDENTS
@@ -99,6 +103,8 @@ def get_student_config_response(student_id: str) -> GetStudentConfigResponseMode
 
 def edit_student_config_request(
     student_id: str, request: PatchStudentConfigRequestModel
-) -> UpdateResult:
+):
     result = edit_student_config(student_id, request)
-    return result
+    if result.matched_count == 0:
+        raise Exception.not_found
+    return GenericOKResponse

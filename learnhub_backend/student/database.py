@@ -195,8 +195,6 @@ def query_student_config(student_id: str) -> dict:
     except InvalidId:
         raise Exception.bad_request
 
-    return student
-
 
 def edit_student_config(
     student_id: str, request: PatchStudentConfigRequestModel
@@ -206,12 +204,12 @@ def edit_student_config(
 
         update_body = {}
         if request.theme != None:
-            update_body["theme"] = request.theme
+            update_body["config"] = {}
+            update_body["config"]["theme"] = request.theme
         update = {"$set": update_body}
 
         result = db_client.user_coll.update_one(filter=filter, update=update)
+        return result
 
     except InvalidId:
         raise Exception.bad_request
-
-    return result
