@@ -3,6 +3,7 @@ from pydantic import TypeAdapter
 from pymongo.results import DeleteResult, UpdateResult
 
 from .database import (
+    create_student,
     edit_student,
     query_list_students,
     query_student,
@@ -17,6 +18,8 @@ from .schemas import (
     PatchStudentRequestModel,
     GetStudentCourseProgressResponseModel,
     LessonProgressModelBody,
+    PostStudentRequestModel,
+    PostStudentResponseModel,
 )
 
 
@@ -41,6 +44,12 @@ def get_student_response(student_id: str) -> GetStudentResponseModel | None:
         return None
     response_body = GetStudentResponseModel(**queried_student)
 
+    return response_body
+
+
+def post_student_request(request: PostStudentRequestModel) -> PostStudentResponseModel:
+    student_id = create_student(request)
+    response_body = PostStudentResponseModel(student_id=student_id)
     return response_body
 
 
@@ -76,5 +85,7 @@ def patch_student_course_progress_request(
     student_id: str, course_id: str, requested_lesson: LessonProgressModelBody
 ) -> dict:
     # TODO: Validate response (not nessessary)
-    response  = edit_student_course_progress(student_id = student_id, course_id = course_id, requested_lesson = requested_lesson )
+    response = edit_student_course_progress(
+        student_id=student_id, course_id=course_id, requested_lesson=requested_lesson
+    )
     return response

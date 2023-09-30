@@ -14,3 +14,14 @@ class ListTeachersModelBody(BaseModel):
 class ListTeachersResponseModel(BaseModel):
     teachers: list[ListTeachersModelBody]
 
+
+class PostTeacherRequestModel(BaseModel):
+    uid: str
+    username: str
+    fullname: str
+    email: str
+    profile_pic: HttpUrl | None
+
+
+class PostTeacherResponseModel(BaseModel):
+    teacher_id: str
