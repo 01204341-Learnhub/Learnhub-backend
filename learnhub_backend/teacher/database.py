@@ -1,7 +1,10 @@
-from learnhub_backend.teacher.schemas import PostTeacherRequestModel
 from bson.objectid import ObjectId
 from bson.errors import InvalidId
 
+from .schemas import (
+    PatchTeacherRequestModel,
+    PostTeacherRequestModel,
+)
 from ..database import (
     db_client,
 )
@@ -66,6 +69,27 @@ def query_teacher(teacher_id: str):
             raise Exception.not_found
         teacher["teacher_id"] = str(teacher["_id"])
         return teacher
+
+    except InvalidId:
+        raise Exception.bad_request
+
+
+def edit_teacher(teacher_id: str, request: PatchTeacherRequestModel):
+    try:
+        filter = {"type": teacher_type, "_id": ObjectId(teacher_id)}
+        patch_content = {}
+        patch_body = {"$set": patch_content}
+        if request.username != None:
+            patch_content["username"] = request.username
+        if request.fullname != None:
+            patch_content["fullname"] = request.fullname
+        if request.profile_pic != None:
+            patch_content["profile_pic"] = str(request.profile_pic)
+
+        update_result = db_client.user_coll.update_one(filter, patch_body)
+        if update_result.matched_count == 0:
+            raise Exception.not_found
+        return
 
     except InvalidId:
         raise Exception.bad_request

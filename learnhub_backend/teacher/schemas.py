@@ -34,3 +34,9 @@ class GetTeacherResponseModel(BaseModel):
     fullname: str
     email: str
     profile_pic: HttpUrl | None
+
+
+class PatchTeacherRequestModel(BaseModel):
+    username: str | None
+    fullname: str | None
+    profile_pic: HttpUrl | None
