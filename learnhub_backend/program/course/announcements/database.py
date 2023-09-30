@@ -6,6 +6,7 @@ from .schemas import PostCourseAnnouncementRequestModel
 from learnhub_backend.database import db_client
 from learnhub_backend.dependencies import (
     Exception,
+    CheckHttpFileType,
 )
 
 
@@ -47,6 +48,7 @@ def create_course_announcement(
         announcement_body_to_inserted["attachments"][i]["src"] = str(
             announcement_body_to_inserted["attachments"][i]["src"]
         )
+        announcement_body_to_inserted["attachments"][i]["attachment_type"] = CheckHttpFileType(announcement_body_to_inserted["attachments"][i]["src"])
     response = db_client.annoucement_coll.insert_one(announcement_body_to_inserted)
     created_id = response.inserted_id
     return str(created_id)

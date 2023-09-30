@@ -13,15 +13,15 @@ class ListCourseAnnouncementsResponseModel(BaseModel):
     annoucements: list[ListCourseAnnouncementsModelBody]
 
 
-class AttachmentModelBody(BaseModel):
-    attachment_type: str
+class AttachmentPostModelBody(BaseModel):
+    #attachment_type: str
     src: HttpUrl
 
 
 class PostCourseAnnouncementRequestModel(BaseModel):
     name: str
     text: str
-    attachments: list[AttachmentModelBody]
+    attachments: list[AttachmentPostModelBody]
     # teacher_id: str
 
 
@@ -32,6 +32,11 @@ class PostCourseAnnouncementResponseModel(BaseModel):
 class TeacherModelBody(BaseModel):
     teacher_id: str
     teacher_name: str
+
+
+class AttachmentModelBody(BaseModel):
+    attachment_type: str
+    src: HttpUrl
 class GetCourseAnnouncementResponseModel(BaseModel):
     announcement_id: str
     teacher: str # TODO: change to TeacherModelBody
