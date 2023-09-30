@@ -5,6 +5,7 @@ from pydantic import BaseModel, HttpUrl
 class TeacherModelBody(BaseModel):
     teacher_id: str
     teacher_name: str
+    profile_pic: HttpUrl
 
 
 class TagModelBody(BaseModel):

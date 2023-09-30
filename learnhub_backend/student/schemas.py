@@ -38,6 +38,7 @@ class PatchStudentRequestModel(BaseModel):
 class TeacherModelBody(BaseModel):
     teacher_id: str
     teacher_name: str
+    profile_pic: HttpUrl
 
 
 class ListStudentCoursesModelBody(BaseModel):
