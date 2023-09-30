@@ -107,6 +107,7 @@ def delete_student(student_id: str):
     result = delete_student_request(student_id)
     if result.deleted_count == 0:
         raise Exception.not_found
+    # TODO: CLear other db related to student
     return GenericOKResponse
 
 
