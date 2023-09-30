@@ -13,7 +13,7 @@ from ..dependencies import (
 
 # TEACHERS
 def query_list_teachers(skip: int = 0, limit: int = 100) -> list:
-    filter = {"type": "teacher"}
+    filter = {"type": teacher_type}
     teachers_cursor = db_client.user_coll.find(skip=skip, limit=limit, filter=filter)
     teachers = []
     for teacher in teachers_cursor:
@@ -54,5 +54,18 @@ def create_teacher(request: PostTeacherRequestModel):
         # Add teacher
         result = db_client.user_coll.insert_one(teacher_body)
         return str(result.inserted_id)
+    except InvalidId:
+        raise Exception.bad_request
+
+
+def query_teacher(teacher_id: str):
+    try:
+        filter = {"type": teacher_type, "_id": ObjectId(teacher_id)}
+        teacher = db_client.user_coll.find_one(filter)
+        if teacher == None:
+            raise Exception.not_found
+        teacher["teacher_id"] = str(teacher["_id"])
+        return teacher
+
     except InvalidId:
         raise Exception.bad_request

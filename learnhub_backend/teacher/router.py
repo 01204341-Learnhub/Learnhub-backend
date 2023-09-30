@@ -7,11 +7,13 @@ from ..dependencies import (
 )
 
 from .services import (
+    get_teacher_response,
     list_teachers_response,
     post_teacher_request,
 )
 
 from .schemas import (
+    GetTeacherResponseModel,
     ListTeachersResponseModel,
     PostTeacherRequestModel,
     PostTeacherResponseModel,
@@ -37,7 +39,6 @@ common_page_params = Annotated[dict, Depends(router.dependencies[0].dependency)]
     response_model=ListTeachersResponseModel,
 )
 def list_teachers(common_paginations: common_page_params):
-    # TODO: Implement actual endpoint
     response_body = list_teachers_response(
         skip=common_paginations["skip"],
         limit=common_paginations["limit"],
@@ -53,4 +54,15 @@ def list_teachers(common_paginations: common_page_params):
 )
 def post_teacher(request_body: PostTeacherRequestModel):
     response_body = post_teacher_request(request_body)
+    return response_body
+
+
+@router.get(
+    "/{teacher_id}",
+    status_code=200,
+    response_model_exclude_none=True,
+    response_model=GetTeacherResponseModel,
+)
+def get_teacher(teacher_id: str):
+    response_body = get_teacher_response(teacher_id)
     return response_body
