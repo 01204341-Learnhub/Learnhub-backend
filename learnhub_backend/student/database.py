@@ -1,9 +1,11 @@
+from fastapi import HTTPException
 from pymongo.results import DeleteResult, UpdateResult
 from learnhub_backend.student.schemas import (
+    PostStudentRequestModel,
     PatchStudentRequestModel,
     LessonProgressModelBody,
-    PatchStudentConfigRequestModel,
     GetStudentConfigResponseModel,
+    PatchStudentConfigRequestModel,
 )
 from ..database import db_client
 from bson.objectid import ObjectId
@@ -34,6 +36,44 @@ def query_student(student_id: str) -> dict | None:
     if student != None:
         student["student_id"] = str(student["_id"])
     return student
+
+
+def create_student(request: PostStudentRequestModel):
+    try:
+        student_body = dict()
+        student_body["uid"] = request.uid
+        student_body["username"] = request.username
+        student_body["email"] = request.email
+        student_body["fullname"] = request.fullname
+        student_body["profile_pic"] = str(request.profile_pic)
+        student_body["config"] = {"theme": "light"}
+        student_body["type"] = "student"
+        student_body["wishlist"] = []
+        student_body["basket"] = []
+        student_body["interested_tags"] = []
+        student_body["owned_programs"] = []
+
+        # Check duplicate uid
+        uid_filter = {"type": student_type, "uid": request.uid}
+        check_uid = db_client.user_coll.find_one(uid_filter)
+        if check_uid != None:
+            error_uid = Exception.unprocessable_content
+            error_uid.__setattr__("detail", "UID duplicate")
+            raise error_uid
+
+        # Check duplicate email
+        email_filter = {"type": student_type, "email": request.email}
+        check_email = db_client.user_coll.find_one(email_filter)
+        if check_email != None:
+            error_email = Exception.unprocessable_content
+            error_email.__setattr__("detail", "Email Duplicate")
+            raise error_email
+
+        # Add student
+        result = db_client.user_coll.insert_one(student_body)
+        return str(result.inserted_id)
+    except InvalidId:
+        raise Exception.bad_request
 
 
 def edit_student(student_id: str, request: PatchStudentRequestModel) -> UpdateResult:

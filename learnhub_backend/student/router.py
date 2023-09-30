@@ -7,24 +7,26 @@ from ..dependencies import (
 )
 
 from .services import (
-    delete_student_request,
-    edit_student_request,
     list_students_response,
     get_student_response,
+    post_student_request,
+    delete_student_request,
+    edit_student_request,
     get_student_course_progress_response,
     patch_student_course_progress_request,
-    edit_student_config_request,
     get_student_config_response,
+    edit_student_config_request,
 )
 
 from .schemas import (
     GetStudentResponseModel,
-    ListStudentCourseResponseModel,
+    PostStudentRequestModel,
+    PostStudentResponseModel,
     ListStudentsResponseModel,
     PatchStudentRequestModel,
+    ListStudentCourseResponseModel,
     GetStudentCourseProgressResponseModel,
     LessonProgressModelBody,
-    placeHolder,
     GetStudentConfigResponseModel,
     PatchStudentConfigRequestModel,
 )
@@ -54,6 +56,17 @@ def list_students(common_paginations: common_page_params):
         skip=common_paginations["skip"],
         limit=common_paginations["limit"],
     )
+    return response_body
+
+
+@router.post(
+    "/",
+    status_code=200,
+    response_model_exclude_none=True,
+    response_model=PostStudentResponseModel,
+)
+def post_student(request_body: PostStudentRequestModel):
+    response_body = post_student_request(request_body)
     return response_body
 
 
@@ -105,6 +118,7 @@ def delete_student(student_id: str):
     response_model=ListStudentCourseResponseModel,
 )
 def list_student_courses(student_id: str):
+    # TODO:implement this
     pass
 
 

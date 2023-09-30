@@ -5,6 +5,7 @@ from pymongo.results import DeleteResult, UpdateResult
 from learnhub_backend.dependencies import GenericOKResponse
 
 from .database import (
+    create_student,
     edit_student,
     query_list_students,
     query_student,
@@ -18,11 +19,13 @@ from .database import (
 from .schemas import (
     ListStudentsResponseModel,
     GetStudentResponseModel,
+    PostStudentRequestModel,
+    PostStudentResponseModel,
     PatchStudentRequestModel,
     GetStudentCourseProgressResponseModel,
     LessonProgressModelBody,
-    PatchStudentConfigRequestModel,
     GetStudentConfigResponseModel,
+    PatchStudentConfigRequestModel,
 )
 
 from ..dependencies import Exception
@@ -49,6 +52,12 @@ def get_student_response(student_id: str) -> GetStudentResponseModel | None:
         return None
     response_body = GetStudentResponseModel(**queried_student)
 
+    return response_body
+
+
+def post_student_request(request: PostStudentRequestModel) -> PostStudentResponseModel:
+    student_id = create_student(request)
+    response_body = PostStudentResponseModel(student_id=student_id)
     return response_body
 
 
