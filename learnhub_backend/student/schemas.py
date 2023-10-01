@@ -2,7 +2,12 @@ from typing import Optional, Union
 from pydantic import BaseModel, HttpUrl, validator
 
 
-## STUDENTS
+class TeacherModelBody(BaseModel):
+    teacher_id: str
+    teacher_name: str
+    profile_pic: HttpUrl
+
+
 class GetStudentResponseModel(BaseModel):
     uid: str
     student_id: str
@@ -35,10 +40,6 @@ class PatchStudentRequestModel(BaseModel):
 
 
 # STUDENTS PROGRAMS
-class TeacherModelBody(BaseModel):
-    teacher_id: str
-    teacher_name: str
-    profile_pic: HttpUrl
 
 
 class ListStudentCoursesModelBody(BaseModel):
@@ -121,8 +122,14 @@ class GetStudentBasketItemResponseModel(BaseModel):
     basket_item_id: str
     name: str
     type: str
-    price: float
     program_id: str
+    teacher: TeacherModelBody
+    program_pic: HttpUrl
+    rating: float
+    review_count: int
+    total_video_length: int
+    difficulty_level: str
+    price: float
 
 
 class ListStudentBasketResponseModel(BaseModel):

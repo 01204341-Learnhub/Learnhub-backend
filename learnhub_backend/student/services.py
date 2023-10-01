@@ -16,6 +16,7 @@ from .database import (
     query_list_students,
     query_student,
     query_student_basket,
+    query_teacher_profile,
     remove_student,
     query_student_course_progress,
     edit_student_course_progress,
@@ -203,10 +204,24 @@ def list_student_basket_response(student_id: str) -> ListStudentBasketResponseMo
         if item["type"] == "course":
             course = query_course(item["program_id"])
             basket[i]["name"] = course["name"]
+            basket[i]["type"] = "course"
+            basket[i]["teacher"] = query_teacher_profile(str(course["teacher_id"]))
+            basket[i]["program_pic"] = course["course_pic"]
+            basket[i]["rating"] = course["rating"]
+            basket[i]["review_count"] = course["review_count"]
+            basket[i]["total_video_length"] = course["total_video_length"]
+            basket[i]["difficulty_level"] = course["difficulty_level"]
             basket[i]["price"] = course["price"]
+
         elif item["type"] == "class":
             cls = query_class(item["program_id"])
             basket[i]["name"] = cls["name"]
+            basket[i]["type"] = "class"
+            basket[i]["teacher"] = query_teacher_profile(str(cls["teacher_id"]))
+            basket[i]["program_pic"] = cls["course_pic"]
+            basket[i]["rating"] = cls["rating"]
+            basket[i]["review_count"] = cls["review_count"]
+            basket[i]["difficulty_level"] = cls["difficulty_level"]
             basket[i]["price"] = cls["price"]
 
     ta = TypeAdapter(list[GetStudentBasketItemResponseModel])
@@ -230,10 +245,23 @@ def get_student_basket_item_response(
     if basket_item["type"] == "course":
         course = query_course(basket_item["program_id"])
         basket_item["name"] = course["name"]
+        basket_item["type"] = "course"
+        basket_item["teacher"] = query_teacher_profile(str(course["teacher_id"]))
+        basket_item["program_pic"] = course["course_pic"]
+        basket_item["rating"] = course["rating"]
+        basket_item["review_count"] = course["review_count"]
+        basket_item["total_video_length"] = course["total_video_length"]
+        basket_item["difficulty_level"] = course["difficulty_level"]
         basket_item["price"] = course["price"]
     elif basket_item["type"] == "class":
         cls = query_class(basket_item["program_id"])
         basket_item["name"] = cls["name"]
+        basket_item["type"] = "class"
+        basket_item["teacher"] = query_teacher_profile(str(cls["teacher_id"]))
+        basket_item["program_pic"] = cls["course_pic"]
+        basket_item["rating"] = cls["rating"]
+        basket_item["review_count"] = cls["review_count"]
+        basket_item["difficulty_level"] = cls["difficulty_level"]
         basket_item["price"] = cls["price"]
 
     return GetStudentBasketItemResponseModel(**basket_item)
