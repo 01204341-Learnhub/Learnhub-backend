@@ -1,6 +1,13 @@
-from fastapi import HTTPException
+from logging import error
 from pymongo.results import DeleteResult, UpdateResult
-from learnhub_backend.student.schemas import (
+from pymongo import ReturnDocument
+from bson.objectid import ObjectId
+from bson.errors import InvalidId
+
+from .schemas import (
+    PatchStudentPaymentMethodRequestModel,
+    PostStudentBasketItemRequestModel,
+    PostStudentPaymentMethodRequestModel,
     PostStudentRequestModel,
     PatchStudentRequestModel,
     LessonProgressModelBody,
@@ -8,34 +15,59 @@ from learnhub_backend.student.schemas import (
     PatchStudentConfigRequestModel,
 )
 from ..database import db_client
-from bson.objectid import ObjectId
-from bson.errors import InvalidId
 
-from ..dependencies import student_type, course_type
 
 from ..dependencies import (
+    student_type,
+    course_type,
     Exception,
 )
-from pymongo import ReturnDocument
 
 
+# PROGRAM
+def query_course(course_id: str):
+    filter = {"_id": ObjectId(course_id)}
+    course = db_client.course_coll.find_one(filter)
+    if course == None:
+        raise Exception.not_found
+    return course
+
+
+def query_class(class_id: str):
+    filter = {"_id": ObjectId(class_id)}
+    cls = db_client.class_coll.find_one(filter)
+    if cls == None:
+        raise Exception.not_found
+    return cls
+
+
+# STUDENT
 def query_list_students(skip: int = 0, limit: int = 100) -> list:
-    filter = {"type": student_type}
-    students_cursor = db_client.user_coll.find(skip=skip, limit=limit, filter=filter)
-    students = []
-    for student in students_cursor:
+    try:
+        filter = {"type": student_type}
+        students_cursor = db_client.user_coll.find(
+            skip=skip, limit=limit, filter=filter
+        )
+        students = []
+        for student in students_cursor:
+            student["student_id"] = str(student["_id"])
+            students.append(student)
+
+        return students
+    except InvalidId:
+        raise Exception.bad_request
+
+
+def query_student(student_id: str) -> dict:
+    try:
+        filter = {"_id": ObjectId(student_id), "type": student_type}
+        student = db_client.user_coll.find_one(filter=filter)
+        if student == None:
+            raise Exception.not_found
         student["student_id"] = str(student["_id"])
-        students.append(student)
-
-    return students
-
-
-def query_student(student_id: str) -> dict | None:
-    filter = {"_id": ObjectId(student_id), "type": student_type}
-    student = db_client.user_coll.find_one(filter=filter)
-    if student != None:
-        student["student_id"] = str(student["_id"])
-    return student
+        return student
+    except InvalidId:
+        raise Exception.bad_request
 
 
 def create_student(request: PostStudentRequestModel):
@@ -53,6 +85,7 @@ def create_student(request: PostStudentRequestModel):
         student_body["basket"] = []
         student_body["interested_tags"] = []
         student_body["owned_programs"] = []
+        student_body["payment_methods"] = []
 
         # Check duplicate uid
         uid_filter = {"type": student_type, "uid": request.uid}
@@ -251,6 +284,181 @@ def edit_student_config(
 
         result = db_client.user_coll.update_one(filter=filter, update=update)
         return result
+
+    except InvalidId:
+        raise Exception.bad_request
+
+
+# PAYMENT METHOD
+def create_student_payment_method(
+    student_id: str, request: PostStudentPaymentMethodRequestModel
+) -> str:
+    try:
+        filter = {"type": student_type, "_id": ObjectId(student_id)}
+
+        payment_body = dict()
+        oid = ObjectId()
+        update_body = {"$push": {"payment_methods": payment_body}}
+        payment_body["payment_method_id"] = oid
+        payment_body["name"] = request.name
+        payment_body["type"] = request.type
+        payment_body["card_number"] = request.card_number
+        payment_body["cvc"] = request.cvc
+        payment_body["expiration_date"] = request.expiration_date
+        payment_body["holder_fullname"] = request.holder_fullname
+
+        result = db_client.user_coll.update_one(filter, update_body)
+        if result.matched_count == 0:
+            raise Exception.not_found
+
+        return str(oid)
+
+    except InvalidId:
+        raise Exception.bad_request
+
+
+def edit_student_payment_method(
+    student_id: str,
+    payment_method_id: str,
+    request: PatchStudentPaymentMethodRequestModel,
+):
+    try:
+        array_filter = {
+            "x.payment_method_id": ObjectId(payment_method_id),
+        }
+
+        filter = {
+            "type": student_type,
+            "_id": ObjectId(student_id),
+        }
+
+        payment_body = {}
+        patch_body = {"$set": payment_body}
+        if request.name != None:
+            payment_body["payment_methods.$[x].name"] = request.name
+        if request.type != None:
+            payment_body["payment_methods.$[x].type"] = request.type
+        if request.card_number != None:
+            payment_body["payment_methods.$[x].card_number"] = request.card_number
+        if request.cvc != None:
+            payment_body["payment_methods.$[x].cvc"] = request.cvc
+        if request.expiration_date != None:
+            payment_body[
+                "payment_methods.$[x].expiration_date"
+            ] = request.expiration_date
+        if request.holder_fullname != None:
+            payment_body[
+                "payment_methods.$[x].holder_fullname"
+            ] = request.holder_fullname
+
+        result = db_client.user_coll.update_one(
+            filter, patch_body, array_filters=[array_filter]
+        )
+        if result.matched_count == 0:
+            raise Exception.not_found
+    except InvalidId:
+        raise Exception.bad_request
+
+
+def remove_student_payment_method(student_id: str, payment_method_id: str):
+    try:
+        filter = {
+            "type": student_type,
+            "_id": ObjectId(student_id),
+        }
+
+        update = {
+            "$pull": {
+                "payment_methods": {"payment_method_id": ObjectId(payment_method_id)}
+            }
+        }
+
+        result = db_client.user_coll.update_one(filter, update)
+        if result.matched_count == 0:
+            raise Exception.not_found
+
+    except InvalidId:
+        raise Exception.bad_request
+
+
+# BASKET
+def query_student_basket(student_id: str):
+    try:
+        student_filter = {
+            "type": student_type,
+            "_id": ObjectId(student_id),
+        }
+        student = db_client.user_coll.find_one(student_filter)
+        if student == None:
+            raise Exception.not_found
+
+        basket = student["basket"]
+
+        for i, item in enumerate(basket):
+            basket[i]["basket_item_id"] = str(item["basket_item_id"])
+            basket[i]["program_id"] = str(item["program_id"])
+        return basket
+
+    except InvalidId:
+        raise Exception.bad_request
+
+
+def create_student_basket_item(
+    student_id: str, request: PostStudentBasketItemRequestModel
+) -> str:
+    try:
+        # Check for duplicate owned_course
+        own_course_filter = {
+            "type": student_type,
+            "_id": ObjectId(student_id),
+            "owned_programs.program_id": ObjectId(request.program_id),
+        }
+        own_course = db_client.user_coll.find_one(own_course_filter)
+        if own_course != None:
+            e = Exception.unprocessable_content
+            e.__setattr__("detail", "Program already owned")
+            raise e
+
+        # Check for duplicate basket_item
+        basket_filter = {
+            "type": student_type,
+            "_id": ObjectId(student_id),
+            "basket.program_id": ObjectId(request.program_id),
+        }
+        basket_result = db_client.user_coll.find_one(basket_filter)
+        if basket_result != None:
+            e = Exception.unprocessable_content
+            e.__setattr__("detail", "Program already in basket")
+            raise e
+
+        # update basket
+        basket_item = dict()
+        update = {"$push": {"basket": basket_item}}
+
+        basket_item_id = ObjectId()
+        basket_item["basket_item_id"] = basket_item_id
+        basket_item["program_id"] = ObjectId(request.program_id)
+        basket_item["type"] = request.type
+
+        student_filter = {"type": student_type, "_id": ObjectId(student_id)}
+        result = db_client.user_coll.update_one(student_filter, update)
+        if result.matched_count == 0:
+            raise Exception.not_found
+        return str(basket_item_id)
+    except InvalidId:
+        raise Exception.bad_request
+
+
+def remove_student_basket_item(student_id: str, basket_item_id: str):
+    try:
+        student_filter = {
+            "type": student_type,
+            "_id": ObjectId(student_id),
+        }
+        update = {"$pull": {"basket": {"basket_item_id": ObjectId(basket_item_id)}}}
+        result = db_client.user_coll.update_one(student_filter, update)
+        if result.matched_count == 0:
+            raise Exception.not_found
 
     except InvalidId:
         raise Exception.bad_request
