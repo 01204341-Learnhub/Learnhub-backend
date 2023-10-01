@@ -19,9 +19,24 @@ from ..database import db_client
 
 from ..dependencies import (
     student_type,
+    teacher_type,
     course_type,
     Exception,
 )
+
+
+def query_teacher_profile(teacher_id: str) -> dict:
+    filter = {"_id": ObjectId(teacher_id), "type": teacher_type}
+    teacher = db_client.user_coll.find_one(filter)
+    if teacher == None:
+        raise Exception.internal_server_error
+
+    teacher_res = {
+        "teacher_id": teacher_id,
+        "teacher_name": teacher["fullname"],
+        "profile_pic": teacher["profile_pic"],
+    }
+    return teacher_res
 
 
 # PROGRAM
