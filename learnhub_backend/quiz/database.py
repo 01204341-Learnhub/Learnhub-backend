@@ -7,6 +7,7 @@ from .schemas import (
     PatchQuizResultRequestModel,
     GetQuizResponseModel,
     GetQuizResultResponseModel,
+    PostQuizRequestModel,
 )
 from learnhub_backend.database import db_client
 from learnhub_backend.dependencies import (
@@ -15,9 +16,10 @@ from learnhub_backend.dependencies import (
 )
 
 
+# QUIZ
 def query_quiz(
     quiz_id: str,
-) -> GetQuizResponseModel:
+):
     try:
         filter = {"_id": ObjectId(quiz_id)}
         quiz = db_client.quiz_coll.find_one(filter=filter)
@@ -31,7 +33,7 @@ def query_quiz(
 def query_quiz_result(
     quiz_id: str,
     student_id: str,
-) -> GetQuizResultResponseModel:
+):
     try:
         filter = {"quiz_id": ObjectId(quiz_id), "student_id": ObjectId(student_id)}
         quiz = db_client.quiz_result_coll.find_one(filter=filter)
@@ -40,6 +42,33 @@ def query_quiz_result(
         return quiz
     except InvalidId:
         raise Exception.bad_request
+
+
+def create_quiz(request: PostQuizRequestModel) -> str:
+    quiz_problems = []
+    for problem in request.problems:
+        quiz_problems.append(
+            {
+                "problem_num": problem.problem_num,
+                "question": problem.question,
+                "multiple_correct_answers": problem.multiple_correct_answers,
+                "explanation": problem.explanation,
+                "choice": problem.choice.model_dump(),
+                "correct_answer": problem.correct_answer.model_dump(),
+            }
+        )
+    quiz_body = {
+        "name": request.name,
+        "description": request.description,
+        "time_limit": request.time_limit,
+        "quiz_pic": request.quiz_pic,
+        "problems": quiz_problems,
+    }
+
+    result = db_client.quiz_coll.insert_one(quiz_body)
+    if result == None:
+        raise Exception.internal_server_error
+    return str(result.inserted_id)
 
 
 def edit_quiz_result(quiz_id: str, student_id: str, score_inc: int, answers_body: dict):

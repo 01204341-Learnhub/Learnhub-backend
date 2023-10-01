@@ -11,11 +11,14 @@ from .schemas import (
     GetQuizResultResponseModel,
     PatchQuizResultRequestModel,
     PatchQuizResultResponseModel,
+    PostQuizRequestModel,
+    PostQuizResponseModel,
 )
 from .services import (
     get_quiz_response,
     get_quiz_result_response,
     patch_quiz_result_response,
+    post_quiz_request,
 )
 
 
@@ -30,6 +33,17 @@ router = APIRouter(
 )
 
 common_page_params = Annotated[dict, Depends(router.dependencies[0].dependency)]
+
+
+@router.post(
+    "/",
+    status_code=200,
+    response_model_exclude_none=True,
+    response_model=PostQuizResponseModel,
+)
+def post_quiz(request_body: PostQuizRequestModel):
+    response_body = post_quiz_request(request_body)
+    return response_body
 
 
 @router.get(
@@ -65,5 +79,7 @@ def get_quiz_result(quiz_id: str, student_id: str):
 def patch_quiz_result(
     quiz_id: str, student_id: str, answers_body: PatchQuizResultRequestModel
 ):
-    response_body = patch_quiz_result_response(quiz_id=quiz_id, student_id=student_id, answers_body=answers_body)
+    response_body = patch_quiz_result_response(
+        quiz_id=quiz_id, student_id=student_id, answers_body=answers_body
+    )
     return response_body

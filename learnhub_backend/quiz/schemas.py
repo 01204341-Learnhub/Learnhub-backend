@@ -1,6 +1,6 @@
 from datetime import datetime
 from typing import Any
-from pydantic import BaseModel, HttpUrl
+from pydantic import BaseModel, HttpUrl, validator
 
 
 # QUIZ
@@ -11,6 +11,15 @@ class ChoiceModelBody(BaseModel):
     choice_d: str
     choice_e: str
     choice_f: str
+
+
+class AnswerModelBody(BaseModel):
+    answer_a: bool
+    answer_b: bool
+    answer_c: bool
+    answer_d: bool
+    answer_e: bool
+    answer_f: bool
 
 
 class GetQuizProblemModelBody(BaseModel):
@@ -28,15 +37,32 @@ class GetQuizResponseModel(BaseModel):
     problems: list[GetQuizProblemModelBody]
 
 
-class AnswerModelBody(BaseModel):
-    answer_a: bool
-    answer_b: bool
-    answer_c: bool
-    answer_d: bool
-    answer_e: bool
-    answer_f: bool
+class PostQuizProblemModelBody(BaseModel):
+    problem_num: int
+    question: str
+    multiple_correct_answers: bool
+    choice: ChoiceModelBody
+    correct_answer: AnswerModelBody
+    explanation: str
+
+    # TODO: Use validator. If multiple_correct_answers = false, correct_answer shouldn't have multiple correct answers
+    # @validator("multiple_correct_answers")
+    # def ....(cls, v: bool)
 
 
+class PostQuizRequestModel(BaseModel):
+    name: str
+    description: str
+    time_limit: int
+    quiz_pic: HttpUrl
+    problems: list[PostQuizProblemModelBody]
+
+
+class PostQuizResponseModel(BaseModel):
+    quiz_id: str
+
+
+# QUIZ RESULT
 class GetQuizResultProblemModelBody(BaseModel):
     problem_num: int
     answer: AnswerModelBody
@@ -59,9 +85,12 @@ class PatchQuizResultRequestModel(BaseModel):
     status: str  # started | finished
     answers: list[PatchQuizResultProblemModelBody]
 
+
 class PatchQuizResultAnswerModelBody(BaseModel):
     problem_num: int
     correct_answer: AnswerModelBody
     explanation: str
+
+
 class PatchQuizResultResponseModel(BaseModel):
     answer_responses: list[PatchQuizResultAnswerModelBody]
