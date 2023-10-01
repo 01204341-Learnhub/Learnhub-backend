@@ -10,6 +10,7 @@ from .services import (
     get_student_payment_method_response,
     list_students_response,
     get_student_response,
+    patch_student_payment_method_request,
     post_student_payment_method_request,
     post_student_request,
     delete_student_request,
@@ -25,6 +26,7 @@ from .schemas import (
     GetStudentPaymentMethodResponseModel,
     GetStudentResponseModel,
     ListStudentPaymentMethodsResponseModel,
+    PatchStudentPaymentMethodRequestModel,
     PostStudentPaymentMethodRequestModel,
     PostStudentPaymentMethodResponseModel,
     PostStudentRequestModel,
@@ -217,4 +219,21 @@ def post_student_payment_method(
 )
 def get_student_payment_method(student_id: str, payment_method_id: str):
     response_body = get_student_payment_method_response(student_id, payment_method_id)
+    return response_body
+
+
+@router.patch(
+    "/{student_id}/payment-methods/{payment_method_id}",
+    status_code=200,
+    response_model_exclude_none=True,
+    response_model=GenericOKResponse,
+)
+def patch_student_payment_method(
+    student_id: str,
+    payment_method_id: str,
+    request_body: PatchStudentPaymentMethodRequestModel,
+):
+    response_body = patch_student_payment_method_request(
+        student_id, payment_method_id, request_body
+    )
     return response_body

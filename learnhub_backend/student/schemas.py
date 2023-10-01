@@ -105,3 +105,12 @@ class PostStudentPaymentMethodRequestModel(BaseModel):
 
 class PostStudentPaymentMethodResponseModel(BaseModel):
     payment_method_id: str
+
+
+class PatchStudentPaymentMethodRequestModel(BaseModel):
+    name: str | None = None
+    type: str | None = None
+    card_number: str | None = None
+    cvc: str | None = None
+    expiration_date: str | None = None
+    holder_fullname: str | None = None

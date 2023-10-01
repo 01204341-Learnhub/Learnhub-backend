@@ -1,6 +1,8 @@
 from fastapi import HTTPException
 from pymongo.results import DeleteResult, UpdateResult
-from learnhub_backend.student.schemas import (
+
+from .schemas import (
+    PatchStudentPaymentMethodRequestModel,
     PostStudentPaymentMethodRequestModel,
     PostStudentRequestModel,
     PatchStudentRequestModel,
@@ -282,5 +284,48 @@ def create_student_payment_method(
 
         return str(oid)
 
+    except InvalidId:
+        raise Exception.bad_request
+
+
+def edit_student_payment_method(
+    student_id: str,
+    payment_method_id: str,
+    request: PatchStudentPaymentMethodRequestModel,
+):
+    try:
+        array_filter = {
+            "x.payment_method_id": ObjectId(payment_method_id),
+        }
+
+        filter = {
+            "type": student_type,
+            "_id": ObjectId(student_id),
+        }
+
+        payment_body = {}
+        patch_body = {"$set": payment_body}
+        if request.name != None:
+            payment_body["payment_methods.$[x].name"] = request.name
+        if request.type != None:
+            payment_body["payment_methods.$[x].type"] = request.type
+        if request.card_number != None:
+            payment_body["payment_methods.$[x].card_number"] = request.card_number
+        if request.cvc != None:
+            payment_body["payment_methods.$[x].cvc"] = request.cvc
+        if request.expiration_date != None:
+            payment_body[
+                "payment_methods.$[x].expiration_date"
+            ] = request.expiration_date
+        if request.holder_fullname != None:
+            payment_body[
+                "payment_methods.$[x].holder_fullname"
+            ] = request.holder_fullname
+
+        result = db_client.user_coll.update_one(
+            filter, patch_body, array_filters=[array_filter]
+        )
+        if result.matched_count == 0:
+            raise Exception.not_found
     except InvalidId:
         raise Exception.bad_request

@@ -8,6 +8,7 @@ from .database import (
     create_student,
     create_student_payment_method,
     edit_student,
+    edit_student_payment_method,
     query_list_students,
     query_student,
     remove_student,
@@ -22,6 +23,7 @@ from .schemas import (
     ListStudentPaymentMethodsResponseModel,
     ListStudentsResponseModel,
     GetStudentResponseModel,
+    PatchStudentPaymentMethodRequestModel,
     PostStudentPaymentMethodRequestModel,
     PostStudentPaymentMethodResponseModel,
     PostStudentRequestModel,
@@ -170,3 +172,12 @@ def post_student_payment_method_request(
     oid = create_student_payment_method(student_id, request)
     response_body = PostStudentPaymentMethodResponseModel(payment_method_id=oid)
     return response_body
+
+
+def patch_student_payment_method_request(
+    student_id: str,
+    payment_method_id: str,
+    request: PatchStudentPaymentMethodRequestModel,
+):
+    edit_student_payment_method(student_id, payment_method_id, request)
+    return GenericOKResponse
