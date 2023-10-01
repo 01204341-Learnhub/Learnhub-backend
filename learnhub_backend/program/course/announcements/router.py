@@ -82,7 +82,11 @@ def get_course_announcement(course_id: str, announcement_id: str):
     response_model_exclude_none=True,
     response_model=GenericOKResponse,
 )
-def patch_course_announcement(course_id: str, announcement_id: str, request_body: PatchCourseAnnouncementRequestModel):
+def patch_course_announcement(
+    course_id: str,
+    announcement_id: str,
+    request_body: PatchCourseAnnouncementRequestModel,
+):
     response_body = patch_course_announcement_request(
         course_id=course_id, announcement_id=announcement_id, request_body=request_body
     )

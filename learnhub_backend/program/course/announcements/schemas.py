@@ -14,7 +14,7 @@ class ListCourseAnnouncementsResponseModel(BaseModel):
 
 
 class AttachmentPostModelBody(BaseModel):
-    #attachment_type: str
+    # attachment_type: str
     src: HttpUrl
 
 
@@ -50,9 +50,10 @@ class GetCourseAnnouncementResponseModel(BaseModel):
 
 
 class AttachmentPatchModelBody(BaseModel):
-    op: str # add | delete | edit
+    op: str  # add | delete | edit
     old_src: str | None = None
     new_src: str | None = None
+
 
 class PatchCourseAnnouncementRequestModel(BaseModel):
     name: str | None = None

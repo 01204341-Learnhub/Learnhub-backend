@@ -31,12 +31,10 @@ common_page_params = Annotated[dict, Depends(router.dependencies[0].dependency)]
     "/{quiz_id}",
     status_code=200,
     response_model_exclude_none=True,
-    response_model=PlaceHolderModel,
+    response_model=None,
 )
-def list_course_announcements(quiz_id : str, common_paginations: common_page_params):
+def get_quiz(quiz_id : str):
     response_body = place_holder_service(
-        skip=common_paginations["skip"],
-        limit=common_paginations["limit"],
-        course_id=quiz_id ,
+        quiz_id=quiz_id ,
     )
     return response_body

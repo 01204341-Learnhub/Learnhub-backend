@@ -14,3 +14,8 @@ from learnhub_backend.dependencies import (
 
 def place_holder_db_service():
     pass
+
+def query_quiz(
+    quiz_id : str,
+):
+    pass
