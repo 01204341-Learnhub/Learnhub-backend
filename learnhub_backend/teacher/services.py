@@ -1,11 +1,20 @@
 from typing import Annotated, Union
 from pydantic import TypeAdapter
 
-from .database import create_teacher, query_list_teachers
+from learnhub_backend.dependencies import GenericOKResponse
+
+from .database import (
+    create_teacher,
+    edit_teacher,
+    query_list_teachers,
+    query_teacher,
+)
 
 from .schemas import (
+    GetTeacherResponseModel,
     ListTeachersModelBody,
     ListTeachersResponseModel,
+    PatchTeacherRequestModel,
     PostTeacherRequestModel,
     PostTeacherResponseModel,
 )
@@ -26,3 +35,14 @@ def post_teacher_request(request: PostTeacherRequestModel) -> PostTeacherRespons
     teacher_id = create_teacher(request)
     response_body = PostTeacherResponseModel(teacher_id=teacher_id)
     return response_body
+
+
+def get_teacher_response(teacher_id: str) -> GetTeacherResponseModel:
+    queried_teacher = query_teacher(teacher_id)
+    response_body = GetTeacherResponseModel(**queried_teacher)
+    return response_body
+
+
+def patch_teacher_request(teacher_id: str, request: PatchTeacherRequestModel):
+    edit_teacher(teacher_id, request)
+    return GenericOKResponse

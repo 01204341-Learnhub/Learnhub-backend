@@ -1,6 +1,6 @@
 from pymongo import MongoClient
 from .config import (
-    DB_ANNOUCEMENT_COLLECTION,
+    DB_ANNOUNCEMENT_COLLECTION,
     DB_CLASS_COLLECTION,
     DB_COURSE_PROGRESS_COLLECTION,
     DB_TAG_COLLECTION,
@@ -24,7 +24,7 @@ class DB_client(MongoClient):
         self.course_coll = self.db[DB_COURSE_COLLECTION]
         self.chapter_coll = self.db[DB_CHAPTER_COLLECTION]
         self.lesson_coll = self.db[DB_LESSON_COLLECTION]
-        self.annoucement_coll = self.db[DB_ANNOUCEMENT_COLLECTION]
+        self.announcement_coll = self.db[DB_ANNOUNCEMENT_COLLECTION]
         self.course_progress_coll = self.db[DB_COURSE_PROGRESS_COLLECTION]
 
         self.class_coll = self.db[DB_CLASS_COLLECTION]
