@@ -138,3 +138,24 @@ def list_student_payment_methods_response(
     )
 
     return response_body
+
+
+def get_student_payment_method_response(
+    student_id: str, payment_method_id: str
+) -> GetStudentPaymentMethodResponseModel:
+    student = query_student(student_id)
+    if student == None:
+        raise Exception.not_found
+
+    response_method = {}
+    for i, method in enumerate(student["payment_methods"]):
+        if str(method["payment_method_id"]) == payment_method_id:
+            response_method = method
+            response_method["payment_method_id"] = str(
+                response_method["payment_method_id"]
+            )
+    if len(response_method) == 0:
+        raise Exception.not_found
+    response_body = GetStudentPaymentMethodResponseModel(**response_method)
+
+    return response_body
