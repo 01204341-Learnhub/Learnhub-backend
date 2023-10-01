@@ -1,3 +1,4 @@
+from logging import error
 from pymongo.results import DeleteResult, UpdateResult
 from pymongo import ReturnDocument
 from bson.objectid import ObjectId
@@ -406,11 +407,31 @@ def create_student_basket_item(
     student_id: str, request: PostStudentBasketItemRequestModel
 ) -> str:
     try:
-        student_filter = {
+        # Check for duplicate owned_course
+        own_course_filter = {
             "type": student_type,
             "_id": ObjectId(student_id),
+            "owned_programs.program_id": ObjectId(request.program_id),
         }
+        own_course = db_client.user_coll.find_one(own_course_filter)
+        if own_course != None:
+            e = Exception.unprocessable_content
+            e.__setattr__("detail", "Program already owned")
+            raise e
 
+        # Check for duplicate basket_item
+        basket_filter = {
+            "type": student_type,
+            "_id": ObjectId(student_id),
+            "basket.program_id": ObjectId(request.program_id),
+        }
+        basket_result = db_client.user_coll.find_one(basket_filter)
+        if basket_result != None:
+            e = Exception.unprocessable_content
+            e.__setattr__("detail", "Program already in basket")
+            raise e
+
+        # update basket
         basket_item = dict()
         update = {"$push": {"basket": basket_item}}
 
@@ -419,6 +440,7 @@ def create_student_basket_item(
         basket_item["program_id"] = ObjectId(request.program_id)
         basket_item["type"] = request.type
 
+        student_filter = {"type": student_type, "_id": ObjectId(student_id)}
         result = db_client.user_coll.update_one(student_filter, update)
         if result.matched_count == 0:
             raise Exception.not_found
