@@ -16,10 +16,12 @@ from .services import (
     patch_student_course_progress_request,
     get_student_config_response,
     edit_student_config_request,
+    list_student_payment_methods_response,
 )
 
 from .schemas import (
     GetStudentResponseModel,
+    ListStudentPaymentMethodsResponseModel,
     PostStudentRequestModel,
     PostStudentResponseModel,
     ListStudentsResponseModel,
@@ -173,4 +175,16 @@ def edit_student_config(student_id: str, request_body: PatchStudentConfigRequest
     response_body = edit_student_config_request(
         student_id=student_id, request=request_body
     )
+    return response_body
+
+
+# TRANSACTION
+@router.get(
+    "/{student_id}/payment-methods",
+    status_code=200,
+    response_model_exclude_none=True,
+    response_model=ListStudentPaymentMethodsResponseModel,
+)
+def list_student_payment_method(student_id: str):
+    response_body = list_student_payment_methods_response(student_id)
     return response_body

@@ -77,3 +77,18 @@ class GetStudentConfigResponseModel(BaseModel):
 
 class PatchStudentConfigRequestModel(BaseModel):
     theme: str | None = None
+
+
+# PAYMENT METHOD
+class GetStudentPaymentMethodResponseModel(BaseModel):
+    payment_method_id: str
+    name: str
+    type: str
+    card_number: str
+    cvc: str
+    expiration_date: str
+    holder_fullname: str
+
+
+class ListStudentPaymentMethodsResponseModel(BaseModel):
+    payment_methods: list[GetStudentPaymentMethodResponseModel]

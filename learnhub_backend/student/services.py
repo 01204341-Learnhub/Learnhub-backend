@@ -17,6 +17,8 @@ from .database import (
 )
 
 from .schemas import (
+    GetStudentPaymentMethodResponseModel,
+    ListStudentPaymentMethodsResponseModel,
     ListStudentsResponseModel,
     GetStudentResponseModel,
     PostStudentRequestModel,
@@ -117,3 +119,22 @@ def edit_student_config_request(
     if result.matched_count == 0:
         raise Exception.not_found
     return GenericOKResponse
+
+
+# PAYMENT METHOD
+def list_student_payment_methods_response(
+    student_id: str,
+) -> ListStudentPaymentMethodsResponseModel:
+    student = query_student(student_id)
+    if student == None:
+        raise Exception.not_found
+    payment_methods = student["payment_methods"]
+    for i, method in enumerate(payment_methods):
+        payment_methods[i]["payment_method_id"] = str(method["payment_method_id"])
+
+    ta = TypeAdapter(list[GetStudentPaymentMethodResponseModel])
+    response_body = ListStudentPaymentMethodsResponseModel(
+        payment_methods=ta.validate_python(payment_methods)
+    )
+
+    return response_body
