@@ -329,3 +329,24 @@ def edit_student_payment_method(
             raise Exception.not_found
     except InvalidId:
         raise Exception.bad_request
+
+
+def remove_student_payment_method(student_id: str, payment_method_id: str):
+    try:
+        filter = {
+            "type": student_type,
+            "_id": ObjectId(student_id),
+        }
+
+        update = {
+            "$pull": {
+                "payment_methods": {"payment_method_id": ObjectId(payment_method_id)}
+            }
+        }
+
+        result = db_client.user_coll.update_one(filter, update)
+        if result.matched_count == 0:
+            raise Exception.not_found
+
+    except InvalidId:
+        raise Exception.bad_request

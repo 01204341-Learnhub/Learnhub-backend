@@ -7,6 +7,7 @@ from ..dependencies import (
 )
 
 from .services import (
+    delete_student_payment_method_request,
     get_student_payment_method_response,
     list_students_response,
     get_student_response,
@@ -236,4 +237,15 @@ def patch_student_payment_method(
     response_body = patch_student_payment_method_request(
         student_id, payment_method_id, request_body
     )
+    return response_body
+
+
+@router.delete(
+    "/{student_id}/payment-methods/{payment_method_id}",
+    status_code=200,
+    response_model_exclude_none=True,
+    response_model=GenericOKResponse,
+)
+def delete_student_payment_method(student_id: str, payment_method_id: str):
+    response_body = delete_student_payment_method_request(student_id, payment_method_id)
     return response_body

@@ -16,6 +16,7 @@ from .database import (
     edit_student_course_progress,
     edit_student_config,
     query_student_config,
+    remove_student_payment_method,
 )
 
 from .schemas import (
@@ -180,4 +181,12 @@ def patch_student_payment_method_request(
     request: PatchStudentPaymentMethodRequestModel,
 ):
     edit_student_payment_method(student_id, payment_method_id, request)
+    return GenericOKResponse
+
+
+def delete_student_payment_method_request(
+    student_id: str,
+    payment_method_id: str,
+):
+    remove_student_payment_method(student_id, payment_method_id)
     return GenericOKResponse
