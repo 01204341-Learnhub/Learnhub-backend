@@ -17,8 +17,8 @@ from .services import (
     create_course_announcements_request,
     list_course_announcements_response,
     get_course_announcement_response,
-    patch_course_annoucement_request,
-    delete_course_annoucement_request,
+    patch_course_announcement_request,
+    delete_course_announcement_request,
 )
 
 
@@ -41,7 +41,7 @@ common_page_params = Annotated[dict, Depends(router.dependencies[0].dependency)]
     response_model_exclude_none=True,
     response_model=ListCourseAnnouncementsResponseModel,
 )
-def list_course_annoucements(course_id: str, common_paginations: common_page_params):
+def list_course_announcements(course_id: str, common_paginations: common_page_params):
     response_body = list_course_announcements_response(
         skip=common_paginations["skip"],
         limit=common_paginations["limit"],
@@ -56,10 +56,10 @@ def list_course_annoucements(course_id: str, common_paginations: common_page_par
     response_model_exclude_none=True,
     response_model=PostCourseAnnouncementResponseModel,
 )
-def create_course_annoucement(
-    course_id: str, annoucement_body: PostCourseAnnouncementRequestModel
+def create_course_announcement(
+    course_id: str, announcement_body: PostCourseAnnouncementRequestModel
 ):
-    response_body = create_course_announcements_request(course_id, annoucement_body)
+    response_body = create_course_announcements_request(course_id, announcement_body)
     return response_body
 
 
@@ -69,7 +69,7 @@ def create_course_annoucement(
     response_model_exclude_none=True,
     response_model=GetCourseAnnouncementResponseModel,
 )
-def get_course_annoucement(course_id: str, announcement_id: str):
+def get_course_announcement(course_id: str, announcement_id: str):
     response_body = get_course_announcement_response(
         course_id=course_id, announcement_id=announcement_id
     )
@@ -82,8 +82,8 @@ def get_course_annoucement(course_id: str, announcement_id: str):
     response_model_exclude_none=True,
     response_model=GenericOKResponse,
 )
-def patch_course_annoucement(course_id: str, announcement_id: str, request_body: PatchCourseAnnouncementRequestModel):
-    response_body = patch_course_annoucement_request(
+def patch_course_announcement(course_id: str, announcement_id: str, request_body: PatchCourseAnnouncementRequestModel):
+    response_body = patch_course_announcement_request(
         course_id=course_id, announcement_id=announcement_id, request_body=request_body
     )
     return response_body
@@ -95,8 +95,8 @@ def patch_course_annoucement(course_id: str, announcement_id: str, request_body:
     response_model_exclude_none=True,
     response_model=GenericOKResponse,
 )
-def delete_course_annoucement(course_id: str, announcement_id: str):
-    response_body = delete_course_annoucement_request(
+def delete_course_announcement(course_id: str, announcement_id: str):
+    response_body = delete_course_announcement_request(
         course_id=course_id, announcement_id=announcement_id
     )
     return response_body

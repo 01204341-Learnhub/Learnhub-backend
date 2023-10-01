@@ -22,10 +22,10 @@ from .schemas import (
 def list_course_announcements_response(
     course_id: str, skip: int = 0, limit: int = 100
 ) -> ListCourseAnnouncementsResponseModel:
-    quried_annoucements = list_course_announcement(course_id, skip, limit)
+    quried_announcements = list_course_announcement(course_id, skip, limit)
     ta = TypeAdapter(list[ListCourseAnnouncementsModelBody])
     response_body = ListCourseAnnouncementsResponseModel(
-        annoucements=ta.validate_python(quried_annoucements)
+        announcements=ta.validate_python(quried_announcements)
     )
     return response_body
 
@@ -53,11 +53,11 @@ def get_course_announcement_response(course_id: str, announcement_id: str)->GetC
     return GetCourseAnnouncementResponseModel(**response_body)
 
 
-def patch_course_annoucement_request(course_id: str, announcement_id: str, request_body: PatchCourseAnnouncementRequestModel):
+def patch_course_announcement_request(course_id: str, announcement_id: str, request_body: PatchCourseAnnouncementRequestModel):
     responese = edit_course_announcement(course_id=course_id, announcement_id=announcement_id, request_body=request_body)
     return GenericOKResponse
 
 
-def delete_course_annoucement_request(course_id: str, announcement_id: str):
+def delete_course_announcement_request(course_id: str, announcement_id: str):
     responese = remove_course_announcement(course_id=course_id, announcement_id=announcement_id)
     return GenericOKResponse

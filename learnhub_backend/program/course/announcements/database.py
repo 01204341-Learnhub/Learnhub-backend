@@ -29,7 +29,7 @@ def list_course_announcement(course_id: str, skip: int = 0, limit: int = 100):
     try:
         q = {"course_id": ObjectId(course_id)}
 
-        announcements_cursor = db_client.annoucement_coll.find(
+        announcements_cursor = db_client.announcement_coll.find(
             q, skip=skip, limit=limit
         )
         announcements = []
@@ -67,7 +67,7 @@ def create_course_announcement(
         announcement_body_to_inserted["attachments"][i][
             "attachment_type"
         ] = CheckHttpFileType(announcement_body_to_inserted["attachments"][i]["src"])
-    response = db_client.annoucement_coll.insert_one(announcement_body_to_inserted)
+    response = db_client.announcement_coll.insert_one(announcement_body_to_inserted)
     created_id = response.inserted_id
     return str(created_id)
 
@@ -75,7 +75,7 @@ def create_course_announcement(
 def query_course_announcement(course_id: str, announcement_id: str) -> dict:
     try:
         filter = {"_id": ObjectId(announcement_id), "course_id": ObjectId(course_id)}
-        announcement = db_client.annoucement_coll.find_one(filter=filter)
+        announcement = db_client.announcement_coll.find_one(filter=filter)
         if announcement is None:
             raise Exception.not_found
         return announcement
@@ -156,17 +156,17 @@ def edit_course_announcement(
                     raise Exception.unprocessable_content
 
         # update each operation
-        result = db_client.annoucement_coll.update_one(
+        result = db_client.announcement_coll.update_one(
             filter=filter, update=update_body_add
         )
         if result.matched_count == 0:
             raise Exception.not_found
-        result = db_client.annoucement_coll.update_one(
+        result = db_client.announcement_coll.update_one(
             filter=filter, update=update_body_delete
         )
         if result.matched_count == 0:
             raise Exception.not_found
-        result = db_client.annoucement_coll.update_one(
+        result = db_client.announcement_coll.update_one(
             filter=filter, update=update_body_edit, array_filters=array_filter
         )
         if result.matched_count == 0:
@@ -179,7 +179,7 @@ def edit_course_announcement(
 def remove_course_announcement(course_id: str, announcement_id: str) -> bool:
     try:
         filter = {"_id": ObjectId(announcement_id), "course_id": ObjectId(course_id)}
-        result = db_client.annoucement_coll.delete_one(filter=filter)
+        result = db_client.announcement_coll.delete_one(filter=filter)
         if result.deleted_count == 0:
             raise Exception.not_found
         return True

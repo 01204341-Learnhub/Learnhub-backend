@@ -10,7 +10,7 @@ class ListCourseAnnouncementsModelBody(BaseModel):
 
 
 class ListCourseAnnouncementsResponseModel(BaseModel):
-    annoucements: list[ListCourseAnnouncementsModelBody]
+    announcements: list[ListCourseAnnouncementsModelBody]
 
 
 class AttachmentPostModelBody(BaseModel):
