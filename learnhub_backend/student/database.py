@@ -1,4 +1,3 @@
-from fastapi import HTTPException
 from pymongo.results import DeleteResult, UpdateResult
 
 from .schemas import (

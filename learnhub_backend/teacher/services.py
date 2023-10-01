@@ -5,19 +5,29 @@ from learnhub_backend.dependencies import GenericOKResponse
 
 from .database import (
     create_teacher,
+    create_teacher_payment_method,
     edit_teacher,
+    edit_teacher_payment_method,
     query_list_teachers,
     query_teacher,
+    remove_teacher_payment_method,
 )
 
 from .schemas import (
+    GetTeacherPaymentMethodResponseModel,
     GetTeacherResponseModel,
+    ListTeacherPaymentMethodsResponseModel,
     ListTeachersModelBody,
     ListTeachersResponseModel,
+    PatchTeacherPaymentMethodRequestModel,
     PatchTeacherRequestModel,
+    PostTeacherPaymentMethodRequestModel,
+    PostTeacherPaymentMethodResponseModel,
     PostTeacherRequestModel,
     PostTeacherResponseModel,
 )
+
+from ..dependencies import Exception
 
 
 # TEACHERS
@@ -45,4 +55,69 @@ def get_teacher_response(teacher_id: str) -> GetTeacherResponseModel:
 
 def patch_teacher_request(teacher_id: str, request: PatchTeacherRequestModel):
     edit_teacher(teacher_id, request)
+    return GenericOKResponse
+
+
+# PAYMENT METHOD
+def list_teacher_payment_methods_response(
+    teacher_id: str,
+) -> ListTeacherPaymentMethodsResponseModel:
+    teacher = query_teacher(teacher_id)
+    if teacher == None:
+        raise Exception.not_found
+    payment_methods = teacher["payment_methods"]
+    for i, method in enumerate(payment_methods):
+        payment_methods[i]["payment_method_id"] = str(method["payment_method_id"])
+
+    ta = TypeAdapter(list[GetTeacherPaymentMethodResponseModel])
+    response_body = ListTeacherPaymentMethodsResponseModel(
+        payment_methods=ta.validate_python(payment_methods)
+    )
+
+    return response_body
+
+
+def get_teacher_payment_method_response(
+    teacher_id: str, payment_method_id: str
+) -> GetTeacherPaymentMethodResponseModel:
+    teacher = query_teacher(teacher_id)
+    if teacher == None:
+        raise Exception.not_found
+
+    response_method = {}
+    for method in teacher["payment_methods"]:
+        if str(method["payment_method_id"]) == payment_method_id:
+            response_method = method
+            response_method["payment_method_id"] = str(
+                response_method["payment_method_id"]
+            )
+    if len(response_method) == 0:
+        raise Exception.not_found
+    response_body = GetTeacherPaymentMethodResponseModel(**response_method)
+
+    return response_body
+
+
+def post_teacher_payment_method_request(
+    teacher_id: str, request: PostTeacherPaymentMethodRequestModel
+) -> PostTeacherPaymentMethodResponseModel:
+    oid = create_teacher_payment_method(teacher_id, request)
+    response_body = PostTeacherPaymentMethodResponseModel(payment_method_id=oid)
+    return response_body
+
+
+def patch_teacher_payment_method_request(
+    teacher_id: str,
+    payment_method_id: str,
+    request: PatchTeacherPaymentMethodRequestModel,
+):
+    edit_teacher_payment_method(teacher_id, payment_method_id, request)
+    return GenericOKResponse
+
+
+def delete_teacher_payment_method_request(
+    teacher_id: str,
+    payment_method_id: str,
+):
+    remove_teacher_payment_method(teacher_id, payment_method_id)
     return GenericOKResponse

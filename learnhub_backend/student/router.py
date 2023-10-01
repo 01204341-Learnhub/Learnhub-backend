@@ -187,7 +187,7 @@ def edit_student_config(student_id: str, request_body: PatchStudentConfigRequest
     return response_body
 
 
-# TRANSACTION
+# PAYMENT METHOD
 @router.get(
     "/{student_id}/payment-methods",
     status_code=200,

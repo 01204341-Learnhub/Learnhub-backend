@@ -40,3 +40,40 @@ class PatchTeacherRequestModel(BaseModel):
     username: str | None
     fullname: str | None
     profile_pic: HttpUrl | None
+
+
+# PAYMENT METHOD
+class GetTeacherPaymentMethodResponseModel(BaseModel):
+    payment_method_id: str
+    name: str
+    type: str
+    card_number: str
+    cvc: str
+    expiration_date: str
+    holder_fullname: str
+
+
+class ListTeacherPaymentMethodsResponseModel(BaseModel):
+    payment_methods: list[GetTeacherPaymentMethodResponseModel]
+
+
+class PostTeacherPaymentMethodRequestModel(BaseModel):
+    name: str
+    type: str
+    card_number: str
+    cvc: str
+    expiration_date: str
+    holder_fullname: str
+
+
+class PostTeacherPaymentMethodResponseModel(BaseModel):
+    payment_method_id: str
+
+
+class PatchTeacherPaymentMethodRequestModel(BaseModel):
+    name: str | None = None
+    type: str | None = None
+    card_number: str | None = None
+    cvc: str | None = None
+    expiration_date: str | None = None
+    holder_fullname: str | None = None
