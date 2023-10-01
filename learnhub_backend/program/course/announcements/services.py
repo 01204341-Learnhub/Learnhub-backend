@@ -7,6 +7,7 @@ from .database import (
     query_course_announcement,
     remove_course_announcement,
     edit_course_announcement,
+    get_teacher_by_id,
 )
 from .schemas import (
     ListCourseAnnouncementsModelBody,
@@ -44,16 +45,15 @@ def get_course_announcement_response(course_id: str, announcement_id: str)->GetC
         course_id=course_id, announcement_id=announcement_id
     )
     response_body["announcement_id"] = str(response_body["_id"])
-    response_body["teacher"] = str(
+    response_body["teacher"] = get_teacher_by_id(str(
         response_body["teacher_id"]
-    )  # TODO: change to TeacherModelBody
+    ))
     response_body["last_edit"] = int(datetime.timestamp(response_body["last_edit"]))
 
     return GetCourseAnnouncementResponseModel(**response_body)
 
 
 def patch_course_annoucement_request(course_id: str, announcement_id: str, request_body: PatchCourseAnnouncementRequestModel):
-    #TODO: implement patch_course_annoucement_request
     responese = edit_course_announcement(course_id=course_id, announcement_id=announcement_id, request_body=request_body)
     return GenericOKResponse
 

@@ -32,7 +32,7 @@ class PostCourseAnnouncementResponseModel(BaseModel):
 class TeacherModelBody(BaseModel):
     teacher_id: str
     teacher_name: str
-    profic_pic: HttpUrl # TODO: make sure this works
+    profile_pic: HttpUrl
 
 
 class AttachmentModelBody(BaseModel):
@@ -42,7 +42,7 @@ class AttachmentModelBody(BaseModel):
 
 class GetCourseAnnouncementResponseModel(BaseModel):
     announcement_id: str
-    teacher: str # TODO: change to TeacherModelBody
+    teacher: TeacherModelBody
     name: str
     last_edit: int
     text: str

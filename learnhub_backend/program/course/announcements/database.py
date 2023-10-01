@@ -12,7 +12,18 @@ from learnhub_backend.dependencies import (
     Exception,
     CheckHttpFileType,
 )
-
+#TODO: optional add this to dependencies
+def get_teacher_by_id(teacher_id: str):
+    try:
+        teacher = db_client.user_coll.find_one({"_id": ObjectId(teacher_id)})
+        if teacher is None:
+            raise Exception.not_found
+        teacher["teacher_id"] = str(teacher["_id"])
+        teacher["teacher_name"] = teacher["fullname"]
+        pprint.pprint(teacher)
+        return teacher
+    except InvalidId:
+        raise Exception.bad_request
 
 def list_course_announcement(course_id: str, skip: int = 0, limit: int = 100):
     try:
@@ -36,7 +47,6 @@ def list_course_announcement(course_id: str, skip: int = 0, limit: int = 100):
 def create_course_announcement(
     course_id: str, announcement_body: PostCourseAnnouncementRequestModel
 ) -> str:
-    #TODO: add teacher_id from course_id
     # Check for valid course
     valid_course_filter = {"_id": ObjectId(course_id)}
     course_result = db_client.course_coll.find_one(filter=valid_course_filter)
@@ -46,6 +56,7 @@ def create_course_announcement(
     # Insert new announcement
     announcement_body_to_inserted = announcement_body.model_dump()
     announcement_body_to_inserted["course_id"] = ObjectId(course_id)
+    announcement_body_to_inserted["teacher_id"] = course_result["teacher_id"]
     announcement_body_to_inserted["last_edit"] = datetime.now(
         tz=timezone(timedelta(hours=7))
     )  # bangkok time
@@ -83,9 +94,11 @@ def edit_course_announcement(
         
         # prepare update body
         update_body_add = {"$push": {"attachments": {"$each": []}}}
+
         update_body_delete = {
-            "$pull": {"attachments": {"src": {"$in": []}}},
+            "$pull": {"attachments": {"src": {"$in": []}}}, # src is id of attachments to delete
         }
+        
         update_body_edit = {
             "$set": {},
         }
@@ -102,6 +115,7 @@ def edit_course_announcement(
 
                 if announcement_body["attachments"][i]["op"] == "add":
                     update_body_add["$push"]["attachments"]["$each"].append(
+                        # document to add to array
                         {
                             "src": str(announcement_body["attachments"][i]["new_src"]),
                             "attachment_type": CheckHttpFileType(
@@ -112,18 +126,20 @@ def edit_course_announcement(
 
                 elif announcement_body["attachments"][i]["op"] == "delete":
                     update_body_delete["$pull"]["attachments"]["src"]["$in"].append(
+                        # id of document to delete from array
                         str(announcement_body["attachments"][i]["old_src"])
                     )
 
                 elif announcement_body["attachments"][i]["op"] == "edit":
                     array_filter.append(
+                        # filter to find document to update in array
                         {
                             f"elem{i}.src": str(
                                 announcement_body["attachments"][i]["old_src"]
                             )
                         }
                     )
-
+                    # update body for document to update in array
                     update_body_edit["$set"][f"attachments.$[elem{i}].src"] = str(
                         announcement_body["attachments"][i]["new_src"]
                     )
