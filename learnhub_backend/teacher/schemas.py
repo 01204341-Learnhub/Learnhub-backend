@@ -25,3 +25,18 @@ class PostTeacherRequestModel(BaseModel):
 
 class PostTeacherResponseModel(BaseModel):
     teacher_id: str
+
+
+class GetTeacherResponseModel(BaseModel):
+    uid: str
+    teacher_id: str
+    username: str
+    fullname: str
+    email: str
+    profile_pic: HttpUrl | None
+
+
+class PatchTeacherRequestModel(BaseModel):
+    username: str | None
+    fullname: str | None
+    profile_pic: HttpUrl | None

@@ -7,12 +7,16 @@ from ..dependencies import (
 )
 
 from .services import (
+    get_teacher_response,
     list_teachers_response,
+    patch_teacher_request,
     post_teacher_request,
 )
 
 from .schemas import (
+    GetTeacherResponseModel,
     ListTeachersResponseModel,
+    PatchTeacherRequestModel,
     PostTeacherRequestModel,
     PostTeacherResponseModel,
 )
@@ -37,7 +41,6 @@ common_page_params = Annotated[dict, Depends(router.dependencies[0].dependency)]
     response_model=ListTeachersResponseModel,
 )
 def list_teachers(common_paginations: common_page_params):
-    # TODO: Implement actual endpoint
     response_body = list_teachers_response(
         skip=common_paginations["skip"],
         limit=common_paginations["limit"],
@@ -54,3 +57,35 @@ def list_teachers(common_paginations: common_page_params):
 def post_teacher(request_body: PostTeacherRequestModel):
     response_body = post_teacher_request(request_body)
     return response_body
+
+
+@router.get(
+    "/{teacher_id}",
+    status_code=200,
+    response_model_exclude_none=True,
+    response_model=GetTeacherResponseModel,
+)
+def get_teacher(teacher_id: str):
+    response_body = get_teacher_response(teacher_id)
+    return response_body
+
+
+@router.patch(
+    "/{teacher_id}",
+    status_code=200,
+    response_model_exclude_none=True,
+    response_model=GenericOKResponse,
+)
+def patch_teacher(teacher_id: str, request_body: PatchTeacherRequestModel):
+    response_body = patch_teacher_request(teacher_id, request_body)
+    return response_body
+
+
+@router.delete(
+    "/{teacher_id}",
+    status_code=200,
+    response_model_exclude_none=True,
+)
+def delete_teacher(teacher_id: str):
+    # TODO: Implement delete teacher
+    return {"detail": "this endpoint is not currently supported"}
