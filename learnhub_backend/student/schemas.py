@@ -92,3 +92,16 @@ class GetStudentPaymentMethodResponseModel(BaseModel):
 
 class ListStudentPaymentMethodsResponseModel(BaseModel):
     payment_methods: list[GetStudentPaymentMethodResponseModel]
+
+
+class PostStudentPaymentMethodRequestModel(BaseModel):
+    name: str
+    type: str
+    card_number: str
+    cvc: str
+    expiration_date: str
+    holder_fullname: str
+
+
+class PostStudentPaymentMethodResponseModel(BaseModel):
+    payment_method_id: str

@@ -6,6 +6,7 @@ from learnhub_backend.dependencies import GenericOKResponse
 
 from .database import (
     create_student,
+    create_student_payment_method,
     edit_student,
     query_list_students,
     query_student,
@@ -21,6 +22,8 @@ from .schemas import (
     ListStudentPaymentMethodsResponseModel,
     ListStudentsResponseModel,
     GetStudentResponseModel,
+    PostStudentPaymentMethodRequestModel,
+    PostStudentPaymentMethodResponseModel,
     PostStudentRequestModel,
     PostStudentResponseModel,
     PatchStudentRequestModel,
@@ -148,7 +151,7 @@ def get_student_payment_method_response(
         raise Exception.not_found
 
     response_method = {}
-    for i, method in enumerate(student["payment_methods"]):
+    for method in student["payment_methods"]:
         if str(method["payment_method_id"]) == payment_method_id:
             response_method = method
             response_method["payment_method_id"] = str(
@@ -158,4 +161,12 @@ def get_student_payment_method_response(
         raise Exception.not_found
     response_body = GetStudentPaymentMethodResponseModel(**response_method)
 
+    return response_body
+
+
+def post_student_payment_method_request(
+    student_id: str, request: PostStudentPaymentMethodRequestModel
+) -> PostStudentPaymentMethodResponseModel:
+    oid = create_student_payment_method(student_id, request)
+    response_body = PostStudentPaymentMethodResponseModel(payment_method_id=oid)
     return response_body
