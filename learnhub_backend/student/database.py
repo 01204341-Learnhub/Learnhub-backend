@@ -2,6 +2,7 @@ from pymongo.results import DeleteResult, UpdateResult
 
 from .schemas import (
     PatchStudentPaymentMethodRequestModel,
+    PostStudentBasketItemRequestModel,
     PostStudentPaymentMethodRequestModel,
     PostStudentRequestModel,
     PatchStudentRequestModel,
@@ -395,6 +396,46 @@ def query_student_basket(student_id: str):
             basket[i]["basket_item_id"] = str(item["basket_item_id"])
             basket[i]["program_id"] = str(item["program_id"])
         return basket
+
+    except InvalidId:
+        raise Exception.bad_request
+
+
+def create_student_basket_item(
+    student_id: str, request: PostStudentBasketItemRequestModel
+) -> str:
+    try:
+        student_filter = {
+            "type": student_type,
+            "_id": ObjectId(student_id),
+        }
+
+        basket_item = dict()
+        update = {"$push": {"basket": basket_item}}
+
+        basket_item_id = ObjectId()
+        basket_item["basket_item_id"] = basket_item_id
+        basket_item["program_id"] = ObjectId(request.program_id)
+        basket_item["type"] = request.type
+
+        result = db_client.user_coll.update_one(student_filter, update)
+        if result.matched_count == 0:
+            raise Exception.not_found
+        return str(basket_item_id)
+    except InvalidId:
+        raise Exception.bad_request
+
+
+def remove_student_basket_item(student_id: str, basket_item_id: str):
+    try:
+        student_filter = {
+            "type": student_type,
+            "_id": ObjectId(student_id),
+        }
+        update = {"$pull": {"basket": {"basket_item_id": ObjectId(basket_item_id)}}}
+        result = db_client.user_coll.update_one(student_filter, update)
+        if result.matched_count == 0:
+            raise Exception.not_found
 
     except InvalidId:
         raise Exception.bad_request

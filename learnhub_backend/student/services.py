@@ -7,6 +7,7 @@ from learnhub_backend.dependencies import GenericOKResponse
 
 from .database import (
     create_student,
+    create_student_basket_item,
     create_student_payment_method,
     edit_student,
     edit_student_payment_method,
@@ -20,6 +21,7 @@ from .database import (
     edit_student_course_progress,
     edit_student_config,
     query_student_config,
+    remove_student_basket_item,
     remove_student_payment_method,
 )
 
@@ -31,6 +33,8 @@ from .schemas import (
     ListStudentsResponseModel,
     GetStudentResponseModel,
     PatchStudentPaymentMethodRequestModel,
+    PostStudentBasketItemRequestModel,
+    PostStudentBasketItemResponseModel,
     PostStudentPaymentMethodRequestModel,
     PostStudentPaymentMethodResponseModel,
     PostStudentRequestModel,
@@ -233,3 +237,16 @@ def get_student_basket_item_response(
         basket_item["price"] = cls["price"]
 
     return GetStudentBasketItemResponseModel(**basket_item)
+
+
+def post_student_basket_item_request(
+    student_id: str, request: PostStudentBasketItemRequestModel
+) -> PostStudentBasketItemResponseModel:
+    basket_item_id = create_student_basket_item(student_id, request)
+    response = PostStudentBasketItemResponseModel(basket_item_id=basket_item_id)
+    return response
+
+
+def delete_student_basket_item_request(student_id: str, basket_item_id: str):
+    remove_student_basket_item(student_id, basket_item_id)
+    return GenericOKResponse

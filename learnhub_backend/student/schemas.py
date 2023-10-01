@@ -127,3 +127,12 @@ class GetStudentBasketItemResponseModel(BaseModel):
 
 class ListStudentBasketResponseModel(BaseModel):
     basket: list[GetStudentBasketItemResponseModel]
+
+
+class PostStudentBasketItemRequestModel(BaseModel):
+    program_id: str
+    type: str
+
+
+class PostStudentBasketItemResponseModel(BaseModel):
+    basket_item_id: str

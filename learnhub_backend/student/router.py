@@ -1,7 +1,6 @@
 from fastapi import APIRouter, Depends
 from typing import Annotated, Union
 
-from learnhub_backend.teacher.schemas import ListTeacherPaymentMethodsResponseModel
 from ..dependencies import (
     common_pagination_parameters,
     GenericOKResponse,
@@ -9,6 +8,7 @@ from ..dependencies import (
 )
 
 from .services import (
+    delete_student_basket_item_request,
     delete_student_payment_method_request,
     get_student_basket_item_response,
     get_student_payment_method_response,
@@ -16,6 +16,7 @@ from .services import (
     list_students_response,
     get_student_response,
     patch_student_payment_method_request,
+    post_student_basket_item_request,
     post_student_payment_method_request,
     post_student_request,
     delete_student_request,
@@ -34,6 +35,8 @@ from .schemas import (
     ListStudentBasketResponseModel,
     ListStudentPaymentMethodsResponseModel,
     PatchStudentPaymentMethodRequestModel,
+    PostStudentBasketItemRequestModel,
+    PostStudentBasketItemResponseModel,
     PostStudentPaymentMethodRequestModel,
     PostStudentPaymentMethodResponseModel,
     PostStudentRequestModel,
@@ -266,6 +269,19 @@ def list_student_basket(student_id: str):
     return response_body
 
 
+@router.post(
+    "/{student_id}/basket",
+    status_code=200,
+    response_model_exclude_none=True,
+    response_model=PostStudentBasketItemResponseModel,
+)
+def post_student_basket_item(
+    student_id: str, request_body: PostStudentBasketItemRequestModel
+):
+    response_body = post_student_basket_item_request(student_id, request_body)
+    return response_body
+
+
 @router.get(
     "/{student_id}/basket/{basket_item_id}",
     status_code=200,
@@ -274,4 +290,15 @@ def list_student_basket(student_id: str):
 )
 def get_student_basket_item(student_id: str, basket_item_id: str):
     response_body = get_student_basket_item_response(student_id, basket_item_id)
+    return response_body
+
+
+@router.delete(
+    "/{student_id}/basket/{basket_item_id}",
+    status_code=200,
+    response_model_exclude_none=True,
+    response_model=GenericOKResponse,
+)
+def delete_student_basket_item(student_id: str, basket_item_id: str):
+    response_body = delete_student_basket_item_request(student_id, basket_item_id)
     return response_body
