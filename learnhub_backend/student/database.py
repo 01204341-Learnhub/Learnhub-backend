@@ -1,4 +1,7 @@
 from pymongo.results import DeleteResult, UpdateResult
+from pymongo import ReturnDocument
+from bson.objectid import ObjectId
+from bson.errors import InvalidId
 
 from .schemas import (
     PatchStudentPaymentMethodRequestModel,
@@ -11,15 +14,13 @@ from .schemas import (
     PatchStudentConfigRequestModel,
 )
 from ..database import db_client
-from bson.objectid import ObjectId
-from bson.errors import InvalidId
 
-from ..dependencies import student_type, course_type
 
 from ..dependencies import (
+    student_type,
+    course_type,
     Exception,
 )
-from pymongo import ReturnDocument
 
 
 # PROGRAM
