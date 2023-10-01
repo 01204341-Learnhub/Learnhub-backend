@@ -53,6 +53,7 @@ def create_student(request: PostStudentRequestModel):
         student_body["basket"] = []
         student_body["interested_tags"] = []
         student_body["owned_programs"] = []
+        student_body["payment_methods"] = []
 
         # Check duplicate uid
         uid_filter = {"type": student_type, "uid": request.uid}

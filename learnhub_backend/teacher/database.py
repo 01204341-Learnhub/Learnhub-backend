@@ -13,14 +13,19 @@ from ..dependencies import (
 
 # TEACHERS
 def query_list_teachers(skip: int = 0, limit: int = 100) -> list:
-    filter = {"type": "teacher"}
-    teachers_cursor = db_client.user_coll.find(skip=skip, limit=limit, filter=filter)
-    teachers = []
-    for teacher in teachers_cursor:
-        teacher["teacher_id"] = str(teacher["_id"])
-        teachers.append(teacher)
+    try:
+        filter = {"type": "teacher"}
+        teachers_cursor = db_client.user_coll.find(
+            skip=skip, limit=limit, filter=filter
+        )
+        teachers = []
+        for teacher in teachers_cursor:
+            teacher["teacher_id"] = str(teacher["_id"])
+            teachers.append(teacher)
 
-    return teachers
+        return teachers
+    except InvalidId:
+        raise Exception.bad_request
 
 
 def create_teacher(request: PostTeacherRequestModel):
@@ -35,6 +40,7 @@ def create_teacher(request: PostTeacherRequestModel):
         teacher_body["config"] = {"theme": "light"}
         teacher_body["type"] = teacher_type
         teacher_body["owned_programs"] = []
+        teacher_body["payment_methods"] = []
 
         # Check duplicate uid
         uid_filter = {"type": teacher_type, "uid": request.uid}
