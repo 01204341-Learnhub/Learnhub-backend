@@ -33,10 +33,10 @@ class GetTeacherResponseModel(BaseModel):
     username: str
     fullname: str
     email: str
-    profile_pic: HttpUrl | None
+    profile_pic: HttpUrl | None = None
 
 
 class PatchTeacherRequestModel(BaseModel):
     username: str | None
     fullname: str | None
-    profile_pic: HttpUrl | None
+    profile_pic: HttpUrl | None = None
