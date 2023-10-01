@@ -21,6 +21,8 @@ def get_quiz_result_response(quiz_id: str, student_id: str):
     response_body["score"] = queried_quiz_result["score"]
 
     #make problem result
+
+    #sort problems in quiz_result by problem_num
     problem_results_list = sorted(
         queried_quiz_result["problems"], key=lambda x: x["problem_num"]
     )
