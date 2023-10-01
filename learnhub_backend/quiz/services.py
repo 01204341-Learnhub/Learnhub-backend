@@ -1,20 +1,16 @@
 from pydantic import TypeAdapter
 from datetime import datetime
 from learnhub_backend.dependencies import GenericOKResponse, Exception
-from .database import (
-    place_holder_db_service
-)
-from .schemas import (
-    PlaceHolderModel
-)
+from .database import query_quiz
+from .schemas import GetQuizResponseModel
+
 
 def place_holder_service():
     pass
 
-def get_quiz_response(quiz_id : str):
-    response_body = query_quiz(
-        quiz_id=quiz_id ,
+
+def get_quiz_response(quiz_id: str):
+    queried_quiz = query_quiz(
+        quiz_id=quiz_id,
     )
-    return response_body
-
-
+    return GetQuizResponseModel(**queried_quiz)

@@ -7,10 +7,10 @@ from learnhub_backend.dependencies import (
     Exception,
 )
 from .schemas import (
-    PlaceHolderModel
+    GetQuizResponseModel
 )
 from .services import (
-    place_holder_service,
+    get_quiz_response,
 )
 
 
@@ -31,10 +31,10 @@ common_page_params = Annotated[dict, Depends(router.dependencies[0].dependency)]
     "/{quiz_id}",
     status_code=200,
     response_model_exclude_none=True,
-    response_model=None,
+    response_model=GetQuizResponseModel,
 )
 def get_quiz(quiz_id : str):
-    response_body = place_holder_service(
+    response_body = get_quiz_response(
         quiz_id=quiz_id ,
     )
     return response_body

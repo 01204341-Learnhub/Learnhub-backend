@@ -17,5 +17,12 @@ def place_holder_db_service():
 
 def query_quiz(
     quiz_id : str,
-):
-    pass
+)->dict:
+    try:
+        filter = {"_id": ObjectId(quiz_id)}
+        quiz = db_client.quiz_coll.find_one(filter=filter)
+        if quiz is None:
+            raise Exception.not_found
+        return quiz
+    except InvalidId:
+        raise Exception.bad_request
