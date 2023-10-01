@@ -1,5 +1,5 @@
 from typing import Optional, Union
-from pydantic import BaseModel, HttpUrl
+from pydantic import BaseModel, HttpUrl, validator
 
 
 ## STUDENTS
@@ -77,3 +77,62 @@ class GetStudentConfigResponseModel(BaseModel):
 
 class PatchStudentConfigRequestModel(BaseModel):
     theme: str | None = None
+
+
+# PAYMENT METHOD
+class GetStudentPaymentMethodResponseModel(BaseModel):
+    payment_method_id: str
+    name: str
+    type: str
+    card_number: str
+    cvc: str
+    expiration_date: str
+    holder_fullname: str
+
+
+class ListStudentPaymentMethodsResponseModel(BaseModel):
+    payment_methods: list[GetStudentPaymentMethodResponseModel]
+
+
+class PostStudentPaymentMethodRequestModel(BaseModel):
+    name: str
+    type: str
+    card_number: str
+    cvc: str
+    expiration_date: str
+    holder_fullname: str
+
+
+class PostStudentPaymentMethodResponseModel(BaseModel):
+    payment_method_id: str
+
+
+class PatchStudentPaymentMethodRequestModel(BaseModel):
+    name: str | None = None
+    type: str | None = None
+    card_number: str | None = None
+    cvc: str | None = None
+    expiration_date: str | None = None
+    holder_fullname: str | None = None
+
+
+# BASKET
+class GetStudentBasketItemResponseModel(BaseModel):
+    basket_item_id: str
+    name: str
+    type: str
+    price: float
+    program_id: str
+
+
+class ListStudentBasketResponseModel(BaseModel):
+    basket: list[GetStudentBasketItemResponseModel]
+
+
+class PostStudentBasketItemRequestModel(BaseModel):
+    program_id: str
+    type: str
+
+
+class PostStudentBasketItemResponseModel(BaseModel):
+    basket_item_id: str

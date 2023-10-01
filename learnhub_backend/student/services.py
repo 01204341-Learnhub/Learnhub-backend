@@ -1,4 +1,5 @@
 from typing import Annotated, Union
+from bson.objectid import ObjectId
 from pydantic import TypeAdapter
 from pymongo.results import DeleteResult, UpdateResult
 
@@ -6,19 +7,36 @@ from learnhub_backend.dependencies import GenericOKResponse
 
 from .database import (
     create_student,
+    create_student_basket_item,
+    create_student_payment_method,
     edit_student,
+    edit_student_payment_method,
+    query_class,
+    query_course,
     query_list_students,
     query_student,
+    query_student_basket,
     remove_student,
     query_student_course_progress,
     edit_student_course_progress,
     edit_student_config,
     query_student_config,
+    remove_student_basket_item,
+    remove_student_payment_method,
 )
 
 from .schemas import (
+    GetStudentBasketItemResponseModel,
+    GetStudentPaymentMethodResponseModel,
+    ListStudentBasketResponseModel,
+    ListStudentPaymentMethodsResponseModel,
     ListStudentsResponseModel,
     GetStudentResponseModel,
+    PatchStudentPaymentMethodRequestModel,
+    PostStudentBasketItemRequestModel,
+    PostStudentBasketItemResponseModel,
+    PostStudentPaymentMethodRequestModel,
+    PostStudentPaymentMethodResponseModel,
     PostStudentRequestModel,
     PostStudentResponseModel,
     PatchStudentRequestModel,
@@ -42,14 +60,8 @@ def list_students_response(skip: int = 0, limit: int = 0) -> ListStudentsRespons
     return response_body
 
 
-def get_student_response(student_id: str) -> GetStudentResponseModel | None:
+def get_student_response(student_id: str) -> GetStudentResponseModel:
     queried_student = query_student(student_id)
-    try:
-        queried_student = query_student(student_id)
-    except:
-        return None
-    if queried_student == None:
-        return None
     response_body = GetStudentResponseModel(**queried_student)
 
     return response_body
@@ -116,4 +128,125 @@ def edit_student_config_request(
     result = edit_student_config(student_id, request)
     if result.matched_count == 0:
         raise Exception.not_found
+    return GenericOKResponse
+
+
+# PAYMENT METHOD
+def list_student_payment_methods_response(
+    student_id: str,
+) -> ListStudentPaymentMethodsResponseModel:
+    student = query_student(student_id)
+    if student == None:
+        raise Exception.not_found
+    payment_methods = student["payment_methods"]
+    for i, method in enumerate(payment_methods):
+        payment_methods[i]["payment_method_id"] = str(method["payment_method_id"])
+
+    ta = TypeAdapter(list[GetStudentPaymentMethodResponseModel])
+    response_body = ListStudentPaymentMethodsResponseModel(
+        payment_methods=ta.validate_python(payment_methods)
+    )
+
+    return response_body
+
+
+def get_student_payment_method_response(
+    student_id: str, payment_method_id: str
+) -> GetStudentPaymentMethodResponseModel:
+    student = query_student(student_id)
+    if student == None:
+        raise Exception.not_found
+
+    response_method = {}
+    for method in student["payment_methods"]:
+        if str(method["payment_method_id"]) == payment_method_id:
+            response_method = method
+            response_method["payment_method_id"] = str(
+                response_method["payment_method_id"]
+            )
+    if len(response_method) == 0:
+        raise Exception.not_found
+    response_body = GetStudentPaymentMethodResponseModel(**response_method)
+
+    return response_body
+
+
+def post_student_payment_method_request(
+    student_id: str, request: PostStudentPaymentMethodRequestModel
+) -> PostStudentPaymentMethodResponseModel:
+    oid = create_student_payment_method(student_id, request)
+    response_body = PostStudentPaymentMethodResponseModel(payment_method_id=oid)
+    return response_body
+
+
+def patch_student_payment_method_request(
+    student_id: str,
+    payment_method_id: str,
+    request: PatchStudentPaymentMethodRequestModel,
+):
+    edit_student_payment_method(student_id, payment_method_id, request)
+    return GenericOKResponse
+
+
+def delete_student_payment_method_request(
+    student_id: str,
+    payment_method_id: str,
+):
+    remove_student_payment_method(student_id, payment_method_id)
+    return GenericOKResponse
+
+
+# BASKET
+def list_student_basket_response(student_id: str) -> ListStudentBasketResponseModel:
+    basket = query_student_basket(student_id)
+    for i, item in enumerate(basket):
+        if item["type"] == "course":
+            course = query_course(item["program_id"])
+            basket[i]["name"] = course["name"]
+            basket[i]["price"] = course["price"]
+        elif item["type"] == "class":
+            cls = query_class(item["program_id"])
+            basket[i]["name"] = cls["name"]
+            basket[i]["price"] = cls["price"]
+
+    ta = TypeAdapter(list[GetStudentBasketItemResponseModel])
+    response = ListStudentBasketResponseModel(basket=ta.validate_python(basket))
+    return response
+
+
+def get_student_basket_item_response(
+    student_id: str, basket_item_id: str
+) -> GetStudentBasketItemResponseModel:
+    student = query_student(student_id)
+    basket_item = dict()
+    for item in student["basket"]:
+        if item["basket_item_id"] == ObjectId(basket_item_id):
+            basket_item = item
+    if len(basket_item) == 0:
+        raise Exception.not_found
+
+    basket_item["basket_item_id"] = str(basket_item["basket_item_id"])
+    basket_item["program_id"] = str(basket_item["program_id"])
+    if basket_item["type"] == "course":
+        course = query_course(basket_item["program_id"])
+        basket_item["name"] = course["name"]
+        basket_item["price"] = course["price"]
+    elif basket_item["type"] == "class":
+        cls = query_class(basket_item["program_id"])
+        basket_item["name"] = cls["name"]
+        basket_item["price"] = cls["price"]
+
+    return GetStudentBasketItemResponseModel(**basket_item)
+
+
+def post_student_basket_item_request(
+    student_id: str, request: PostStudentBasketItemRequestModel
+) -> PostStudentBasketItemResponseModel:
+    basket_item_id = create_student_basket_item(student_id, request)
+    response = PostStudentBasketItemResponseModel(basket_item_id=basket_item_id)
+    return response
+
+
+def delete_student_basket_item_request(student_id: str, basket_item_id: str):
+    remove_student_basket_item(student_id, basket_item_id)
     return GenericOKResponse
