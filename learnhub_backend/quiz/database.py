@@ -12,12 +12,10 @@ from learnhub_backend.dependencies import (
     CheckHttpFileType,
 )
 
-def place_holder_db_service():
-    pass
 
 def query_quiz(
-    quiz_id : str,
-)->dict:
+    quiz_id: str,
+) -> dict:
     try:
         filter = {"_id": ObjectId(quiz_id)}
         quiz = db_client.quiz_coll.find_one(filter=filter)
@@ -26,3 +24,18 @@ def query_quiz(
         return quiz
     except InvalidId:
         raise Exception.bad_request
+
+
+def query_quiz_result(
+    quiz_id: str,
+    student_id: str,
+) -> dict:
+    try:
+        filter = {"quiz_id": ObjectId(quiz_id), "student_id": ObjectId(student_id)}
+        quiz = db_client.quiz_result_coll.find_one(filter=filter)
+        if quiz is None:
+            raise Exception.not_found
+        return quiz
+    except InvalidId:
+        raise Exception.bad_request
+
