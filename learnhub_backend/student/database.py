@@ -21,23 +21,50 @@ from ..dependencies import (
 from pymongo import ReturnDocument
 
 
+# PROGRAM
+def query_course(course_id: str):
+    filter = {"_id": ObjectId(course_id)}
+    course = db_client.course_coll.find_one(filter)
+    if course == None:
+        raise Exception.not_found
+    return course
+
+
+def query_class(class_id: str):
+    filter = {"_id": ObjectId(class_id)}
+    cls = db_client.class_coll.find_one(filter)
+    if cls == None:
+        raise Exception.not_found
+    return cls
+
+
+# STUDENT
 def query_list_students(skip: int = 0, limit: int = 100) -> list:
-    filter = {"type": student_type}
-    students_cursor = db_client.user_coll.find(skip=skip, limit=limit, filter=filter)
-    students = []
-    for student in students_cursor:
+    try:
+        filter = {"type": student_type}
+        students_cursor = db_client.user_coll.find(
+            skip=skip, limit=limit, filter=filter
+        )
+        students = []
+        for student in students_cursor:
+            student["student_id"] = str(student["_id"])
+            students.append(student)
+
+        return students
+    except InvalidId:
+        raise Exception.bad_request
+
+
+def query_student(student_id: str) -> dict:
+    try:
+        filter = {"_id": ObjectId(student_id), "type": student_type}
+        student = db_client.user_coll.find_one(filter=filter)
+        if student == None:
+            raise Exception.not_found
         student["student_id"] = str(student["_id"])
-        students.append(student)
-
-    return students
-
-
-def query_student(student_id: str) -> dict | None:
-    filter = {"_id": ObjectId(student_id), "type": student_type}
-    student = db_client.user_coll.find_one(filter=filter)
-    if student != None:
-        student["student_id"] = str(student["_id"])
-    return student
+        return student
+    except InvalidId:
+        raise Exception.bad_request
 
 
 def create_student(request: PostStudentRequestModel):
@@ -346,6 +373,28 @@ def remove_student_payment_method(student_id: str, payment_method_id: str):
         result = db_client.user_coll.update_one(filter, update)
         if result.matched_count == 0:
             raise Exception.not_found
+
+    except InvalidId:
+        raise Exception.bad_request
+
+
+# BASKET
+def query_student_basket(student_id: str):
+    try:
+        student_filter = {
+            "type": student_type,
+            "_id": ObjectId(student_id),
+        }
+        student = db_client.user_coll.find_one(student_filter)
+        if student == None:
+            raise Exception.not_found
+
+        basket = student["basket"]
+
+        for i, item in enumerate(basket):
+            basket[i]["basket_item_id"] = str(item["basket_item_id"])
+            basket[i]["program_id"] = str(item["program_id"])
+        return basket
 
     except InvalidId:
         raise Exception.bad_request

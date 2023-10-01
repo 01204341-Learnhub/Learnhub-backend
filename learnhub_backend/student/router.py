@@ -1,5 +1,7 @@
 from fastapi import APIRouter, Depends
 from typing import Annotated, Union
+
+from learnhub_backend.teacher.schemas import ListTeacherPaymentMethodsResponseModel
 from ..dependencies import (
     common_pagination_parameters,
     GenericOKResponse,
@@ -8,7 +10,9 @@ from ..dependencies import (
 
 from .services import (
     delete_student_payment_method_request,
+    get_student_basket_item_response,
     get_student_payment_method_response,
+    list_student_basket_response,
     list_students_response,
     get_student_response,
     patch_student_payment_method_request,
@@ -24,8 +28,10 @@ from .services import (
 )
 
 from .schemas import (
+    GetStudentBasketItemResponseModel,
     GetStudentPaymentMethodResponseModel,
     GetStudentResponseModel,
+    ListStudentBasketResponseModel,
     ListStudentPaymentMethodsResponseModel,
     PatchStudentPaymentMethodRequestModel,
     PostStudentPaymentMethodRequestModel,
@@ -88,9 +94,6 @@ def post_student(request_body: PostStudentRequestModel):
 )
 def get_student(student_id: str):
     response_body = get_student_response(student_id)
-    if response_body == None:
-        raise Exception.not_found
-
     return response_body
 
 
@@ -248,4 +251,27 @@ def patch_student_payment_method(
 )
 def delete_student_payment_method(student_id: str, payment_method_id: str):
     response_body = delete_student_payment_method_request(student_id, payment_method_id)
+    return response_body
+
+
+# BASKET
+@router.get(
+    "/{student_id}/basket",
+    status_code=200,
+    response_model_exclude_none=True,
+    response_model=ListStudentBasketResponseModel,
+)
+def list_student_basket(student_id: str):
+    response_body = list_student_basket_response(student_id)
+    return response_body
+
+
+@router.get(
+    "/{student_id}/basket/{basket_item_id}",
+    status_code=200,
+    response_model_exclude_none=True,
+    response_model=GetStudentBasketItemResponseModel,
+)
+def get_student_basket_item(student_id: str, basket_item_id: str):
+    response_body = get_student_basket_item_response(student_id, basket_item_id)
     return response_body
