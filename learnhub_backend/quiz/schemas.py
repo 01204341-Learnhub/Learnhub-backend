@@ -3,8 +3,6 @@ from typing import Any
 from pydantic import BaseModel, HttpUrl
 
 
-class PlaceHolderModel(BaseModel):
-    pass
 # QUIZ
 class ChoiceModelBody(BaseModel):
     choice_a: str
@@ -14,11 +12,12 @@ class ChoiceModelBody(BaseModel):
     choice_e: str
     choice_f: str
 
+
 class GetQuizProblemModelBody(BaseModel):
-   problem_num: int
-   question: str
-   multiple_correct_answers: bool
-   choice: ChoiceModelBody
+    problem_num: int
+    question: str
+    multiple_correct_answers: bool
+    choice: ChoiceModelBody
 
 
 class GetQuizResponseModel(BaseModel):
@@ -36,19 +35,33 @@ class AnswerModelBody(BaseModel):
     answer_d: bool
     answer_e: bool
     answer_f: bool
-class CorrectAnswerModelBody(BaseModel):
-    answer_a: bool
-    answer_b: bool
-    answer_c: bool
-    answer_d: bool
-    answer_e: bool
-    answer_f: bool
+
+
 class GetQuizResultProblemModelBody(BaseModel):
     problem_num: int
     answer: AnswerModelBody
-    correct_answer: CorrectAnswerModelBody
+    correct_answer: AnswerModelBody
     explanation: str
+
+
 class GetQuizResultResponseModel(BaseModel):
-    status: str
+    status: str  # not started | started | finished
     score: int
     problems: list[GetQuizResultProblemModelBody]
+
+
+class PatchQuizResultProblemModelBody(BaseModel):
+    problem_num: int
+    answer: AnswerModelBody
+
+
+class PatchQuizResultRequestModel(BaseModel):
+    status: str  # started | finished
+    answers: list[PatchQuizResultProblemModelBody]
+
+class PatchQuizResultAnswerModelBody(BaseModel):
+    problem_num: int
+    correct_answer: AnswerModelBody
+    explanation: str
+class PatchQuizResultResponseModel(BaseModel):
+    answer_responses: list[PatchQuizResultAnswerModelBody]
