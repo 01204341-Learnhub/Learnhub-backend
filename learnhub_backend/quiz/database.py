@@ -61,7 +61,7 @@ def create_quiz(request: PostQuizRequestModel) -> str:
         "name": request.name,
         "description": request.description,
         "time_limit": request.time_limit,
-        "quiz_pic": request.quiz_pic,
+        "quiz_pic": str(request.quiz_pic),
         "problems": quiz_problems,
     }
 
