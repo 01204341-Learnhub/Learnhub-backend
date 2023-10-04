@@ -45,9 +45,20 @@ class PostQuizProblemModelBody(BaseModel):
     correct_answer: AnswerModelBody
     explanation: str
 
-    # TODO: Use validator. If multiple_correct_answers = false, correct_answer shouldn't have multiple correct answers
-    # @validator("multiple_correct_answers")
-    # def ....(cls, v: bool)
+    @validator("correct_answer")
+    def choice_validator(cls, v: AnswerModelBody , values, **kwargs):
+        if "multiple_correct_answers" in values and values["multiple_correct_answers"] == False:
+            print('test')
+            answer_count = 0
+
+            for answer in v.dict().values():
+                if answer == True:
+                    answer_count += 1
+            print(answer_count)
+            if answer_count > 1:
+                raise ValueError("Multiple correct answers are not allowed")
+        return v
+
 
 
 class PostQuizRequestModel(BaseModel):
