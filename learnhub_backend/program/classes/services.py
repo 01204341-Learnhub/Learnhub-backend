@@ -8,8 +8,13 @@ from .database import (
     query_list_classes,
     get_teacher_by_id,
     query_list_tags_by_id,
+    query_class,
 )
-from .schemas import ListClassesModelBody, ListClassesResponseModel
+from .schemas import (
+    ListClassesModelBody,
+    ListClassesResponseModel,
+    GetClassResponseModel,
+)
 
 from ...dependencies import Exception
 
@@ -27,3 +32,12 @@ def list_classes_response(skip: int, limit: int):  # TODO: add return type
     ta = TypeAdapter(list[ListClassesModelBody])
     response_body = ListClassesResponseModel(classes=ta.validate_python(quried_classes))
     return response_body
+
+
+def get_class_response(class_id: str):
+    class_ = query_class(class_id=class_id)
+    class_["class_id"] = str(class_["_id"])
+    class_["teacher"] = get_teacher_by_id(str(class_["teacher_id"]))
+    class_["tags"] = query_list_tags_by_id(class_["tags"])
+
+    return GetClassResponseModel(**class_)

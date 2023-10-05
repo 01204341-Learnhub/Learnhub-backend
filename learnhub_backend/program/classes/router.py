@@ -8,10 +8,12 @@ from ...dependencies import (
 
 from .services import (
     list_classes_response,
+    get_class_response,
 )
 
 from .schemas import (
     ListClassesResponseModel,
+    GetClassResponseModel,
 )
 
 router = APIRouter(
@@ -26,6 +28,7 @@ router = APIRouter(
 
 common_page_params = Annotated[dict, Depends(router.dependencies[0].dependency)]
 
+
 # CLASSES
 @router.get(
     "/",
@@ -38,4 +41,15 @@ def list_classes(common_paginations: common_page_params):
         skip=common_paginations["skip"],
         limit=common_paginations["limit"],
     )
+    return response_body
+
+
+@router.get(
+    "/{class_id}",
+    status_code=200,
+    response_model_exclude_none=True,
+    response_model=GetClassResponseModel,
+)
+def get_class(class_id: str):
+    response_body = get_class_response(class_id=class_id)
     return response_body

@@ -4,12 +4,12 @@ from bson.objectid import ObjectId
 from bson.errors import InvalidId
 from .schemas import (
     TagModelBody,
-
 )
 
 from ...dependencies import Exception
 
-#TODO: optional add this to dependencies
+
+# TODO: optional add this to dependencies
 def get_teacher_by_id(teacher_id: str):
     try:
         teacher = db_client.user_coll.find_one({"_id": ObjectId(teacher_id)})
@@ -20,6 +20,7 @@ def get_teacher_by_id(teacher_id: str):
         return teacher
     except InvalidId:
         raise Exception.bad_request
+
 
 def query_list_tags_by_id(ids: list[str | ObjectId]):
     try:
@@ -37,10 +38,20 @@ def query_list_tags_by_id(ids: list[str | ObjectId]):
     except InvalidId:
         raise Exception.bad_request
 
+
 # CLASSES
-def query_list_classes(skip: int, limit: int):# TODO: add return type
+def query_list_classes(skip: int, limit: int):
     try:
         classes_corsor = db_client.class_coll.find(skip=skip, limit=limit)
     except InvalidId:
         raise Exception.bad_request
     return classes_corsor
+
+
+def query_class(class_id: str) -> dict:
+    try:
+        class_filter = {"_id": ObjectId(class_id)}
+        class_ = db_client.class_coll.find_one(class_filter)
+        return class_
+    except InvalidId:
+        raise Exception.bad_request
