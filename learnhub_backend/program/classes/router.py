@@ -7,12 +7,10 @@ from ...dependencies import (
 )
 
 from .services import (
-    service_placeholder,
     list_classes_response,
 )
 
 from .schemas import (
-    placeholder,
     ListClassesResponseModel,
 )
 

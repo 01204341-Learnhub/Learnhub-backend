@@ -1,7 +1,6 @@
 from datetime import datetime, timedelta, timezone
 from bson.objectid import ObjectId
 from bson.errors import InvalidId
-import pprint
 
 from .schemas import (
     PostCourseAnnouncementRequestModel,
@@ -20,7 +19,6 @@ def get_teacher_by_id(teacher_id: str):
             raise Exception.not_found
         teacher["teacher_id"] = str(teacher["_id"])
         teacher["teacher_name"] = teacher["fullname"]
-        pprint.pprint(teacher)
         return teacher
     except InvalidId:
         raise Exception.bad_request
