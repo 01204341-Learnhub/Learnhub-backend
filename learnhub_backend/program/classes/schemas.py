@@ -8,6 +8,7 @@ from bson import ObjectId
 class TeacherModelBody(BaseModel):
     teacher_id: str
     teacher_name: str
+    profile_pic: HttpUrl
 class TagModelBody(BaseModel):
     tag_id: str
     tag_name: str
