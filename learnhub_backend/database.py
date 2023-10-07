@@ -11,6 +11,7 @@ from .config import (
     DB_CHAPTER_COLLECTION,
     DB_LESSON_COLLECTION,
     DB_USER_COLLECTION,
+    DB_ASSIGNMENT_COLLECTION,
 )
 
 
@@ -33,6 +34,7 @@ class DB_client(MongoClient):
         self.transaction_coll = self.db[DB_TRANSACTION_COLLECTION]
 
         self.user_coll = self.db[DB_USER_COLLECTION]
+        self.assignment_coll = self.db[DB_ASSIGNMENT_COLLECTION]
 
 
 db_client = DB_client(MONGODB_URI)

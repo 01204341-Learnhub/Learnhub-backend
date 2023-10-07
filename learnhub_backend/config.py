@@ -24,3 +24,4 @@ DB_TAG_COLLECTION = config("DB_TAG_COLLECTION", default="tags")
 DB_TRANSACTION_COLLECTION = config("DB_TRANSACTION_COLLECTION", default="transactions")
 
 DB_USER_COLLECTION = config("DB_USER_COLLECTION", default="users")
+DB_ASSIGNMENT_COLLECTION = config("DB_ASSIGNMENT_COLLECTION", default="assignments")
