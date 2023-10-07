@@ -30,6 +30,8 @@ from .schemas import (
     GetStudentBasketItemResponseModel,
     GetStudentPaymentMethodResponseModel,
     ListStudentBasketResponseModel,
+    ListStudentCourseResponseModel,
+    ListStudentCoursesModelBody,
     ListStudentPaymentMethodsResponseModel,
     ListStudentsResponseModel,
     GetStudentResponseModel,
@@ -45,6 +47,7 @@ from .schemas import (
     LessonProgressModelBody,
     GetStudentConfigResponseModel,
     PatchStudentConfigRequestModel,
+    TeacherModelBody,
 )
 
 from ..dependencies import Exception
@@ -86,19 +89,64 @@ def delete_student_request(student_id: str) -> DeleteResult:
     return result
 
 
+# STUDENT COURSE
+def list_student_courses_response(student_id: str) -> ListStudentCourseResponseModel:
+    student = query_student(student_id)
+    student_id = str(student["_id"])
+    student_courses = []
+    for owned_program in student["owned_programs"]:
+        if owned_program["type"] == "course":
+            course = query_course(str(owned_program["program_id"]))
+            teacher = query_teacher_profile(str(course["teacher_id"]))
+            student_course_progress = query_student_course_progress(
+                student_id, str(owned_program["program_id"])
+            )
+
+            total_lessons = (
+                course["video_count"] + course["quiz_count"] + course["file_count"]
+            )
+            # assign value
+            student_course = dict()
+            student_course["course_id"] = str(course["_id"])
+            student_course["course_pic"] = course["course_pic"]
+            student_course["name"] = course["name"]
+            student_course["teacher"] = TeacherModelBody(**teacher)
+            student_course["rating"] = course["rating"]
+            student_course["progress"] = (
+                student_course_progress["finished_count"] * 100
+            ) / total_lessons
+            student_course = ListStudentCoursesModelBody(**student_course)
+            student_courses.append(student_course)
+
+    student_courses = ListStudentCourseResponseModel(courses=student_courses)
+    return student_courses
+
+
 # STUDENT COURSE PROGRESS
 def get_student_course_progress_response(
     student_id: str, course_id: str
 ) -> GetStudentCourseProgressResponseModel:
-    queried_course_progress = query_student_course_progress(
-        student_id=student_id, course_id=course_id
-    )
-    # response_body = GetStudentCourseProgressResponseModel(**queried_course_progress)
-    ta = TypeAdapter(list[LessonProgressModelBody])
-    response_body = GetStudentCourseProgressResponseModel(
-        progress=queried_course_progress["progress"],
-        lessons=ta.validate_python(queried_course_progress["lessons"]),
-    )
+    response = dict()  # resposne_body
+    response["lessons"] = []
+
+    course = query_course(course_id)
+    total_lessons = course["video_count"] + course["quiz_count"] + course["file_count"]
+
+    progress = query_student_course_progress(student_id, course_id)
+
+    for i, lesson in enumerate(progress["lessons"]):
+        lesson_progress_body = {
+            "lesson_id": str(lesson["lesson_id"]),
+            "chapter_id": str(lesson["chapter_id"]),
+            "finished": lesson["finished"],
+            "lesson_completed": lesson["lesson_completed"],
+        }
+        response["lessons"].append(LessonProgressModelBody(**lesson_progress_body))
+
+    response["progress"] = (progress["finished_count"] * 100) / total_lessons
+
+    # response body
+    response_body = GetStudentCourseProgressResponseModel(**response)
     return response_body
 
 

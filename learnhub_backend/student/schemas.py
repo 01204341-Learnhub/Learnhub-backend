@@ -40,13 +40,10 @@ class PatchStudentRequestModel(BaseModel):
 
 
 # STUDENTS PROGRAMS
-
-
 class ListStudentCoursesModelBody(BaseModel):
     course_id: str
     course_pic: HttpUrl
     name: str
-    status: str  # finished | not started | started
     teacher: TeacherModelBody
     progress: float
     rating: float

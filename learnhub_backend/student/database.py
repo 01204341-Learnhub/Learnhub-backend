@@ -148,46 +148,18 @@ def remove_student(student_id: str) -> DeleteResult:
     return result
 
 
-def query_list_student_course(student_id: str):
-    filter = {"type": student_type, "_id": ObjectId(student_id)}
-    # TODO: Query course db student list.
-
-
 # STUDENT COURSE PROGRESS
 def query_student_course_progress(student_id: str, course_id: str) -> dict:
     try:
-        # find total lessons in course
-        total_lessons_filter = {"_id": ObjectId(course_id)}
-        total_lessons_projection = {"video_count": 1, "quiz_count": 1, "file_count": 1}
-        total_lessons_res = db_client.course_coll.find_one(
-            filter=total_lessons_filter, projection=total_lessons_projection
-        )
-        if total_lessons_res == None:
-            raise Exception.not_found
-        total_lessons = (
-            total_lessons_res["video_count"]
-            + total_lessons_res["quiz_count"]
-            + total_lessons_res["file_count"]
-        )
-
         # find student course progress
         filter = {"student_id": ObjectId(student_id), "course_id": ObjectId(course_id)}
         student_course_progress = db_client.course_progress_coll.find_one(filter=filter)
+
         if student_course_progress == None:
             raise Exception.not_found
-        for i in range(len(student_course_progress["lessons"])):
-            student_course_progress["lessons"][i]["lesson_id"] = str(
-                student_course_progress["lessons"][i]["lesson_id"]
-            )
-            student_course_progress["lessons"][i]["chapter_id"] = str(
-                student_course_progress["lessons"][i]["chapter_id"]
-            )
-        student_course_progress["progress"] = (
-            student_course_progress["finished_count"] / total_lessons
-        ) * 100
+        return student_course_progress
     except InvalidId:
         raise Exception.bad_request
-    return student_course_progress
 
 
 def edit_student_course_progress(
