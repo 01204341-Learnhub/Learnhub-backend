@@ -11,6 +11,7 @@ from .services import (
     delete_student_basket_item_request,
     delete_student_payment_method_request,
     get_student_basket_item_response,
+    get_student_course_response,
     get_student_payment_method_response,
     list_student_basket_response,
     list_student_courses_response,
@@ -31,6 +32,7 @@ from .services import (
 
 from .schemas import (
     GetStudentBasketItemResponseModel,
+    GetStudentCourseResponseModel,
     GetStudentPaymentMethodResponseModel,
     GetStudentResponseModel,
     ListStudentBasketResponseModel,
@@ -137,6 +139,17 @@ def delete_student(student_id: str):
 )
 def list_student_courses(student_id: str):
     response_body = list_student_courses_response(student_id)
+    return response_body
+
+
+@router.get(
+    "/{student_id}/courses/{course_id}",
+    status_code=200,
+    response_model_exclude_none=True,
+    response_model=GetStudentCourseResponseModel,
+)
+def get_student_course(student_id: str, course_id: str):
+    response_body = get_student_course_response(student_id, course_id)
     return response_body
 
 

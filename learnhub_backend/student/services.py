@@ -1,9 +1,14 @@
+from datetime import datetime
 from typing import Annotated, Union
 from bson.objectid import ObjectId
 from pydantic import TypeAdapter
 from pymongo.results import DeleteResult, UpdateResult
 
 from learnhub_backend.dependencies import GenericOKResponse
+from learnhub_backend.program.course.announcements.database import (
+    list_course_announcement,
+)
+from learnhub_backend.program.course.database import query_list_course_chapters
 
 from .database import (
     create_student,
@@ -28,6 +33,7 @@ from .database import (
 
 from .schemas import (
     GetStudentBasketItemResponseModel,
+    GetStudentCourseResponseModel,
     GetStudentPaymentMethodResponseModel,
     ListStudentBasketResponseModel,
     ListStudentCourseResponseModel,
@@ -48,6 +54,8 @@ from .schemas import (
     GetStudentConfigResponseModel,
     PatchStudentConfigRequestModel,
     TeacherModelBody,
+    courseAnnouncementModelBody,
+    courseChapterModelBody,
 )
 
 from ..dependencies import Exception
@@ -120,6 +128,44 @@ def list_student_courses_response(student_id: str) -> ListStudentCourseResponseM
 
     student_courses = ListStudentCourseResponseModel(courses=student_courses)
     return student_courses
+
+
+def get_student_course_response(
+    student_id: str, course_id: str
+) -> GetStudentCourseResponseModel:
+    student_course = dict()
+    student_course["chapters"] = []
+    student_course["announcements"] = []
+
+    course = query_course(course_id)
+    teacher = query_teacher_profile(str(course["teacher_id"]))
+
+    course_chapters = query_list_course_chapters(course_id)
+    for chapter in course_chapters:
+        student_course["chapters"].append(
+            courseChapterModelBody(
+                chapter_num=chapter["chapter_num"],
+                name=chapter["name"],
+                chapter_id=str(chapter["_id"]),
+            )
+        )
+
+    announcements = list_course_announcement(course_id)
+    for announce in announcements:
+        student_course["announcements"].append(
+            courseAnnouncementModelBody(
+                announcement_id=str(announce["_id"]),
+                name=announce["name"],
+                last_edit=announce["last_edit"],
+            )
+        )
+    # response
+    student_course["course_pic"] = course["course_pic"]
+    student_course["name"] = course["name"]
+    student_course["teacher"] = TeacherModelBody(**teacher)
+
+    response = GetStudentCourseResponseModel(**student_course)
+    return response
 
 
 # STUDENT COURSE PROGRESS
