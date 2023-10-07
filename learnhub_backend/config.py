@@ -24,3 +24,6 @@ DB_TAG_COLLECTION = config("DB_TAG_COLLECTION", default="tags")
 DB_TRANSACTION_COLLECTION = config("DB_TRANSACTION_COLLECTION", default="transactions")
 
 DB_USER_COLLECTION = config("DB_USER_COLLECTION", default="users")
+DB_QUIZ_COLLECTION = config("DB_QUIZ_COLLECTION", default="quizzes")
+DB_QUIZ_RESULT_COLLECTION = config("DB_QUIZ_RESULT_COLLECTION", default="quizzes_result")
+
