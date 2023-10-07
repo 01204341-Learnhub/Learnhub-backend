@@ -129,7 +129,7 @@ def delete_student(student_id: str):
 
 # STUDENT PROGRAMS
 @router.get(
-    "/{student_id}/programs/courses",
+    "/{student_id}/courses",
     status_code=200,
     response_model_exclude_none=True,
     response_model=ListStudentCourseResponseModel,
@@ -141,7 +141,7 @@ def list_student_courses(student_id: str):
 
 # STUDENT COURSE PROGRESS
 @router.get(
-    "/{student_id}/programs/courses/{course_id}/progress",
+    "/{student_id}/programs/course_progress/{course_id}",
     status_code=200,
     response_model_exclude_none=True,
     response_model=GetStudentCourseProgressResponseModel,
@@ -154,7 +154,7 @@ def get_student_course_progress(student_id: str, course_id: str):
 
 
 @router.patch(
-    "/{student_id}/programs/courses/{course_id}/progress",
+    "/{student_id}/programs/course_progress/{course_id}",
     status_code=200,
     response_model_exclude_none=True,
     response_model=dict,
