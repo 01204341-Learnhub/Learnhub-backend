@@ -1,5 +1,5 @@
 from typing import Optional, Union
-from pydantic import BaseModel, HttpUrl
+from pydantic import BaseModel, HttpUrl, validator
 
 
 class TeacherModelBody(BaseModel):
@@ -108,7 +108,8 @@ class GetCourseLessonResponseModel(BaseModel):
     name: str
     lesson_type: str
     lesson_length: int
-    src: HttpUrl
+    src: HttpUrl | None = None
+    quiz_id: str | None = None
 
 
 class ListCourseLessonsModelBody(BaseModel):
@@ -125,8 +126,17 @@ class ListCourseLessonsResponseModel(BaseModel):
 
 class PostCourseLessonRequestModel(BaseModel):
     name: str
-    src: HttpUrl
-    lesson_length: int
+    lesson_length: int | None = None
+    src: HttpUrl | None = None
+    quiz_id: str | None = None
+
+    @validator("src")
+    def check_src_and_quiz(cls, src: HttpUrl, values):
+        if "quiz_id" not in values and not src:
+            raise ValueError("either src or quiz_id is required")
+        elif "quiz_id" in values and src:
+            raise ValueError("Src and Quiz should be mutually exclusive")
+        return src
 
 
 class PostCourseLessonResponseModel(BaseModel):

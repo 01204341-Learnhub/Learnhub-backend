@@ -176,6 +176,8 @@ def get_course_lesson_response(
     quried_lesson = query_course_lesson(course_id, chapter_id, lesson_id)
     if quried_lesson == None:
         raise Exception.not_found
+    if "quiz_id" in quried_lesson:
+        quried_lesson["quiz_id"] = str(quried_lesson["quiz_id"])
     response_body = GetCourseLessonResponseModel(**quried_lesson)
     return response_body
 

@@ -4,6 +4,8 @@ from pymongo.results import InsertOneResult, UpdateResult
 from bson.objectid import ObjectId
 from bson.errors import InvalidId
 
+from learnhub_backend.quiz.database import query_quiz
+
 from ..database import db_client
 
 from .schemas import (
@@ -301,18 +303,36 @@ def create_course_lesson(
             raise Exception.unprocessable_content
         valid_chapter_filter = {"_id": ObjectId(chapter_id)}
         chapter_result = db_client.chapter_coll.find_one(filter=valid_chapter_filter)
+
         if chapter_result == None:
             raise Exception.unprocessable_content
 
-        lessontype = CheckLessonType(str(request.src))
-        body = {
-            "course_id": ObjectId(course_id),
-            "chapter_id": ObjectId(chapter_id),
-            "name": request.name,
-            "lesson_length": request.lesson_length,
-            "lesson_type": lessontype,
-            "src": str(request.src),
-        }
+        body = dict()
+        if request.src == None and request.quiz_id == None:
+            err = Exception.unprocessable_content
+            err.__setattr__("detail", "Need either quiz_id or src")
+            raise err
+        elif request.src != None and request.quiz_id != None:
+            err = Exception.unprocessable_content
+            err.__setattr__("detail", "quiz_id and src are mutually exclusive")
+            raise err
+        elif request.quiz_id != None:
+            lessontype = "quiz"
+            quiz = query_quiz(request.quiz_id)
+            if quiz == None:
+                err = Exception.unprocessable_content
+                err.__setattr__("detail", "quiz does not exist")
+                raise err
+            body["quiz_id"] = ObjectId(request.quiz_id)
+        else:
+            lessontype = CheckLessonType(str(request.src))
+            body["src"] = str(request.src)
+
+        body["course_id"] = ObjectId(course_id)
+        body["chapter_id"] = ObjectId(chapter_id)
+        body["name"] = request.name
+        body["lesson_length"] = request.lesson_length
+        body["lesson_type"] = lessontype
 
         filter = {"course_id": ObjectId(course_id), "chapter_id": ObjectId(chapter_id)}
         while True:
@@ -348,6 +368,8 @@ def create_course_lesson(
             }
         elif lessontype == "file":  # other filetype count as file
             course_update = {"$inc": {"file_count": 1}}
+        elif lessontype == "quiz":
+            course_update = {"$inc": {"quiz_count": 1}}
 
         result = db_client.course_coll.update_one(
             filter=course_filter, update=course_update
