@@ -40,13 +40,10 @@ class PatchStudentRequestModel(BaseModel):
 
 
 # STUDENTS PROGRAMS
-
-
 class ListStudentCoursesModelBody(BaseModel):
     course_id: str
     course_pic: HttpUrl
     name: str
-    status: str  # finished | not started | started
     teacher: TeacherModelBody
     progress: float
     rating: float
@@ -54,6 +51,26 @@ class ListStudentCoursesModelBody(BaseModel):
 
 class ListStudentCourseResponseModel(BaseModel):
     courses: list[ListStudentCoursesModelBody]
+
+
+class courseChapterModelBody(BaseModel):
+    chapter_num: int
+    name: str
+    chapter_id: str
+
+
+class courseAnnouncementModelBody(BaseModel):
+    announcement_id: str
+    name: str
+    last_edit: int
+
+
+class GetStudentCourseResponseModel(BaseModel):
+    course_pic: HttpUrl
+    name: str
+    teacher: TeacherModelBody
+    chapters: list[courseChapterModelBody]
+    announcements: list[courseAnnouncementModelBody]
 
 
 # STUDENT COURSE PROGRESS
