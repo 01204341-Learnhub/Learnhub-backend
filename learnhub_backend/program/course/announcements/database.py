@@ -11,7 +11,9 @@ from learnhub_backend.dependencies import (
     Exception,
     CheckHttpFileType,
 )
-#TODO: optional add this to dependencies
+
+
+# TODO: optional add this to dependencies
 def get_teacher_by_id(teacher_id: str):
     try:
         teacher = db_client.user_coll.find_one({"_id": ObjectId(teacher_id)})
@@ -22,6 +24,7 @@ def get_teacher_by_id(teacher_id: str):
         return teacher
     except InvalidId:
         raise Exception.bad_request
+
 
 def list_course_announcement(course_id: str, skip: int = 0, limit: int = 100):
     try:
@@ -87,22 +90,27 @@ def edit_course_announcement(
     request_body: PatchCourseAnnouncementRequestModel,
 ):
     try:
-        announcement_body = request_body.model_dump() # info to update
+        announcement_body = request_body.model_dump()  # info to update
         filter = {"_id": ObjectId(announcement_id), "course_id": ObjectId(course_id)}
-        
+
         # prepare update body
         update_body_add = {"$push": {"attachments": {"$each": []}}}
 
         update_body_delete = {
-            "$pull": {"attachments": {"src": {"$in": []}}}, # src is id of attachments to delete
+            "$pull": {
+                "attachments": {"src": {"$in": []}}
+            },  # src is id of attachments to delete
         }
-        
+
         update_body_edit = {
             "$set": {},
         }
         array_filter = []
 
         # set update body for each field
+        update_body_edit["$set"]["last_edit"] = datetime.now(
+            tz=timezone(timedelta(hours=7))
+        )  # bangkok time
         if announcement_body["name"] is not None:
             update_body_edit["$set"]["name"] = announcement_body["name"]
         if announcement_body["text"] is not None:
