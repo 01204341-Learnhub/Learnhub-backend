@@ -108,17 +108,16 @@ def _update_course_progress_on_purchase(student_id: str, course_ids: list[Object
     progresses = []
     for course_id in course_ids:
         progress = dict()
-        progress["student_id"] = student_id
+        progress["student_id"] = ObjectId(student_id)
         progress["course_id"] = course_id
         progress["finished"] = False
         progress["finished_count"] = 0
         progress["lessons"] = []
 
         lessons_filter = {"course_id": ObjectId(course_id)}
-        lessons_cur = db_client.course_coll.find(lessons_filter)
-        # FIXME: why course_coll not lesson_coll
+        lessons_cur = db_client.lesson_coll.find(lessons_filter)
         for lesson in lessons_cur:
-            #TODO: check if lesson_type is quiz then make quiz_result for this student
+            # TODO: check if lesson_type is quiz then make quiz_result for this student
             progress["lessons"].append(
                 {
                     "lesson_id": lesson["_id"],
