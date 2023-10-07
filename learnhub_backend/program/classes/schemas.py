@@ -49,3 +49,20 @@ class GetClassResponseModel(BaseModel):
     student_count: int
     max_student: int
     assignment_count: int
+
+
+# ASSIGNMENTS
+
+
+class AttachmentPatchModelBody(BaseModel):
+    op: str  # add | delete | edit
+    old_src: str | None = None
+    new_src: str | None = None
+
+
+class PatchAssignmentRequestModel(BaseModel):
+    name: str | None = None
+    due_date: int | None = None
+    status: str | None = None
+    text: str | None = None
+    attachments: list[AttachmentPatchModelBody] | None = None

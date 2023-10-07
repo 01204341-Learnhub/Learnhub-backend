@@ -9,11 +9,13 @@ from .database import (
     get_teacher_by_id,
     query_list_tags_by_id,
     query_class,
+    edit_assignment,
 )
 from .schemas import (
     ListClassesModelBody,
     ListClassesResponseModel,
     GetClassResponseModel,
+    PatchAssignmentRequestModel,
 )
 
 from ...dependencies import Exception
@@ -41,3 +43,8 @@ def get_class_response(class_id: str):
     class_["tags"] = query_list_tags_by_id(class_["tags"])
 
     return GetClassResponseModel(**class_)
+
+# ASSIGNMENTS
+def patch_assignment_request(class_id: str, assignment_id: str, patch_body: PatchAssignmentRequestModel):
+    response = edit_assignment(class_id=class_id, assignment_id=assignment_id, patch_body_=patch_body)
+    return GenericOKResponse

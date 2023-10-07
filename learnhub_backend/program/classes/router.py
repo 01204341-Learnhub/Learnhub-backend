@@ -9,11 +9,13 @@ from ...dependencies import (
 from .services import (
     list_classes_response,
     get_class_response,
+    patch_assignment_request
 )
 
 from .schemas import (
     ListClassesResponseModel,
     GetClassResponseModel,
+    PatchAssignmentRequestModel,
 )
 
 router = APIRouter(
@@ -53,3 +55,17 @@ def list_classes(common_paginations: common_page_params):
 def get_class(class_id: str):
     response_body = get_class_response(class_id=class_id)
     return response_body
+
+
+# ASSIGNMENTS
+@router.patch(
+    "/{class_id}/assignments/{assignment_id}}",
+    status_code=200,
+    response_model_exclude_none=True,
+    response_model=None,
+)
+def patch_assignment(class_id: str, assignment_id: str, patch_body: PatchAssignmentRequestModel):
+    #TODO: check if this works
+    response_body = patch_assignment_request(class_id=class_id, assignment_id=assignment_id, patch_body=patch_body)
+    return response_body
+
