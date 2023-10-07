@@ -418,6 +418,21 @@ def create_student_basket_item(
             e.__setattr__("detail", "Program already in basket")
             raise e
 
+        # Check for valid program
+        program_filter = {"_id": ObjectId(request.program_id)}
+        if request.type == "course":
+            program_result = db_client.course_coll.find_one(program_filter)
+        elif request.type == "class":
+            program_result = db_client.class_coll.find_one(program_filter)
+        else:
+            err = Exception.unprocessable_content
+            err.__setattr__("detail", "Invalid type")
+            raise err
+        if program_result == None:
+            err = Exception.unprocessable_content
+            err.__setattr__("detail", "Invalid Program_id, Program does not exists")
+            raise err
+
         # update basket
         basket_item = dict()
         update = {"$push": {"basket": basket_item}}
