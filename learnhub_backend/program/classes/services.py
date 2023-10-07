@@ -22,7 +22,7 @@ from ...dependencies import Exception
 
 
 # CLASSES
-def list_classes_response(skip: int, limit: int):  # TODO: add return type
+def list_classes_response(skip: int, limit: int) -> ListClassesResponseModel:
     classes_corsor = query_list_classes(skip=skip, limit=limit)
     quried_classes = []
     for class_ in classes_corsor:
@@ -36,15 +36,23 @@ def list_classes_response(skip: int, limit: int):  # TODO: add return type
     return response_body
 
 
-def get_class_response(class_id: str):
+def get_class_response(class_id: str) -> GetClassResponseModel:
     class_ = query_class(class_id=class_id)
+    if class_ == None:
+        raise Exception.not_found
+
     class_["class_id"] = str(class_["_id"])
     class_["teacher"] = get_teacher_by_id(str(class_["teacher_id"]))
     class_["tags"] = query_list_tags_by_id(class_["tags"])
 
     return GetClassResponseModel(**class_)
 
+
 # ASSIGNMENTS
-def patch_assignment_request(class_id: str, assignment_id: str, patch_body: PatchAssignmentRequestModel):
-    response = edit_assignment(class_id=class_id, assignment_id=assignment_id, patch_body_=patch_body)
+def patch_assignment_request(
+    class_id: str, assignment_id: str, patch_body: PatchAssignmentRequestModel
+):
+    response = edit_assignment(
+        class_id=class_id, assignment_id=assignment_id, patch_body_=patch_body
+    )
     return GenericOKResponse
