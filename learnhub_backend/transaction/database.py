@@ -117,7 +117,8 @@ def _update_course_progress_on_purchase(student_id: str, course_ids: list[Object
         lessons_filter = {"course_id": ObjectId(course_id)}
         lessons_cur = db_client.lesson_coll.find(lessons_filter)
         for lesson in lessons_cur:
-            # TODO: check if lesson_type is quiz then make quiz_result for this student
+            if lesson["lesson_type"] == "quiz":
+                _create_student_quiz_result(student_id, str(lesson["quiz_id"]))
             progress["lessons"].append(
                 {
                     "lesson_id": lesson["_id"],
@@ -129,6 +130,36 @@ def _update_course_progress_on_purchase(student_id: str, course_ids: list[Object
         progresses.append(progress)
 
     _ = db_client.course_progress_coll.insert_many(progresses)
+
+
+def _create_student_quiz_result(student_id: str, quiz_id: str):
+    quiz_filter = {"_id": ObjectId(quiz_id)}
+    quiz = db_client.quiz_coll.find_one(quiz_filter)
+    if quiz == None:
+        raise Exception.internal_server_error
+    body = {
+        "score": 0,
+        "problems": [],
+        "status": "not started",
+        "quiz_id": ObjectId(quiz_id),
+        "student_id": ObjectId(student_id),
+    }
+    for problem in quiz["problems"]:
+        body["problems"].append(
+            {
+                "problem_num": problem["problem_num"],
+                "is_correct": False,
+                "answer": {
+                    "answer_a": False,
+                    "answer_b": False,
+                    "answer_c": False,
+                    "answer_d": False,
+                    "answer_e": False,
+                    "answer_f": False,
+                },
+            }
+        )
+    _ = db_client.quiz_result_coll.insert_one(body)
 
 
 def _update_course_on_purchase(course_ids: list[ObjectId]):
