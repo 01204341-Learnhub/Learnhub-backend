@@ -23,6 +23,7 @@ from ...dependencies import (
 )
 
 from ..dependencies import CheckLessonType
+from ...dependencies import student_type
 
 
 # AUXILARY
@@ -243,7 +244,8 @@ def delete_course_chapter(chapter_id: str, course_id: str):
                 update_course["$inc"]["total_video_length"] -= lesson["lesson_length"]
             elif lesson["lesson_type"] == "file":
                 update_course["$inc"]["file_count"] -= 1
-            # TODO: update quiz count
+            elif lesson["lesson_type"] == "quiz":
+                update_course["$inc"]["quiz_count"] -= 1
 
         # lesson delete
         delete_response = db_client.lesson_coll.delete_many(filter=lesson_filter)
@@ -375,9 +377,67 @@ def create_course_lesson(
             filter=course_filter, update=course_update
         )
 
+        _update_student_progress(
+            course_id, chapter_id, str(object_id.inserted_id), lessontype, request
+        )
+
         return str(object_id.inserted_id)
     except InvalidId:
         raise Exception.bad_request
+
+
+def _update_student_progress(
+    course_id: str,
+    chapter_id: str,
+    lesson_id: str,
+    lesson_type: str,
+    request: PostCourseLessonRequestModel,
+):
+    progress_filter = {"course_id": ObjectId(course_id)}
+    progress_lesson_body = {
+        "lesson_id": ObjectId(lesson_id),
+        "chapter_id": ObjectId(chapter_id),
+        "finished": False,
+        "lesson_completed": 0,
+    }
+    result = db_client.course_progress_coll.update_many(
+        progress_filter, {"$push": {"lessons": progress_lesson_body}}
+    )
+    if lesson_type == "quiz":  # should add student quiz results
+        own_course_filter = {
+            "type": student_type,
+            "owned_programs.program_id": ObjectId(course_id),
+            "owned_programs.type": "course",
+        }
+        students_cur = db_client.user_coll.find(own_course_filter)
+
+        quiz = db_client.quiz_coll.find_one(ObjectId(request.quiz_id))
+        if quiz == None:
+            raise Exception.internal_server_error
+        for student in students_cur:
+            body = {
+                "score": 0,
+                "problems": [],
+                "status": "not started",
+                "quiz_id": ObjectId(request.quiz_id),
+                "student_id": student["_id"],  # already object id
+            }
+            for problem in quiz["problems"]:
+                body["problems"].append(
+                    {
+                        "problem_num": problem["problem_num"],
+                        "is_correct": False,
+                        "answer": {
+                            "answer_a": False,
+                            "answer_b": False,
+                            "answer_c": False,
+                            "answer_d": False,
+                            "answer_e": False,
+                            "answer_f": False,
+                        },
+                    }
+                )
+            _ = db_client.quiz_result_coll.insert_one(body)
 
 
 def edit_course_lesson(
@@ -498,7 +558,12 @@ def remove_course_lesson(
                         "file_count": -1,
                     }
                 }
-            # TODO: case "quiz":
+            case "quiz":
+                course_update = {
+                    "$inc": {
+                        "quiz_count": -1,
+                    }
+                }
             case _:
                 course_update = dict()
         result = db_client.course_coll.update_one(course_filter, course_update)
