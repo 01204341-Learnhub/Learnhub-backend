@@ -152,8 +152,15 @@ def edit_class(class_id: str, request: PatchClassRequestModel):
                     pull_content["class_objective"]["$in"].append(objective_.value)
 
         # tags
-        # TODO: test valid tag
+
         if request.tag != None:
+            tag_filter = {"_id": ObjectId(request.tag.tag_id)}
+            tag = db_client.tag_coll.find_one(tag_filter)
+            if tag == None:
+                err = Exception.unprocessable_content
+                err.__setattr__("detail", "Invalid tag_id")
+                raise err
+
             if request.tag.op == "add":
                 push_content["tags"] = ObjectId(request.tag.tag_id)
             elif request.tag.op == "remove":
