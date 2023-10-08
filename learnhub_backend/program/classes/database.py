@@ -4,6 +4,7 @@ from ..database import db_client
 from bson.objectid import ObjectId
 from bson.errors import InvalidId
 from .schemas import (
+    PatchClassRequestModel,
     PostClassRequestModel,
     TagModelBody,
     PatchAssignmentRequestModel,
@@ -75,7 +76,7 @@ def create_class(request: PostClassRequestModel) -> str:
             "class_objective": request.class_objective,
             "class_requirement": request.class_requirement,
             "difficulty_level": request.difficulty_level,
-            "tags": [ObjectId(tag_) for tag_ in request.tags],
+            "tags": [ObjectId(tag_) for tag_ in request.tag_ids],
             "assignment_count": 0,
             "meeting_count": 0,
             "chapter_count": 0,
@@ -98,6 +99,103 @@ def create_class(request: PostClassRequestModel) -> str:
             raise Exception.internal_server_error
         else:
             return str(result.inserted_id)
+    except InvalidId:
+        raise Exception.bad_request
+
+
+def edit_class(class_id: str, request: PatchClassRequestModel):
+    try:
+        filter = {"_id": ObjectId(class_id)}
+
+        # prepare update body
+        set_content = dict()
+        push_content = dict()
+        pull_content = dict()
+        if request.name != None:
+            set_content["name"] = request.name
+        if request.class_pic != None:
+            set_content["class_pic"] = str(request.class_pic)
+        if request.max_student != None:
+            # TODO: how to determine if able to change max_student
+            set_content["max_student"] = request.max_student
+        if request.price != None:
+            set_content["price"] = request.price
+        if request.description != None:
+            set_content["description"] = request.description
+        if request.class_requirement != None:
+            set_content["class_requirement"] = request.class_requirement
+        if request.difficulty_level != None:
+            set_content["difficulty_level"] = request.difficulty_level
+        if request.open_time != None:
+            set_content["open_time"] = datetime.fromtimestamp(request.open_time)
+        if request.registration_ended_date != None:
+            set_content["registration_ended_date"] = datetime.fromtimestamp(
+                request.registration_ended_date
+            )
+        if request.class_ended_date != None:
+            set_content["class_ended_date"] = datetime.fromtimestamp(
+                request.class_ended_date
+            )
+
+        # class objective
+        if request.class_objective != None:
+            for objective_ in request.class_objective:
+                if objective_.op == "add":
+                    if "class_objective" not in push_content:
+                        push_content["class_objective"] = {}
+                        push_content["class_objective"]["$each"] = []
+                    push_content["class_objective"]["$each"].append(objective_.value)
+                elif objective_.op == "remove":
+                    if "class_objective" not in pull_content:
+                        pull_content["class_objective"] = {}
+                        pull_content["class_objective"]["$in"] = []
+                    pull_content["class_objective"]["$in"].append(objective_.value)
+
+        # tags
+        # TODO: test valid tag
+        if request.tag != None:
+            if request.tag.op == "add":
+                push_content["tags"] = ObjectId(request.tag.tag_id)
+            elif request.tag.op == "remove":
+                pull_content["tags"]["$in"] = [ObjectId(request.tag.tag_id)]
+
+        # schedules
+        if request.schedules != None:
+            if request.schedules.op == "add":
+                push_content["schedules"] = {}
+                push_content["schedules"]["$each"] = [
+                    {
+                        "start": datetime.fromtimestamp(request.schedules.start),
+                        "end": datetime.fromtimestamp(request.schedules.end),
+                    }
+                ]
+            elif request.schedules.op == "remove":
+                pull_content["schedules"] = {
+                    "$in": [
+                        {
+                            "start": datetime.fromtimestamp(request.schedules.start),
+                            "end": datetime.fromtimestamp(request.schedules.end),
+                        }
+                    ]
+                }
+
+        # mongo doesn't allow multi operation edit
+        patch_result = None
+        if len(set_content) != 0:
+            patch_result = db_client.class_coll.update_one(
+                filter, {"$set": set_content}
+            )
+        if len(push_content) != 0:
+            patch_result = db_client.class_coll.update_one(
+                filter, {"$push": push_content}
+            )
+        if len(pull_content) != 0:
+            patch_result = db_client.class_coll.update_one(
+                filter, {"$pull": pull_content}
+            )
+
+        if patch_result == None:
+            raise Exception.internal_server_error
     except InvalidId:
         raise Exception.bad_request
 

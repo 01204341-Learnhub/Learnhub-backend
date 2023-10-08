@@ -72,7 +72,7 @@ class PostClassRequestModel(BaseModel):
     class_objective: list[str]
     class_requirement: str
     difficulty_level: str
-    tags: list[str]  # listOf[tag_id]
+    tag_ids: list[str]  # listOf[tag_id]
     schedules: list[ScheduleModelBody]
     registration_ended_date: int
     open_time: int
@@ -85,21 +85,18 @@ class PostClassResponseModel(BaseModel):
 
 class PatchClassObjectiveModelBody(BaseModel):
     op: str  # add | delete | edit | swap
-    old: str
     value: str
 
 
 class PatchTagModelBody(BaseModel):
     op: str  # add | remove
-    value: str  # tag_id
+    tag_id: str  # tag_id
 
 
 class PatchClassScheduleModelBody(BaseModel):
     op: str
-    old_start: str
-    old_end: str
-    new_start: str
-    new_end: str
+    start: int
+    end: int
 
 
 class PatchClassRequestModel(BaseModel):
@@ -111,7 +108,7 @@ class PatchClassRequestModel(BaseModel):
     class_objective: list[PatchClassObjectiveModelBody] | None = None
     class_requirement: str | None = None
     difficulty_level: str | None = None
-    tag_ids: PatchTagModelBody | None = None
+    tag: PatchTagModelBody | None = None
     schedules: PatchClassScheduleModelBody | None = None
     open_time: int | None = None
     registration_ended_date: int | None = None

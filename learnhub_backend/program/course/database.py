@@ -113,6 +113,8 @@ def create_course(course_body: PostCourseRequestModel) -> InsertOneResult:
     except InvalidId:
         raise Exception.bad_request
 
+    # TODO: Patch course
+
 
 # CHAPTER
 def query_list_course_chapters(course_id: str, skip: int = 0, limit: int = 100) -> list:

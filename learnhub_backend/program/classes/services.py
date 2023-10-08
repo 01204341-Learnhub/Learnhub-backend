@@ -7,6 +7,7 @@ from learnhub_backend.dependencies import GenericOKResponse
 
 from .database import (
     create_class,
+    edit_class,
     query_list_classes,
     get_teacher_by_id,
     query_list_tags_by_id,
@@ -18,6 +19,7 @@ from .schemas import (
     ListClassesResponseModel,
     GetClassResponseModel,
     PatchAssignmentRequestModel,
+    PatchClassRequestModel,
     PostClassRequestModel,
     PostClassResponseModel,
 )
@@ -65,6 +67,11 @@ def get_class_response(class_id: str) -> GetClassResponseModel:
 def post_class_request(request: PostClassRequestModel) -> PostClassResponseModel:
     class_id = create_class(request)
     return PostClassResponseModel(class_id=class_id)
+
+
+def patch_class_request(class_id: str, request: PatchClassRequestModel):
+    edit_class(class_id, request)
+    return GenericOKResponse
 
 
 # ASSIGNMENTS

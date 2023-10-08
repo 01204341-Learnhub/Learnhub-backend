@@ -10,6 +10,7 @@ from .services import (
     list_classes_response,
     get_class_response,
     patch_assignment_request,
+    patch_class_request,
     post_class_request,
 )
 
@@ -79,7 +80,8 @@ def get_class(class_id: str):
     response_model=GenericOKResponse,
 )
 def patch_class(class_id: str, request_body: PatchClassRequestModel):
-    pass
+    response_body = patch_class_request(class_id, request_body)
+    return response_body
 
 
 # ASSIGNMENTS
