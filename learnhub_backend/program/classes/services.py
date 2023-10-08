@@ -38,7 +38,7 @@ def list_classes_response(skip: int, limit: int) -> ListClassesResponseModel:
         class_["registration_ended_date"] = int(
             datetime.timestamp(class_["registration_ended_date"])
         )
-        class_["open_time"] = int(datetime.timestamp(class_["open_time"]))
+        class_["open_date"] = int(datetime.timestamp(class_["open_date"]))
         class_["class_ended_date"] = int(datetime.timestamp(class_["class_ended_date"]))
         quried_classes.append(class_)
 
@@ -58,7 +58,7 @@ def get_class_response(class_id: str) -> GetClassResponseModel:
     class_["registration_ended_date"] = int(
         datetime.timestamp(class_["registration_ended_date"])
     )
-    class_["open_time"] = int(datetime.timestamp(class_["open_time"]))
+    class_["open_date"] = int(datetime.timestamp(class_["open_date"]))
     class_["class_ended_date"] = int(datetime.timestamp(class_["class_ended_date"]))
 
     return GetClassResponseModel(**class_)

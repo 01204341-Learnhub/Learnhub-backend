@@ -30,7 +30,7 @@ class ListClassesModelBody(BaseModel):
     status: str
     tags: list[TagModelBody]
     registration_ended_date: int
-    open_time: int
+    open_date: int
     class_ended_date: int
     price: float
 
@@ -49,7 +49,7 @@ class GetClassResponseModel(BaseModel):
     status: str
     schedules: list[ScheduleModelBody]
     registration_ended_date: int  # datetime
-    open_time: int  # datetime
+    open_date: int  # datetime
     class_ended_date: int  # datetime
     price: float
     class_objective: list[str]
@@ -75,7 +75,7 @@ class PostClassRequestModel(BaseModel):
     tag_ids: list[str]  # listOf[tag_id]
     schedules: list[ScheduleModelBody]
     registration_ended_date: int
-    open_time: int
+    open_date: int
     class_ended_date: int
 
 
@@ -110,7 +110,7 @@ class PatchClassRequestModel(BaseModel):
     difficulty_level: str | None = None
     tag: PatchTagModelBody | None = None
     schedules: PatchClassScheduleModelBody | None = None
-    open_time: int | None = None
+    open_date: int | None = None
     registration_ended_date: int | None = None
     class_ended_date: int | None = None
 

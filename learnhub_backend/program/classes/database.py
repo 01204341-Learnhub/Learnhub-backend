@@ -80,20 +80,25 @@ def create_class(request: PostClassRequestModel) -> str:
             "assignment_count": 0,
             "meeting_count": 0,
             "chapter_count": 0,
-            "schedules": [
-                {
-                    "start": datetime.fromtimestamp(sched_.start),
-                    "end": datetime.fromtimestamp(sched_.end),
-                }
-                for sched_ in request.schedules
-            ],
-            "open_time": datetime.fromtimestamp(request.open_time),
+            "schedules": [],
+            "open_date": datetime.fromtimestamp(request.open_date),
             "registration_ended_date": datetime.fromtimestamp(
                 request.registration_ended_date
             ),
             "class_ended_date": datetime.fromtimestamp(request.class_ended_date),
             "status": "started",
         }
+
+        for sched_ in request.schedules:
+            if sched_.start > sched_.end:
+                err = Exception.unprocessable_content
+                err.__setattr__("detail", "required schedule's start <= end")
+            body["schedules"].append(
+                {
+                    "start": datetime.fromtimestamp(sched_.start),
+                    "end": datetime.fromtimestamp(sched_.end),
+                }
+            )
         result = db_client.class_coll.insert_one(body)
         if result.inserted_id == None:
             raise Exception.internal_server_error
@@ -126,8 +131,8 @@ def edit_class(class_id: str, request: PatchClassRequestModel):
             set_content["class_requirement"] = request.class_requirement
         if request.difficulty_level != None:
             set_content["difficulty_level"] = request.difficulty_level
-        if request.open_time != None:
-            set_content["open_time"] = datetime.fromtimestamp(request.open_time)
+        if request.open_date != None:
+            set_content["open_date"] = datetime.fromtimestamp(request.open_date)
         if request.registration_ended_date != None:
             set_content["registration_ended_date"] = datetime.fromtimestamp(
                 request.registration_ended_date
@@ -152,7 +157,6 @@ def edit_class(class_id: str, request: PatchClassRequestModel):
                     pull_content["class_objective"]["$in"].append(objective_.value)
 
         # tags
-
         if request.tag != None:
             tag_filter = {"_id": ObjectId(request.tag.tag_id)}
             tag = db_client.tag_coll.find_one(tag_filter)
@@ -169,6 +173,9 @@ def edit_class(class_id: str, request: PatchClassRequestModel):
         # schedules
         if request.schedules != None:
             if request.schedules.op == "add":
+                if request.schedules.start > request.schedules.end:
+                    err = Exception.unprocessable_content
+                    err.__setattr__("detail", "required schedule's start <= end ")
                 push_content["schedules"] = {}
                 push_content["schedules"]["$each"] = [
                     {
