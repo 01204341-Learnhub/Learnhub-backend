@@ -2,6 +2,7 @@ from typing import Annotated, Union
 from pydantic import TypeAdapter
 
 from .database import (
+    create_tag,
     query_list_programs,
     query_list_tags,
 )
@@ -11,6 +12,8 @@ from .schemas import (
     ListProgramsCourseModelBody,
     ListProgramsClassModelBody,
     ListTagsResponseModel,
+    PostTagRequestModel,
+    PostTagResponseModel,
     TagModelBody,
 )
 
@@ -37,3 +40,8 @@ def list_tags_response(skip: int = 0, limit: int = 100) -> ListTagsResponseModel
     ta = TypeAdapter(list[TagModelBody])
     response_body = ListTagsResponseModel(tags=ta.validate_python(tags))
     return response_body
+
+
+def post_tag_request(request: PostTagRequestModel) -> PostTagResponseModel:
+    tag_id = create_tag(request)
+    return PostTagResponseModel(tag_id=tag_id)

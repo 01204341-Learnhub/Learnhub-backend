@@ -2,6 +2,8 @@ from bson.objectid import ObjectId
 from bson.errors import InvalidId
 from pymongo.cursor import Cursor
 
+from learnhub_backend.program.schemas import PostTagRequestModel
+
 from ..database import (
     db_client,
 )
@@ -31,3 +33,11 @@ def query_list_tags(skip: int = 0, limit: int = 100) -> Cursor:
         return tags_cur
     except InvalidId:
         raise Exception.bad_request
+
+
+def create_tag(request: PostTagRequestModel) -> str:
+    body = {"name": request.tag_name}
+    result = db_client.tag_coll.insert_one(body)
+    if result.inserted_id == None:
+        raise Exception.internal_server_error
+    return str(result.inserted_id)
