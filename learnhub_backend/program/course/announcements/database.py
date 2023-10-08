@@ -7,10 +7,7 @@ from .schemas import (
     PatchCourseAnnouncementRequestModel,
 )
 from learnhub_backend.database import db_client
-from learnhub_backend.dependencies import (
-    Exception,
-    CheckHttpFileType,
-)
+from learnhub_backend.dependencies import Exception, CheckHttpFileType
 
 
 # TODO: optional add this to dependencies

@@ -4,6 +4,8 @@ from pymongo.results import InsertOneResult, UpdateResult
 from bson.objectid import ObjectId
 from bson.errors import InvalidId
 
+from learnhub_backend.quiz.database import query_quiz
+
 from ..database import db_client
 
 from .schemas import (
@@ -16,11 +18,10 @@ from .schemas import (
 
 from ...dependencies import (
     Exception,
-    CheckHttpFileType,
     teacher_type,
 )
 
-from ..dependencies import CheckLessonType
+from ...dependencies import student_type
 
 
 # AUXILARY
@@ -241,7 +242,8 @@ def delete_course_chapter(chapter_id: str, course_id: str):
                 update_course["$inc"]["total_video_length"] -= lesson["lesson_length"]
             elif lesson["lesson_type"] == "file":
                 update_course["$inc"]["file_count"] -= 1
-            # TODO: update quiz count
+            elif lesson["lesson_type"] == "quiz":
+                update_course["$inc"]["quiz_count"] -= 1
 
         # lesson delete
         delete_response = db_client.lesson_coll.delete_many(filter=lesson_filter)
@@ -301,18 +303,17 @@ def create_course_lesson(
             raise Exception.unprocessable_content
         valid_chapter_filter = {"_id": ObjectId(chapter_id)}
         chapter_result = db_client.chapter_coll.find_one(filter=valid_chapter_filter)
+
         if chapter_result == None:
             raise Exception.unprocessable_content
 
-        lessontype = CheckLessonType(str(request.src))
-        body = {
-            "course_id": ObjectId(course_id),
-            "chapter_id": ObjectId(chapter_id),
-            "name": request.name,
-            "lesson_length": request.lesson_length,
-            "lesson_type": lessontype,
-            "src": str(request.src),
-        }
+        body = dict()
+        body["course_id"] = ObjectId(course_id)
+        body["chapter_id"] = ObjectId(chapter_id)
+        body["name"] = request.name
+        body["lesson_length"] = request.lesson_length
+        body["lesson_type"] = request.lesson_type
+        body["src"] = request.src
 
         filter = {"course_id": ObjectId(course_id), "chapter_id": ObjectId(chapter_id)}
         while True:
@@ -342,20 +343,81 @@ def create_course_lesson(
         # course
         course_update = dict()
         course_filter = {"_id": ObjectId(course_id)}
-        if lessontype == "video":
+        if request.lesson_type == "video":
             course_update = {
                 "$inc": {"total_video_length": request.lesson_length, "video_count": 1}
             }
-        elif lessontype == "file":  # other filetype count as file
+        elif request.lesson_type == "file":  # other filetype count as file
             course_update = {"$inc": {"file_count": 1}}
+        elif request.lesson_type == "quiz":
+            course_update = {"$inc": {"quiz_count": 1}}
+        # elif request.lesson_type == "doc":
+        # TODO: inc doc
 
         result = db_client.course_coll.update_one(
             filter=course_filter, update=course_update
         )
 
+        _update_student_progress(
+            course_id, chapter_id, str(object_id.inserted_id), request
+        )
+
         return str(object_id.inserted_id)
     except InvalidId:
         raise Exception.bad_request
+
+
+def _update_student_progress(
+    course_id: str,
+    chapter_id: str,
+    lesson_id: str,
+    request: PostCourseLessonRequestModel,
+):
+    progress_filter = {"course_id": ObjectId(course_id)}
+    progress_lesson_body = {
+        "lesson_id": ObjectId(lesson_id),
+        "chapter_id": ObjectId(chapter_id),
+        "finished": False,
+        "lesson_completed": 0,
+    }
+    result = db_client.course_progress_coll.update_many(
+        progress_filter, {"$push": {"lessons": progress_lesson_body}}
+    )
+    if request.lesson_type == "quiz":  # should add student quiz results
+        own_course_filter = {
+            "type": student_type,
+            "owned_programs.program_id": ObjectId(course_id),
+            "owned_programs.type": "course",
+        }
+        students_cur = db_client.user_coll.find(own_course_filter)
+
+        quiz = db_client.quiz_coll.find_one(ObjectId(request.src))
+        if quiz == None:
+            raise Exception.internal_server_error
+        for student in students_cur:
+            body = {
+                "score": 0,
+                "problems": [],
+                "status": "not started",
+                "quiz_id": ObjectId(request.src),
+                "student_id": student["_id"],  # already object id
+            }
+            for problem in quiz["problems"]:
+                body["problems"].append(
+                    {
+                        "problem_num": problem["problem_num"],
+                        "is_correct": False,
+                        "answer": {
+                            "answer_a": False,
+                            "answer_b": False,
+                            "answer_c": False,
+                            "answer_d": False,
+                            "answer_e": False,
+                            "answer_f": False,
+                        },
+                    }
+                )
+            _ = db_client.quiz_result_coll.insert_one(body)
 
 
 def edit_course_lesson(
@@ -382,10 +444,6 @@ def edit_course_lesson(
             update_body["lesson_length"] = request.lesson_length
         if request.src != None:
             update_body["src"] = str(request.src)
-            if (
-                CheckLessonType(str(request.src)) != original["lesson_type"]
-            ):  # Changing lesson type is not allowed
-                raise Exception.unprocessable_content
 
         update = {"$set": update_body}
         result = db_client.lesson_coll.update_one(
@@ -476,7 +534,12 @@ def remove_course_lesson(
                         "file_count": -1,
                     }
                 }
-            # TODO: case "quiz":
+            case "quiz":
+                course_update = {
+                    "$inc": {
+                        "quiz_count": -1,
+                    }
+                }
             case _:
                 course_update = dict()
         result = db_client.course_coll.update_one(course_filter, course_update)
