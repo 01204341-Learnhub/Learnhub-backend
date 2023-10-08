@@ -42,6 +42,19 @@ class PatchTeacherRequestModel(BaseModel):
     profile_pic: HttpUrl | None = None
 
 
+# PROGRAM
+class ListTeacherCoursesModelBody(BaseModel):
+    course_id: str
+    course_pic: HttpUrl
+    name: str
+    rating: float
+    student_count: int
+
+
+class ListTeacherCoursesResponseModel(BaseModel):
+    courses: list[ListTeacherCoursesModelBody]
+
+
 # PAYMENT METHOD
 class GetTeacherPaymentMethodResponseModel(BaseModel):
     payment_method_id: str

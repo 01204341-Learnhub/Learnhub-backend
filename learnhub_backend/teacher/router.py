@@ -10,6 +10,7 @@ from .services import (
     delete_teacher_payment_method_request,
     get_teacher_payment_method_response,
     get_teacher_response,
+    list_teacher_courses_response,
     list_teacher_payment_methods_response,
     list_teachers_response,
     patch_teacher_payment_method_request,
@@ -21,6 +22,7 @@ from .services import (
 from .schemas import (
     GetTeacherPaymentMethodResponseModel,
     GetTeacherResponseModel,
+    ListTeacherCoursesResponseModel,
     ListTeacherPaymentMethodsResponseModel,
     ListTeachersResponseModel,
     PatchTeacherPaymentMethodRequestModel,
@@ -99,6 +101,18 @@ def patch_teacher(teacher_id: str, request_body: PatchTeacherRequestModel):
 def delete_teacher(teacher_id: str):
     # TODO: Implement delete teacher
     return {"detail": "this endpoint is not currently supported"}
+
+
+# PROGRAM
+@router.get(
+    "/{teacher_id}/courses",
+    status_code=200,
+    response_model_exclude_none=True,
+    response_model=ListTeacherCoursesResponseModel,
+)
+def list_teacher_courses(teacher_id: str):
+    response_body = list_teacher_courses_response(teacher_id)
+    return response_body
 
 
 # PAYMENT METHOD
