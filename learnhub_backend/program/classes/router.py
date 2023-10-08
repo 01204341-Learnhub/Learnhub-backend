@@ -17,6 +17,7 @@ from .schemas import (
     ListClassesResponseModel,
     GetClassResponseModel,
     PatchAssignmentRequestModel,
+    PatchClassRequestModel,
     PostClassRequestModel,
     PostClassResponseModel,
 )
@@ -69,6 +70,16 @@ def post_class(requestBody: PostClassRequestModel):
 def get_class(class_id: str):
     response_body = get_class_response(class_id=class_id)
     return response_body
+
+
+@router.patch(
+    "/{class_id}",
+    status_code=200,
+    response_model_exclude_none=True,
+    response_model=GenericOKResponse,
+)
+def patch_class(class_id: str, request_body: PatchClassRequestModel):
+    pass
 
 
 # ASSIGNMENTS
