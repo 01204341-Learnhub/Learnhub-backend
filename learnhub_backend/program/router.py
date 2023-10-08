@@ -8,10 +8,12 @@ from ..dependencies import (
 
 from .schemas import (
     ListProgramsResponseModel,
+    ListTagsResponseModel,
 )
 
 from .services import (
     list_programs_response,
+    list_tags_response,
 )
 
 
@@ -36,6 +38,19 @@ common_page_params = Annotated[dict, Depends(router.dependencies[0].dependency)]
 )
 def list_programs(common_paginations: common_page_params):
     response_body = list_programs_response(
+        common_paginations["skip"], common_paginations["limit"]
+    )
+    return response_body
+
+
+@router.get(
+    "/tags",
+    status_code=200,
+    response_model=ListTagsResponseModel,
+    response_model_exclude_none=True,
+)
+def list_tags(common_paginations: common_page_params):
+    response_body = list_tags_response(
         common_paginations["skip"], common_paginations["limit"]
     )
     return response_body
