@@ -11,7 +11,6 @@ from .schemas import (
 from ...dependencies import Exception, CheckHttpFileType
 
 
-# TODO: optional add this to dependencies
 def get_teacher_by_id(teacher_id: str):
     try:
         teacher = db_client.user_coll.find_one({"_id": ObjectId(teacher_id)})

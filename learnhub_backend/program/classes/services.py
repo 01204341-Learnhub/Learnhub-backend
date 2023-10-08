@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Annotated, Union
 from pydantic import TypeAdapter
 from pymongo.results import UpdateResult
@@ -29,6 +30,11 @@ def list_classes_response(skip: int, limit: int) -> ListClassesResponseModel:
         class_["class_id"] = str(class_["_id"])
         class_["teacher"] = get_teacher_by_id(str(class_["teacher_id"]))
         class_["tags"] = query_list_tags_by_id(class_["tags"])
+        class_["registration_ended_date"] = int(
+            datetime.timestamp(class_["registration_ended_date"])
+        )
+        class_["open_time"] = int(datetime.timestamp(class_["open_time"]))
+        class_["class_ended_date"] = int(datetime.timestamp(class_["class_ended_date"]))
         quried_classes.append(class_)
 
     ta = TypeAdapter(list[ListClassesModelBody])
@@ -44,6 +50,11 @@ def get_class_response(class_id: str) -> GetClassResponseModel:
     class_["class_id"] = str(class_["_id"])
     class_["teacher"] = get_teacher_by_id(str(class_["teacher_id"]))
     class_["tags"] = query_list_tags_by_id(class_["tags"])
+    class_["registration_ended_date"] = int(
+        datetime.timestamp(class_["registration_ended_date"])
+    )
+    class_["open_time"] = int(datetime.timestamp(class_["open_time"]))
+    class_["class_ended_date"] = int(datetime.timestamp(class_["class_ended_date"]))
 
     return GetClassResponseModel(**class_)
 

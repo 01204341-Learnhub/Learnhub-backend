@@ -16,6 +16,11 @@ class TagModelBody(BaseModel):
     tag_name: str
 
 
+class ScheduleModelBody(BaseModel):
+    start: int
+    end: int
+
+
 class ListClassesModelBody(BaseModel):
     class_id: str
     name: str
@@ -23,7 +28,9 @@ class ListClassesModelBody(BaseModel):
     teacher: TeacherModelBody
     status: str
     tags: list[TagModelBody]
-    registration_ended_date: datetime
+    registration_ended_date: int
+    open_time: int
+    class_ended_date: int
     price: float
 
 
@@ -36,10 +43,12 @@ class GetClassResponseModel(BaseModel):
     name: str
     class_pic: HttpUrl
     teacher: TeacherModelBody
-    status: str
     tags: list[TagModelBody]
-    registration_ended_date: datetime
-    class_ended_date: datetime
+    status: str
+    schedules: list[ScheduleModelBody]
+    registration_ended_date: int  # datetime
+    open_time: int  # datetime
+    class_ended_date: int  # datetime
     price: float
     class_objective: list[str]
     class_requirement: str
