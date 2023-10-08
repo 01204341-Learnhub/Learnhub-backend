@@ -26,6 +26,7 @@ class ListClassesModelBody(BaseModel):
     name: str
     class_pic: HttpUrl
     teacher: TeacherModelBody
+    description: str
     status: str
     tags: list[TagModelBody]
     registration_ended_date: int
@@ -38,11 +39,33 @@ class ListClassesResponseModel(BaseModel):
     classes: list[ListClassesModelBody]
 
 
+class PostClassRequestModel(BaseModel):
+    name: str
+    class_pic: HttpUrl
+    teacher_id: str
+    max_student: int
+    price: float
+    description: str
+    class_objective: list[str]
+    class_requirement: str
+    difficulty_level: str
+    tags: list[str]  # listOf[tag_id]
+    schedules: list[ScheduleModelBody]
+    registration_ended_date: int
+    open_time: int
+    class_ended_date: int
+
+
+class PostClassResponseModel(BaseModel):
+    class_id: str
+
+
 class GetClassResponseModel(BaseModel):
     class_id: str
     name: str
     class_pic: HttpUrl
     teacher: TeacherModelBody
+    description: str
     tags: list[TagModelBody]
     status: str
     schedules: list[ScheduleModelBody]

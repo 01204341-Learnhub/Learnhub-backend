@@ -4,6 +4,7 @@ from ..database import db_client
 from bson.objectid import ObjectId
 from bson.errors import InvalidId
 from .schemas import (
+    PostClassRequestModel,
     TagModelBody,
     PatchAssignmentRequestModel,
 )
@@ -54,6 +55,49 @@ def query_class(class_id: str) -> dict | None:
         class_filter = {"_id": ObjectId(class_id)}
         class_ = db_client.class_coll.find_one(class_filter)
         return class_
+    except InvalidId:
+        raise Exception.bad_request
+
+
+def create_class(request: PostClassRequestModel) -> str:
+    try:
+        body = {
+            "name": request.name,
+            "description": request.description,
+            "created_date": datetime.now(tz=timezone(timedelta(hours=7))),
+            "class_pic": str(request.class_pic),
+            "student_count": 0,
+            "max_student": request.max_student,
+            "rating": 0,
+            "review_count": 0,
+            "price": request.price,
+            "teacher_id": ObjectId(request.teacher_id),
+            "class_objective": request.class_objective,
+            "class_requirement": request.class_requirement,
+            "difficulty_level": request.difficulty_level,
+            "tags": [ObjectId(tag_) for tag_ in request.tags],
+            "assignment_count": 0,
+            "meeting_count": 0,
+            "chapter_count": 0,
+            "schedules": [
+                {
+                    "start": datetime.fromtimestamp(sched_.start),
+                    "end": datetime.fromtimestamp(sched_.end),
+                }
+                for sched_ in request.schedules
+            ],
+            "open_time": datetime.fromtimestamp(request.open_time),
+            "registration_ended_date": datetime.fromtimestamp(
+                request.registration_ended_date
+            ),
+            "class_ended_date": datetime.fromtimestamp(request.class_ended_date),
+            "status": "started",
+        }
+        result = db_client.class_coll.insert_one(body)
+        if result.inserted_id == None:
+            raise Exception.internal_server_error
+        else:
+            return str(result.inserted_id)
     except InvalidId:
         raise Exception.bad_request
 

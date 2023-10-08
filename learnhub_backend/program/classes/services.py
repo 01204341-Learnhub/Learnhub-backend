@@ -6,6 +6,7 @@ from pymongo.results import UpdateResult
 from learnhub_backend.dependencies import GenericOKResponse
 
 from .database import (
+    create_class,
     query_list_classes,
     get_teacher_by_id,
     query_list_tags_by_id,
@@ -17,6 +18,8 @@ from .schemas import (
     ListClassesResponseModel,
     GetClassResponseModel,
     PatchAssignmentRequestModel,
+    PostClassRequestModel,
+    PostClassResponseModel,
 )
 
 from ...dependencies import Exception
@@ -57,6 +60,11 @@ def get_class_response(class_id: str) -> GetClassResponseModel:
     class_["class_ended_date"] = int(datetime.timestamp(class_["class_ended_date"]))
 
     return GetClassResponseModel(**class_)
+
+
+def post_class_request(request: PostClassRequestModel) -> PostClassResponseModel:
+    class_id = create_class(request)
+    return PostClassResponseModel(class_id=class_id)
 
 
 # ASSIGNMENTS
