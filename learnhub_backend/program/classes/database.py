@@ -78,7 +78,7 @@ def create_class(request: PostClassRequestModel) -> str:
             "difficulty_level": request.difficulty_level,
             "tags": [ObjectId(tag_) for tag_ in request.tag_ids],
             "assignment_count": 0,
-            "meeting_count": 0,
+            "meeting_count": len(request.schedules),
             "chapter_count": 0,
             "schedules": [],
             "open_date": datetime.fromtimestamp(request.open_date),
@@ -116,6 +116,7 @@ def edit_class(class_id: str, request: PatchClassRequestModel):
         set_content = dict()
         push_content = dict()
         pull_content = dict()
+        inc_content = dict()
         if request.name != None:
             set_content["name"] = request.name
         if request.class_pic != None:
@@ -158,6 +159,17 @@ def edit_class(class_id: str, request: PatchClassRequestModel):
 
         # tags
         if request.tag != None:
+            #  Check duplicate tags
+            _class_tag_filter = {
+                "_id": ObjectId(class_id),
+                "tags": ObjectId(request.tag.tag_id),
+            }
+            _class_tag_check_result = db_client.class_coll.find_one(_class_tag_filter)
+            if _class_tag_check_result != None:
+                err = Exception.unprocessable_content
+                err.__setattr__("detail", "duplicate class's tag")
+                raise err
+
             tag_filter = {"_id": ObjectId(request.tag.tag_id)}
             tag = db_client.tag_coll.find_one(tag_filter)
             if tag == None:
@@ -173,6 +185,24 @@ def edit_class(class_id: str, request: PatchClassRequestModel):
         # schedules
         if request.schedules != None:
             if request.schedules.op == "add":
+                # Check duplicate schedules
+                _schedule_filter = {
+                    "_id": ObjectId(class_id),
+                    "schedules": {
+                        "$elemMatch": {
+                            "start": datetime.fromtimestamp(request.schedules.start),
+                            "end": datetime.fromtimestamp(request.schedules.end),
+                        }
+                    },
+                }
+                _duplicate_check_result = db_client.class_coll.find_one(
+                    _schedule_filter
+                )
+                if _duplicate_check_result != None:
+                    err = Exception.unprocessable_content
+                    err.__setattr__("detail", "duplicate schedules")
+                    raise err
+                # check start < end time
                 if request.schedules.start > request.schedules.end:
                     err = Exception.unprocessable_content
                     err.__setattr__("detail", "required schedule's start <= end ")
@@ -183,6 +213,9 @@ def edit_class(class_id: str, request: PatchClassRequestModel):
                         "end": datetime.fromtimestamp(request.schedules.end),
                     }
                 ]
+                if "meeting_count" not in inc_content:
+                    inc_content["meeting_count"] = 0
+                inc_content["meeting_count"] += 1
             elif request.schedules.op == "remove":
                 pull_content["schedules"] = {
                     "$in": [
@@ -192,6 +225,9 @@ def edit_class(class_id: str, request: PatchClassRequestModel):
                         }
                     ]
                 }
+                if "meeting_count" not in inc_content:
+                    inc_content["meeting_count"] = 0
+                inc_content["meeting_count"] -= 1
 
         # mongo doesn't allow multi operation edit
         patch_result = None
@@ -206,6 +242,10 @@ def edit_class(class_id: str, request: PatchClassRequestModel):
         if len(pull_content) != 0:
             patch_result = db_client.class_coll.update_one(
                 filter, {"$pull": pull_content}
+            )
+        if len(inc_content) != 0:
+            patch_result = db_client.class_coll.update_one(
+                filter, {"$inc": inc_content}
             )
 
         if patch_result == None:

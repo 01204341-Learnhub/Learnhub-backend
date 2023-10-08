@@ -14,6 +14,7 @@ from .services import (
     get_student_course_response,
     get_student_payment_method_response,
     list_student_basket_response,
+    list_student_classes_response,
     list_student_courses_response,
     list_students_response,
     get_student_response,
@@ -36,6 +37,7 @@ from .schemas import (
     GetStudentPaymentMethodResponseModel,
     GetStudentResponseModel,
     ListStudentBasketResponseModel,
+    ListStudentClassResponseModel,
     ListStudentPaymentMethodsResponseModel,
     PatchStudentPaymentMethodRequestModel,
     PostStudentBasketItemRequestModel,
@@ -150,6 +152,17 @@ def list_student_courses(student_id: str):
 )
 def get_student_course(student_id: str, course_id: str):
     response_body = get_student_course_response(student_id, course_id)
+    return response_body
+
+
+@router.get(
+    "/{student_id}/classes",
+    status_code=200,
+    response_model_exclude_none=True,
+    response_model=ListStudentClassResponseModel,
+)
+def list_students_classes(student_id: str):
+    response_body = list_student_classes_response(student_id)
     return response_body
 
 

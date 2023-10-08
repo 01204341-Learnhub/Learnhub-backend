@@ -9,6 +9,7 @@ from learnhub_backend.program.course.announcements.database import (
     list_course_announcement,
 )
 from learnhub_backend.program.course.database import query_list_course_chapters
+from learnhub_backend.teacher.database import query_teacher
 
 from .database import (
     create_student,
@@ -19,6 +20,7 @@ from .database import (
     query_class,
     query_course,
     query_list_students,
+    query_multiple_classes,
     query_student,
     query_student_basket,
     query_teacher_profile,
@@ -36,6 +38,8 @@ from .schemas import (
     GetStudentCourseResponseModel,
     GetStudentPaymentMethodResponseModel,
     ListStudentBasketResponseModel,
+    ListStudentClassModelBody,
+    ListStudentClassResponseModel,
     ListStudentCourseResponseModel,
     ListStudentCoursesModelBody,
     ListStudentPaymentMethodsResponseModel,
@@ -97,6 +101,7 @@ def delete_student_request(student_id: str) -> DeleteResult:
     return result
 
 
+# PROGRAM
 # STUDENT COURSE
 def list_student_courses_response(student_id: str) -> ListStudentCourseResponseModel:
     student = query_student(student_id)
@@ -203,6 +208,36 @@ def patch_student_course_progress_request(
     response = edit_student_course_progress(
         student_id=student_id, course_id=course_id, requested_lesson=requested_lesson
     )
+    return response
+
+
+# STUDENT CLASS
+def list_student_classes_response(student_id: str) -> ListStudentClassResponseModel:
+    student = query_student(student_id)
+    if student == None:
+        raise Exception.not_found
+
+    owned_programs = []
+    for program_ in student["owned_programs"]:
+        if program_["type"] == "class":
+            owned_programs.append(str(program_["program_id"]))
+    classes = query_multiple_classes(owned_programs)
+    classes_response = []
+    for class_ in classes:
+        teacher = query_teacher_profile(str(class_["teacher_id"]))
+        classes_response.append(
+            ListStudentClassModelBody(
+                class_id=str(class_["_id"]),
+                name=class_["name"],
+                class_pic=class_["class_pic"],
+                status=class_["status"],
+                progress=0,  # TODO: implement this
+                class_ended_date=int(datetime.timestamp(class_["class_ended_date"])),
+                teacher=TeacherModelBody(**teacher),
+            )
+        )
+
+    response = ListStudentClassResponseModel(classes=classes_response)
     return response
 
 

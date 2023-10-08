@@ -56,6 +56,12 @@ def query_class(class_id: str):
     return cls
 
 
+def query_multiple_classes(class_ids: list[str]):
+    filter = {"_id": {"$in": [ObjectId(id_) for id_ in class_ids]}}
+    classes_cur = db_client.class_coll.find(filter)
+    return classes_cur
+
+
 # STUDENT
 def query_list_students(skip: int = 0, limit: int = 100) -> list:
     try:

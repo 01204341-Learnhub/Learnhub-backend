@@ -73,6 +73,20 @@ class GetStudentCourseResponseModel(BaseModel):
     announcements: list[courseAnnouncementModelBody]
 
 
+class ListStudentClassModelBody(BaseModel):
+    class_id: str
+    name: str
+    class_pic: HttpUrl
+    status: str
+    progress: float
+    class_ended_date: int
+    teacher: TeacherModelBody
+
+
+class ListStudentClassResponseModel(BaseModel):
+    classes: list[ListStudentClassModelBody]
+
+
 # STUDENT COURSE PROGRESS
 class LessonProgressModelBody(BaseModel):
     lesson_id: str
