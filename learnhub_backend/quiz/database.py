@@ -12,7 +12,6 @@ from .schemas import (
 from learnhub_backend.database import db_client
 from learnhub_backend.dependencies import (
     Exception,
-    CheckHttpFileType,
 )
 
 

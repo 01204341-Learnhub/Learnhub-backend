@@ -1,5 +1,5 @@
 from typing import Optional, Union
-from pydantic import BaseModel, HttpUrl
+from pydantic import BaseModel, HttpUrl, validator
 
 
 class TeacherModelBody(BaseModel):
@@ -108,7 +108,8 @@ class GetCourseLessonResponseModel(BaseModel):
     name: str
     lesson_type: str
     lesson_length: int
-    src: HttpUrl
+    src: str
+    # TODO: Implement
 
 
 class ListCourseLessonsModelBody(BaseModel):
@@ -125,8 +126,10 @@ class ListCourseLessonsResponseModel(BaseModel):
 
 class PostCourseLessonRequestModel(BaseModel):
     name: str
-    src: HttpUrl
     lesson_length: int
+    lesson_type: str
+    src: str  # video | file | doc | quiz
+    # TODO: Implement
 
 
 class PostCourseLessonResponseModel(BaseModel):
@@ -135,5 +138,5 @@ class PostCourseLessonResponseModel(BaseModel):
 
 class PatchCourseLessonRequestModel(BaseModel):
     name: str | None = None
-    src: HttpUrl | None = None
+    src: str | None = None
     lesson_length: int

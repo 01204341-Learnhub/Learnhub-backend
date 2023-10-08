@@ -7,4 +7,3 @@ def CheckLessonType(url: str) -> str:
         return "video"
     else:
         return "file"
-    # TODO: quiz type
