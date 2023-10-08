@@ -37,6 +37,7 @@ teacher_type = "teacher"
 course_type = "course"
 
 
+# FIX: Doesn't work for youtube video
 def CheckHttpFileType(url: str) -> str:
     result = mimetypes.guess_type(url)[0]  # ('audio/mpeg', None)
     if result == None:  # no extension url

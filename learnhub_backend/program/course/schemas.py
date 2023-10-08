@@ -108,8 +108,8 @@ class GetCourseLessonResponseModel(BaseModel):
     name: str
     lesson_type: str
     lesson_length: int
-    src: HttpUrl | None = None
-    quiz_id: str | None = None
+    src: str
+    # TODO: Implement
 
 
 class ListCourseLessonsModelBody(BaseModel):
@@ -126,17 +126,10 @@ class ListCourseLessonsResponseModel(BaseModel):
 
 class PostCourseLessonRequestModel(BaseModel):
     name: str
-    lesson_length: int | None = None
-    src: HttpUrl | None = None
-    quiz_id: str | None = None
-
-    @validator("src")
-    def check_src_and_quiz(cls, src: HttpUrl, values):
-        if "quiz_id" not in values and not src:
-            raise ValueError("either src or quiz_id is required")
-        elif "quiz_id" in values and src:
-            raise ValueError("Src and Quiz should be mutually exclusive")
-        return src
+    lesson_length: int
+    lesson_type: str
+    src: str  # video | file | doc | quiz
+    # TODO: Implement
 
 
 class PostCourseLessonResponseModel(BaseModel):
@@ -145,5 +138,5 @@ class PostCourseLessonResponseModel(BaseModel):
 
 class PatchCourseLessonRequestModel(BaseModel):
     name: str | None = None
-    src: HttpUrl | None = None
+    src: str | None = None
     lesson_length: int

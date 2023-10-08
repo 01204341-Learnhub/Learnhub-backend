@@ -18,11 +18,9 @@ from .schemas import (
 
 from ...dependencies import (
     Exception,
-    CheckHttpFileType,
     teacher_type,
 )
 
-from ..dependencies import CheckLessonType
 from ...dependencies import student_type
 
 
@@ -310,31 +308,12 @@ def create_course_lesson(
             raise Exception.unprocessable_content
 
         body = dict()
-        if request.src == None and request.quiz_id == None:
-            err = Exception.unprocessable_content
-            err.__setattr__("detail", "Need either quiz_id or src")
-            raise err
-        elif request.src != None and request.quiz_id != None:
-            err = Exception.unprocessable_content
-            err.__setattr__("detail", "quiz_id and src are mutually exclusive")
-            raise err
-        elif request.quiz_id != None:
-            lessontype = "quiz"
-            quiz = query_quiz(request.quiz_id)
-            if quiz == None:
-                err = Exception.unprocessable_content
-                err.__setattr__("detail", "quiz does not exist")
-                raise err
-            body["quiz_id"] = ObjectId(request.quiz_id)
-        else:
-            lessontype = CheckLessonType(str(request.src))
-            body["src"] = str(request.src)
-
         body["course_id"] = ObjectId(course_id)
         body["chapter_id"] = ObjectId(chapter_id)
         body["name"] = request.name
         body["lesson_length"] = request.lesson_length
-        body["lesson_type"] = lessontype
+        body["lesson_type"] = request.lesson_type
+        body["src"] = request.src
 
         filter = {"course_id": ObjectId(course_id), "chapter_id": ObjectId(chapter_id)}
         while True:
@@ -364,21 +343,23 @@ def create_course_lesson(
         # course
         course_update = dict()
         course_filter = {"_id": ObjectId(course_id)}
-        if lessontype == "video":
+        if request.lesson_type == "video":
             course_update = {
                 "$inc": {"total_video_length": request.lesson_length, "video_count": 1}
             }
-        elif lessontype == "file":  # other filetype count as file
+        elif request.lesson_type == "file":  # other filetype count as file
             course_update = {"$inc": {"file_count": 1}}
-        elif lessontype == "quiz":
+        elif request.lesson_type == "quiz":
             course_update = {"$inc": {"quiz_count": 1}}
+        # elif request.lesson_type == "doc":
+        # TODO: inc doc
 
         result = db_client.course_coll.update_one(
             filter=course_filter, update=course_update
         )
 
         _update_student_progress(
-            course_id, chapter_id, str(object_id.inserted_id), lessontype, request
+            course_id, chapter_id, str(object_id.inserted_id), request
         )
 
         return str(object_id.inserted_id)
@@ -390,7 +371,6 @@ def _update_student_progress(
     course_id: str,
     chapter_id: str,
     lesson_id: str,
-    lesson_type: str,
     request: PostCourseLessonRequestModel,
 ):
     progress_filter = {"course_id": ObjectId(course_id)}
@@ -403,7 +383,7 @@ def _update_student_progress(
     result = db_client.course_progress_coll.update_many(
         progress_filter, {"$push": {"lessons": progress_lesson_body}}
     )
-    if lesson_type == "quiz":  # should add student quiz results
+    if request.lesson_type == "quiz":  # should add student quiz results
         own_course_filter = {
             "type": student_type,
             "owned_programs.program_id": ObjectId(course_id),
@@ -411,7 +391,7 @@ def _update_student_progress(
         }
         students_cur = db_client.user_coll.find(own_course_filter)
 
-        quiz = db_client.quiz_coll.find_one(ObjectId(request.quiz_id))
+        quiz = db_client.quiz_coll.find_one(ObjectId(request.src))
         if quiz == None:
             raise Exception.internal_server_error
         for student in students_cur:
@@ -419,7 +399,7 @@ def _update_student_progress(
                 "score": 0,
                 "problems": [],
                 "status": "not started",
-                "quiz_id": ObjectId(request.quiz_id),
+                "quiz_id": ObjectId(request.src),
                 "student_id": student["_id"],  # already object id
             }
             for problem in quiz["problems"]:
@@ -464,10 +444,6 @@ def edit_course_lesson(
             update_body["lesson_length"] = request.lesson_length
         if request.src != None:
             update_body["src"] = str(request.src)
-            if (
-                CheckLessonType(str(request.src)) != original["lesson_type"]
-            ):  # Changing lesson type is not allowed
-                raise Exception.unprocessable_content
 
         update = {"$set": update_body}
         result = db_client.lesson_coll.update_one(
