@@ -93,6 +93,7 @@ def _create_class_students_submission(class_id: str, assignment_id: str):
         "class_id": ObjectId(class_id),
         "status": SubmissionStatus.unsubmit,
         "score": 0,
+        "submission_date": datetime.fromtimestamp(0),
         "attachments": [],
     }
     bodies = []
@@ -270,6 +271,7 @@ def update_submission(
         set_content["class_id"] = ObjectId(class_id)
         set_content["status"] = SubmissionStatus.uncheck
         set_content["score"] = 0
+        set_content["submission_date"] = datetime.now(tz=timezone(timedelta(hours=7)))
         set_content["attachments"] = [
             {"attachment_type": at_.attachment_type, "src": at_.src}
             for at_ in request.attachments

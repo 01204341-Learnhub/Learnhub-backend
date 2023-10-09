@@ -76,6 +76,7 @@ class PatchAssignmentRequestModel(BaseModel):
 class ListAssignmentSubmissionModelBody(BaseModel):
     status: str  # check | uncheck | unsubmit
     score: float
+    submission_date: int
     student: StudentModelBody
 
 
@@ -86,6 +87,7 @@ class ListAssignmentSubmissionResponseModel(BaseModel):
 class GetAssignmentSubmissionResponseModel(BaseModel):
     status: str  # check | uncheck | unsubmit
     score: float
+    submission_date: int
     student: StudentModelBody
     attachments: list[AttachmentModelBody]
 

@@ -110,6 +110,7 @@ def list_assignment_submissions_response(
             ListAssignmentSubmissionModelBody(
                 status=sub_["status"],
                 score=sub_["score"],
+                submission_date=int(datetime.timestamp(sub_["submission_date"])),
                 student=StudentModelBody(**student),
             )
         )
@@ -133,6 +134,7 @@ def get_assignment_submission_response(
         status=submission["status"],
         score=submission["score"],
         student=StudentModelBody(**student),
+        submission_date=int(datetime.timestamp(submission["submission_date"])),
         attachments=ta.validate_python(submission["attachments"]),
     )
     return response
