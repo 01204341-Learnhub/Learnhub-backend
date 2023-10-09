@@ -127,7 +127,7 @@ def edit_course_announcement(
                         }
                     )
 
-                elif announcement_body["attachments"][i]["op"] == "delete":
+                elif announcement_body["attachments"][i]["op"] == "remove":
                     update_body_delete["$pull"]["attachments"]["src"]["$in"].append(
                         # id of document to delete from array
                         str(announcement_body["attachments"][i]["old_src"])
