@@ -113,19 +113,3 @@ class PatchClassRequestModel(BaseModel):
     open_date: int | None = None
     registration_ended_date: int | None = None
     class_ended_date: int | None = None
-
-
-# ASSIGNMENTS
-class AttachmentPatchModelBody(BaseModel):
-    op: str  # add | delete
-    src: str
-
-
-class PatchAssignmentRequestModel(BaseModel):
-    name: str | None = None
-    group_name: str | None = None
-    due_time: int | None = None
-    status: str | None = None
-    text: str | None = None
-    max_score: int | None = None
-    attachments: list[AttachmentPatchModelBody] | None = None

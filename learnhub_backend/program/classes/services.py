@@ -12,13 +12,11 @@ from .database import (
     get_teacher_by_id,
     query_list_tags_by_id,
     query_class,
-    edit_assignment,
 )
 from .schemas import (
     ListClassesModelBody,
     ListClassesResponseModel,
     GetClassResponseModel,
-    PatchAssignmentRequestModel,
     PatchClassRequestModel,
     PostClassRequestModel,
     PostClassResponseModel,
@@ -62,8 +60,12 @@ def get_class_response(class_id: str) -> GetClassResponseModel:
     class_["class_ended_date"] = int(datetime.timestamp(class_["class_ended_date"]))
     for i in range(len(class_["schedules"])):
         print(class_["schedules"][i]["start"])
-        class_["schedules"][i]["start"] = int(datetime.timestamp(class_["schedules"][i]["start"]))
-        class_["schedules"][i]["end"] = int(datetime.timestamp(class_["schedules"][i]["end"]))
+        class_["schedules"][i]["start"] = int(
+            datetime.timestamp(class_["schedules"][i]["start"])
+        )
+        class_["schedules"][i]["end"] = int(
+            datetime.timestamp(class_["schedules"][i]["end"])
+        )
 
     return GetClassResponseModel(**class_)
 
@@ -75,14 +77,4 @@ def post_class_request(request: PostClassRequestModel) -> PostClassResponseModel
 
 def patch_class_request(class_id: str, request: PatchClassRequestModel):
     edit_class(class_id, request)
-    return GenericOKResponse
-
-
-# ASSIGNMENTS
-def patch_assignment_request(
-    class_id: str, assignment_id: str, patch_body: PatchAssignmentRequestModel
-):
-    response = edit_assignment(
-        class_id=class_id, assignment_id=assignment_id, patch_body_=patch_body
-    )
     return GenericOKResponse
