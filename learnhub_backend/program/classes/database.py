@@ -1,3 +1,4 @@
+from pymongo.cursor import Cursor
 from pymongo.results import UpdateResult
 from datetime import datetime, timedelta, timezone
 from ..database import db_client
@@ -255,7 +256,7 @@ def edit_class(class_id: str, request: PatchClassRequestModel):
 
 
 # THREADS
-def query_list_threads(class_id: str, skip: int, limit: int):
+def query_list_threads(class_id: str, skip: int, limit: int) -> Cursor:
     try:
         filter_ = {"class_id": ObjectId(class_id)}
         thread_cursor = db_client.thread_coll.find(
