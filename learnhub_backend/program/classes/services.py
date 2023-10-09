@@ -60,7 +60,10 @@ def get_class_response(class_id: str) -> GetClassResponseModel:
     )
     class_["open_date"] = int(datetime.timestamp(class_["open_date"]))
     class_["class_ended_date"] = int(datetime.timestamp(class_["class_ended_date"]))
-    #TODO: add schedules
+    for i in range(len(class_["schedules"])):
+        print(class_["schedules"][i]["start"])
+        class_["schedules"][i]["start"] = int(datetime.timestamp(class_["schedules"][i]["start"]))
+        class_["schedules"][i]["end"] = int(datetime.timestamp(class_["schedules"][i]["end"]))
 
     return GetClassResponseModel(**class_)
 

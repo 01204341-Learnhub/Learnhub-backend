@@ -94,7 +94,6 @@ def patch_class(class_id: str, request_body: PatchClassRequestModel):
 def patch_assignment(
     class_id: str, assignment_id: str, patch_body: PatchAssignmentRequestModel
 ):
-    # TODO: check if this works
  
     response_body = patch_assignment_request(
         class_id=class_id, assignment_id=assignment_id, patch_body=patch_body
