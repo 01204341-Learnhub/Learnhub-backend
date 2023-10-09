@@ -260,6 +260,7 @@ def unsubmit_submission(class_id: str, assignment_id: str, student_id: str):
         }
         set_content = dict()
         set_content["status"] = SubmissionStatus.unsubmit
+        set_content["score"] = 0
 
         result = db_client.assignment_submission_coll.update_one(
             filter, {"$set": set_content}
