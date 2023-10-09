@@ -8,6 +8,7 @@ from ....dependencies import (
 )
 
 from .schemas import (
+    GetAssignmentSubmissionResponseModel,
     GetClassAssignmentResponseModel,
     ListAssignmentSubmissionResponseModel,
     ListClassAssignmentsResponseModel,
@@ -20,6 +21,7 @@ from .schemas import (
 
 from .services import (
     get_assignment_response,
+    get_assignment_submission_response,
     list_assignment_response,
     list_assignment_submissions_response,
     patch_assignment_request,
@@ -102,6 +104,19 @@ def patch_assignment(
 )
 def list_assignment_submissions(class_id: str, assignment_id: str):
     response_body = list_assignment_submissions_response(class_id, assignment_id)
+    return response_body
+
+
+@router.get(
+    "/{class_id}/assignments/{assignment_id}/submissions/{student_id}",
+    status_code=200,
+    response_model_exclude_none=True,
+    response_model=GetAssignmentSubmissionResponseModel,
+)
+def get_assignment_submission(class_id: str, assignment_id: str, student_id: str):
+    response_body = get_assignment_submission_response(
+        class_id, assignment_id, student_id
+    )
     return response_body
 
 

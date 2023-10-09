@@ -7,6 +7,7 @@ from ....dependencies import GenericOKResponse, Exception, CheckHttpFileType
 
 from .schemas import (
     AttachmentModelBody,
+    GetAssignmentSubmissionResponseModel,
     GetClassAssignmentResponseModel,
     ListAssignmentSubmissionModelBody,
     ListAssignmentSubmissionResponseModel,
@@ -26,6 +27,7 @@ from .database import (
     query_list_submission_by_assignment_id,
     query_single_assignment,
     edit_assignment,
+    query_single_submission_by_student_id,
     query_student_profile,
     unsubmit_submission,
     update_submission,
@@ -109,6 +111,27 @@ def list_assignment_submissions_response(
         )
 
     return ListAssignmentSubmissionResponseModel(submissions=submissions)
+
+
+def get_assignment_submission_response(
+    class_id: str, assignment_id: str, student_id: str
+) -> GetAssignmentSubmissionResponseModel:
+    submission = query_single_submission_by_student_id(
+        class_id, assignment_id, student_id
+    )
+    if submission == None:
+        raise Exception.not_found
+    student = query_student_profile(str(submission["student_id"]))
+
+    ta = TypeAdapter(list[AttachmentModelBody])
+
+    response = GetAssignmentSubmissionResponseModel(
+        status=submission["status"],
+        score=submission["score"],
+        student=StudentModelBody(**student),
+        attachments=ta.validate_python(submission["attachments"]),
+    )
+    return response
 
 
 def put_assignment_submit_request(

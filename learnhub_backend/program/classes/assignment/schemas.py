@@ -80,6 +80,13 @@ class ListAssignmentSubmissionResponseModel(BaseModel):
     submissions: list[ListAssignmentSubmissionModelBody]
 
 
+class GetAssignmentSubmissionResponseModel(BaseModel):
+    status: str  # check | uncheck | unsubmit
+    score: float
+    student: StudentModelBody
+    attachments: list[AttachmentModelBody]
+
+
 class PutAssignmentSubmitRequestModel(BaseModel):
     attachments: list[AttachmentModelBody]
 

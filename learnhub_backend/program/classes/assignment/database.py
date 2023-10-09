@@ -206,6 +206,19 @@ def query_list_submission_by_assignment_id(class_id: str, assignment_id: str) ->
     return subs_cur
 
 
+def query_single_submission_by_student_id(
+    class_id: str, assignment_id: str, student_id: str
+) -> dict | None:
+    filter = {
+        "student_id": ObjectId(student_id),
+        "class_id": ObjectId(class_id),
+        "assignment_id": ObjectId(assignment_id),
+    }
+
+    submission = db_client.assignment_submission_coll.find_one(filter)
+    return submission
+
+
 def update_submission(
     class_id: str,
     assignment_id: str,
