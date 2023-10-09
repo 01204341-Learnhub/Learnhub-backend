@@ -1,6 +1,7 @@
 from pymongo import MongoClient
 from .config import (
     DB_ANNOUNCEMENT_COLLECTION,
+    DB_ASSIGNMENT_SUBMISSIONS_COLLECTION,
     DB_CLASS_COLLECTION,
     DB_COURSE_PROGRESS_COLLECTION,
     DB_TAG_COLLECTION,
@@ -37,6 +38,7 @@ class DB_client(MongoClient):
 
         self.user_coll = self.db[DB_USER_COLLECTION]
         self.assignment_coll = self.db[DB_ASSIGNMENT_COLLECTION]
+        self.assignment_submission_coll = self.db[DB_ASSIGNMENT_SUBMISSIONS_COLLECTION]
 
         self.quiz_coll = self.db[DB_QUIZ_COLLECTION]
         self.quiz_result_coll = self.db[DB_QUIZ_RESULT_COLLECTION]
