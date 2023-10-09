@@ -4,6 +4,17 @@ from datetime import datetime
 from bson import ObjectId
 
 
+# ATTACHMENT
+class AttachmentModelBody(BaseModel):
+    attachment_type: str
+    src: str
+
+
+class AttachmentPatchModelBody(BaseModel):
+    op: str  # add | delete
+    src: str
+
+
 # ASSIGNMENTS
 class ListClassAssignmentsModelBody(BaseModel):
     assignment_id: str
@@ -19,9 +30,14 @@ class ListClassAssignmentsResponseModel(BaseModel):
     assignments: list[ListClassAssignmentsModelBody]
 
 
-class AttachmentPatchModelBody(BaseModel):
-    op: str  # add | delete
-    src: str
+class GetClassAssignmentResponseModel(BaseModel):
+    name: str
+    group_name: str
+    last_edit: int
+    due_date: int
+    status: str
+    text: str
+    attachments: list[AttachmentModelBody]
 
 
 class PatchAssignmentRequestModel(BaseModel):

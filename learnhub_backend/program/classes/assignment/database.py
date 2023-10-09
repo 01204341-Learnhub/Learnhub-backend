@@ -19,6 +19,12 @@ def query_assignments_by_class_id(class_id: str) -> Cursor:
     return assignments_cur
 
 
+def query_single_assignment(class_id: str, assignment_id: str) -> dict | None:
+    filter = {"_id": ObjectId(assignment_id), "class_id": ObjectId(class_id)}
+    assignment = db_client.assignment_coll.find_one(filter)
+    return assignment
+
+
 def edit_assignment(
     class_id: str, assignment_id: str, patch_body_: PatchAssignmentRequestModel
 ):

@@ -8,11 +8,13 @@ from ....dependencies import (
 )
 
 from .schemas import (
+    GetClassAssignmentResponseModel,
     ListClassAssignmentsResponseModel,
     PatchAssignmentRequestModel,
 )
 
 from .services import (
+    get_assignment_response,
     list_assignment_response,
     patch_assignment_request,
 )
@@ -39,6 +41,17 @@ common_page_params = Annotated[dict, Depends(router.dependencies[0].dependency)]
 )
 def list_assignment(class_id: str):
     response_body = list_assignment_response(class_id)
+    return response_body
+
+
+@router.get(
+    "/{class_id}/assignments/{assignment_id}",
+    status_code=200,
+    response_model_exclude_none=True,
+    response_model=GetClassAssignmentResponseModel,
+)
+def get_assignment(class_id: str, assignment_id):
+    response_body = get_assignment_response(class_id, assignment_id)
     return response_body
 
 
