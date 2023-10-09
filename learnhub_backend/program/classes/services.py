@@ -15,6 +15,7 @@ from .database import (
     edit_assignment,
     query_list_threads,
     create_thread,
+    query_thread
 )
 from .schemas import (
     ListClassesModelBody,
@@ -28,6 +29,7 @@ from .schemas import (
     ListThreadResponseModel,
     PostThreadRequestModel,
     PostThreadResponseModel,
+    GetThreadResponseModel,
 )
 
 from ...dependencies import Exception
@@ -105,6 +107,13 @@ def list_threads_response(class_id: str, skip: int, limit: int):
 def post_thread_request(class_id: str, thread_body: PostThreadRequestModel):
     thread_id = create_thread(class_id=class_id, thread_body=thread_body)
     return PostThreadResponseModel(thread_id=thread_id)
+
+
+def get_thread_response(class_id: str, thread_id: str):
+    quried_thread = query_thread(class_id=class_id, thread_id=thread_id)
+    quried_thread["teacher"] = get_teacher_by_id(str(quried_thread["teacher_id"]))
+    quried_thread["last_edit"] = int(datetime.timestamp(quried_thread["last_edit"]))
+    return GetThreadResponseModel(**quried_thread)
 
 
 

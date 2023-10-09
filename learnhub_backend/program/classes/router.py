@@ -14,6 +14,7 @@ from .services import (
     post_class_request,
     list_threads_response,
     post_thread_request,
+    get_thread_response,
 )
 
 from .schemas import (
@@ -26,6 +27,7 @@ from .schemas import (
     ListThreadResponseModel,
     PostThreadRequestModel,
     PostThreadResponseModel,
+    GetThreadResponseModel,
 )
 
 router = APIRouter(
@@ -113,6 +115,17 @@ def list_threads(class_id: str, common_paginations: common_page_params):
 )
 def post_thread(class_id: str, thread_body: PostThreadRequestModel):
     response_body = post_thread_request(class_id=class_id, thread_body=thread_body)
+    return response_body
+
+
+@router.get(
+    "/{class_id}/threads/{thread_id}",
+    status_code=200,
+    response_model_exclude_none=True,
+    response_model=GetThreadResponseModel,
+)
+def get_thread(class_id: str, thread_id: str):
+    response_body = get_thread_response(class_id=class_id, thread_id=thread_id)
     return response_body
 
 

@@ -271,7 +271,7 @@ def create_thread(class_id: str, thread_body: PostThreadRequestModel):
     try:
         # check valid class
         valid_class_filter = {"_id": ObjectId(class_id)}
-        class_result = db_client.class_coll.find_one(filter=valid_class_filter)
+        class_result = db_client.class_coll.find_one(filter=valid_class_filter, projection={"teacher_id": 1})
         if class_result == None:
             raise Exception.unprocessable_content
 
@@ -289,6 +289,15 @@ def create_thread(class_id: str, thread_body: PostThreadRequestModel):
         
         result = db_client.thread_coll.insert_one(thread_to_insert)
         return str(result.inserted_id)
+    except InvalidId:
+        raise Exception.bad_request
+
+
+def query_thread(class_id: str, thread_id: str):
+    try:
+        filter_ = {"_id": ObjectId(thread_id), "class_id": ObjectId(class_id)}
+        thread = db_client.thread_coll.find_one(filter=filter_)
+        return thread
     except InvalidId:
         raise Exception.bad_request
 

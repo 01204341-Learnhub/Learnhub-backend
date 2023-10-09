@@ -141,6 +141,17 @@ class PostThreadResponseModel(BaseModel):
     thread_id: str
 
 
+class AttachmentModelBody(BaseModel):
+    attachment_type: str
+    src: str
+class GetThreadResponseModel(BaseModel):
+    name: str
+    teacher: TeacherModelBody
+    last_edit: int
+    text: str
+    attachments: list[AttachmentModelBody]
+
+
 # ASSIGNMENTS
 class AttachmentPatchModelBody(BaseModel):
     op: str  # add | delete
