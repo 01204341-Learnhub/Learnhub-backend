@@ -50,6 +50,7 @@ def list_assignment_response(class_id: str) -> ListClassAssignmentsResponseModel
                 last_edit=int(datetime.timestamp(assg_["last_edit"])),
                 due_date=int(datetime.timestamp(assg_["due_date"])),
                 status=assg_["status"],
+                max_score=assg_["max_score"],
                 text=assg_["text"],
             )
         )
@@ -69,6 +70,7 @@ def get_assignment_response(
         last_edit=int(datetime.timestamp(assignment["last_edit"])),
         due_date=int(datetime.timestamp(assignment["due_date"])),
         status=assignment["status"],
+        max_score=assignment["max_score"],
         text=assignment["text"],
         attachments=ta.validate_python(assignment["attachments"]),
     )

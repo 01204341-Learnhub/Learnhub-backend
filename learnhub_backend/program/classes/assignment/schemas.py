@@ -31,6 +31,7 @@ class ListClassAssignmentsModelBody(BaseModel):
     last_edit: int
     due_date: int
     status: str
+    max_score: float
     text: str
 
 
@@ -44,6 +45,7 @@ class GetClassAssignmentResponseModel(BaseModel):
     last_edit: int
     due_date: int
     status: str
+    max_score: float
     text: str
     attachments: list[AttachmentModelBody]
 
@@ -53,6 +55,7 @@ class PostClassAssignmentRequestModel(BaseModel):
     group_name: str
     due_date: int
     text: str
+    max_score: float
     attachments: list[AttachmentModelBody]
 
 

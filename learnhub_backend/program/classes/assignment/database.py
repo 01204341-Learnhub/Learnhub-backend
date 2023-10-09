@@ -66,7 +66,7 @@ def create_assignment(class_id: str, request: PostClassAssignmentRequestModel) -
             "name": request.name,
             "created_date": datetime.now(tz=timezone(timedelta(hours=7))),
             "group_name": request.group_name,
-            "max_score": 100,
+            "max_score": request.max_score,
             "text": request.text,
             "attachments": [
                 {"attachment_type": at_.attachment_type, "src": at_.src}
