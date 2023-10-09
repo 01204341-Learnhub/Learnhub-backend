@@ -5,7 +5,7 @@ from ..database import db_client
 from bson.objectid import ObjectId
 from bson.errors import InvalidId
 
-from ....dependencies import Exception, CheckHttpFileType
+from ....dependencies import Exception, CheckHttpFileType, student_type
 
 from .schemas import (
     PatchAssignmentRequestModel,
@@ -14,8 +14,8 @@ from .schemas import (
 )
 
 from .config import (
-    assignment_status,
-    submission_status,
+    AssignmentStatus,
+    SubmissionStatus,
 )
 
 
@@ -40,7 +40,6 @@ def query_single_assignment(class_id: str, assignment_id: str) -> dict | None:
 
 def create_assignment(class_id: str, request: PostClassAssignmentRequestModel) -> str:
     try:
-        # TODO: create student's submission
         body = {
             "class_id": ObjectId(class_id),
             "name": request.name,
@@ -53,15 +52,41 @@ def create_assignment(class_id: str, request: PostClassAssignmentRequestModel) -
                 for at_ in request.attachments
             ],
             "last_edit": datetime.now(tz=timezone(timedelta(hours=7))),
-            "status": assignment_status.open,
+            "status": AssignmentStatus.open,
             "due_date": datetime.fromtimestamp(request.due_date),
         }
         response = db_client.assignment_coll.insert_one(body)
         if response.inserted_id == None:
             raise Exception.internal_server_error
+
+        _create_class_students_submission(class_id, str(response.inserted_id))
         return str(response.inserted_id)
     except InvalidId:
         raise Exception.bad_request
+
+
+def _create_class_students_submission(class_id: str, assignment_id: str):
+    # Create all class's student submissions
+    body_template = {
+        "assignment_id": ObjectId(assignment_id),
+        "class_id": ObjectId(class_id),
+        "status": SubmissionStatus.unsubmit,
+        "score": 0,
+        "attachments": [],
+    }
+    bodies = []
+
+    student_filter = {
+        "type": student_type,
+        "owned_programs.program_id": ObjectId(class_id),
+        "owned_programs.type": "class",
+    }
+    students_cur = db_client.user_coll.find(student_filter)
+    for stu_ in students_cur:
+        body = body_template
+        body["student_id"] = ObjectId(stu_["_id"])
+        bodies.append(body)
+    _ = db_client.assignment_submission_coll.insert_many(bodies)
 
 
 def edit_assignment(
@@ -163,7 +188,7 @@ def update_submission(
         set_content["student_id"] = ObjectId(request.student_id)
         set_content["assignment_id"] = ObjectId(assignment_id)
         set_content["class_id"] = ObjectId(class_id)
-        set_content["status"] = submission_status.uncheck
+        set_content["status"] = SubmissionStatus.uncheck
         set_content["score"] = 0
         set_content["attachments"] = [
             {"attachment_type": at_.attachment_type, "src": at_.src}

@@ -1,9 +1,9 @@
-class submission_status:
+class SubmissionStatus:
     check = "check"
     uncheck = "uncheck"
     unsubmit = "unsubmit"
 
 
-class assignment_status:
+class AssignmentStatus:
     open = "open"
     closed = "closed"
