@@ -118,7 +118,7 @@ def _update_course_progress_on_purchase(student_id: str, course_ids: list[Object
         lessons_cur = db_client.lesson_coll.find(lessons_filter)
         for lesson in lessons_cur:
             if lesson["lesson_type"] == "quiz":
-                _create_student_quiz_result(student_id, str(lesson["quiz_id"]))
+                _create_student_quiz_result(student_id, str(lesson["src"]))
             progress["lessons"].append(
                 {
                     "lesson_id": lesson["_id"],
