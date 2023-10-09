@@ -14,6 +14,7 @@ from .config import (
     DB_ASSIGNMENT_COLLECTION,
     DB_QUIZ_COLLECTION,
     DB_QUIZ_RESULT_COLLECTION,
+    DB_THREAD_COLLECTION,
 )
 
 
@@ -40,6 +41,7 @@ class DB_client(MongoClient):
 
         self.quiz_coll = self.db[DB_QUIZ_COLLECTION]
         self.quiz_result_coll = self.db[DB_QUIZ_RESULT_COLLECTION]
+        self.thread_coll = self.db[DB_THREAD_COLLECTION]
 
 
 db_client = DB_client(MONGODB_URI)

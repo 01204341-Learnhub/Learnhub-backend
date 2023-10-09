@@ -115,6 +115,9 @@ class PatchClassRequestModel(BaseModel):
     class_ended_date: int | None = None
 
 
+#THREADS
+
+
 # ASSIGNMENTS
 class AttachmentPatchModelBody(BaseModel):
     op: str  # add | delete

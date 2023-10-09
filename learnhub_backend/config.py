@@ -31,3 +31,4 @@ DB_QUIZ_COLLECTION = config("DB_QUIZ_COLLECTION", default="quizzes")
 DB_QUIZ_RESULT_COLLECTION = config(
     "DB_QUIZ_RESULT_COLLECTION", default="quizzes_result"
 )
+DB_THREAD_COLLECTION = config("DB_THREAD_COLLECTION", default="threads")
