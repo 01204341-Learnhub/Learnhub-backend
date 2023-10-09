@@ -1,3 +1,4 @@
+from pymongo.cursor import Cursor
 from pymongo.results import UpdateResult
 from datetime import datetime, timedelta, timezone
 from ..database import db_client
@@ -12,6 +13,12 @@ from .schemas import (
 
 
 # ASSIGNMENTS
+def query_assignments_by_class_id(class_id: str) -> Cursor:
+    filter = {"class_id": ObjectId(class_id)}
+    assignments_cur = db_client.assignment_coll.find(filter)
+    return assignments_cur
+
+
 def edit_assignment(
     class_id: str, assignment_id: str, patch_body_: PatchAssignmentRequestModel
 ):

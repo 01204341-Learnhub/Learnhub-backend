@@ -5,6 +5,20 @@ from bson import ObjectId
 
 
 # ASSIGNMENTS
+class ListClassAssignmentsModelBody(BaseModel):
+    assignment_id: str
+    name: str
+    group_name: str
+    last_edit: int
+    due_date: int
+    status: str
+    text: str
+
+
+class ListClassAssignmentsResponseModel(BaseModel):
+    assignments: list[ListClassAssignmentsModelBody]
+
+
 class AttachmentPatchModelBody(BaseModel):
     op: str  # add | delete
     src: str

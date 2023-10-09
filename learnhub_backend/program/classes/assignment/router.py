@@ -8,10 +8,12 @@ from ....dependencies import (
 )
 
 from .schemas import (
+    ListClassAssignmentsResponseModel,
     PatchAssignmentRequestModel,
 )
 
 from .services import (
+    list_assignment_response,
     patch_assignment_request,
 )
 
@@ -29,6 +31,17 @@ common_page_params = Annotated[dict, Depends(router.dependencies[0].dependency)]
 
 
 # ASSIGNMENTS
+@router.get(
+    "/{class_id}/assignments",
+    status_code=200,
+    response_model_exclude_none=True,
+    response_model=ListClassAssignmentsResponseModel,
+)
+def list_assignment(class_id: str):
+    response_body = list_assignment_response(class_id)
+    return response_body
+
+
 @router.patch(
     "/{class_id}/assignments/{assignment_id}",
     status_code=200,
