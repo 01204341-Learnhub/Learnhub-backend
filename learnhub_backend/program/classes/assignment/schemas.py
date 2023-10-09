@@ -70,3 +70,7 @@ class PutAssigmentSubmitRequestModel(BaseModel):
 
 class PutAssigmentSubmitResponseModel(BaseModel):
     submission_id: str
+
+
+class PatchAssignmentUnsubmitRequestModel(BaseModel):
+    student_id: str

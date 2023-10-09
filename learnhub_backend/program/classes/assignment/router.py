@@ -11,6 +11,7 @@ from .schemas import (
     GetClassAssignmentResponseModel,
     ListClassAssignmentsResponseModel,
     PatchAssignmentRequestModel,
+    PatchAssignmentUnsubmitRequestModel,
     PostClassAssignmentRequestModel,
     PostClassAssignmentResponseModel,
     PutAssigmentSubmitRequestModel,
@@ -21,8 +22,9 @@ from .services import (
     get_assignment_response,
     list_assignment_response,
     patch_assignment_request,
+    patch_assignment_unsubmit_request,
     post_assignment_request,
-    put_assignment_submission_request,
+    put_assignment_submit_request,
 )
 
 router = APIRouter(
@@ -100,7 +102,20 @@ def patch_assignment(
 def put_assignment_submit(
     class_id: str, assignment_id: str, request_body: PutAssigmentSubmitRequestModel
 ):
-    response_body = put_assignment_submission_request(
+    response_body = put_assignment_submit_request(class_id, assignment_id, request_body)
+    return response_body
+
+
+@router.patch(
+    "/{class_id}/assignments/{assignment_id}/unsubmit",
+    status_code=200,
+    response_model_exclude_none=True,
+    response_model=GenericOKResponse,
+)
+def patch_assignment_unsubmit(
+    class_id: str, assignment_id: str, request_body: PatchAssignmentUnsubmitRequestModel
+):
+    response_body = patch_assignment_unsubmit_request(
         class_id, assignment_id, request_body
     )
     return response_body

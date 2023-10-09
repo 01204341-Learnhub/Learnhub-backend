@@ -9,6 +9,7 @@ from ....dependencies import Exception, CheckHttpFileType, student_type
 
 from .schemas import (
     PatchAssignmentRequestModel,
+    PatchAssignmentUnsubmitRequestModel,
     PostClassAssignmentRequestModel,
     PutAssigmentSubmitRequestModel,
 )
@@ -203,5 +204,26 @@ def update_submission(
 
         return str(result["_id"])
 
+    except InvalidId:
+        raise Exception.bad_request
+
+
+def unsubmit_submission(
+    class_id: str, assignment_id: str, request: PatchAssignmentUnsubmitRequestModel
+):
+    try:
+        filter = {
+            "student_id": ObjectId(request.student_id),
+            "assignment_id": ObjectId(assignment_id),
+            "class_id": ObjectId(class_id),
+        }
+        set_content = dict()
+        set_content["status"] = SubmissionStatus.unsubmit
+
+        result = db_client.assignment_submission_coll.update_one(
+            filter, {"$set": set_content}
+        )
+        if result.matched_count == 0:
+            raise Exception.not_found
     except InvalidId:
         raise Exception.bad_request
