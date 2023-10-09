@@ -40,6 +40,18 @@ class GetClassAssignmentResponseModel(BaseModel):
     attachments: list[AttachmentModelBody]
 
 
+class PostClassAssignmentRequestModel(BaseModel):
+    name: str
+    group_name: str
+    due_date: int
+    text: str
+    attachments: list[AttachmentModelBody]
+
+
+class PostClassAssignmentResponseModel(BaseModel):
+    assignment_id: str
+
+
 class PatchAssignmentRequestModel(BaseModel):
     name: str | None = None
     group_name: str | None = None

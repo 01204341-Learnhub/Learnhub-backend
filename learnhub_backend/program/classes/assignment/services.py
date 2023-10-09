@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone, timedelta
 from typing import Annotated, Union
 from pydantic import TypeAdapter
 from pymongo.results import UpdateResult
@@ -11,12 +11,15 @@ from .schemas import (
     ListClassAssignmentsModelBody,
     ListClassAssignmentsResponseModel,
     PatchAssignmentRequestModel,
+    PostClassAssignmentRequestModel,
+    PostClassAssignmentResponseModel,
 )
 
 from .database import (
+    create_assignment,
     query_assignments_by_class_id,
-    edit_assignment,
     query_single_assignment,
+    edit_assignment,
 )
 
 
@@ -57,6 +60,16 @@ def get_assignment_response(
         attachments=ta.validate_python(assignment["attachments"]),
     )
     return response_body
+
+
+def post_assignment_request(
+    class_id: str, request: PostClassAssignmentRequestModel
+) -> PostClassAssignmentResponseModel:
+    inserted_id = create_assignment(class_id, request)
+    if request.due_date <= datetime.now(tz=timezone(timedelta(hours=7))).timestamp():
+        err = Exception.unprocessable_content
+        err.__setattr__("detail", "required due_date to be later that present")
+    return PostClassAssignmentResponseModel(assignment_id=inserted_id)
 
 
 def patch_assignment_request(

@@ -11,12 +11,15 @@ from .schemas import (
     GetClassAssignmentResponseModel,
     ListClassAssignmentsResponseModel,
     PatchAssignmentRequestModel,
+    PostClassAssignmentRequestModel,
+    PostClassAssignmentResponseModel,
 )
 
 from .services import (
     get_assignment_response,
     list_assignment_response,
     patch_assignment_request,
+    post_assignment_request,
 )
 
 router = APIRouter(
@@ -41,6 +44,17 @@ common_page_params = Annotated[dict, Depends(router.dependencies[0].dependency)]
 )
 def list_assignment(class_id: str):
     response_body = list_assignment_response(class_id)
+    return response_body
+
+
+@router.post(
+    "/{class_id}/assignments",
+    status_code=200,
+    response_model_exclude_none=True,
+    response_model=PostClassAssignmentResponseModel,
+)
+def post_assignment(class_id: str, request_body: PostClassAssignmentRequestModel):
+    response_body = post_assignment_request(class_id, request_body)
     return response_body
 
 

@@ -9,6 +9,7 @@ from ....dependencies import Exception, CheckHttpFileType
 
 from .schemas import (
     PatchAssignmentRequestModel,
+    PostClassAssignmentRequestModel,
 )
 
 
@@ -23,6 +24,28 @@ def query_single_assignment(class_id: str, assignment_id: str) -> dict | None:
     filter = {"_id": ObjectId(assignment_id), "class_id": ObjectId(class_id)}
     assignment = db_client.assignment_coll.find_one(filter)
     return assignment
+
+
+def create_assignment(class_id: str, request: PostClassAssignmentRequestModel) -> str:
+    body = {
+        "class_id": ObjectId(class_id),
+        "name": request.name,
+        "created_date": datetime.now(tz=timezone(timedelta(hours=7))),
+        "group_name": request.group_name,
+        "max_score": 100,
+        "text": request.text,
+        "attachments": [
+            {"attachment_type": at_.attachment_type, "src": at_.src}
+            for at_ in request.attachments
+        ],
+        "last_edit": datetime.now(tz=timezone(timedelta(hours=7))),
+        "status": "open",
+        "due_date": datetime.fromtimestamp(request.due_date),
+    }
+    response = db_client.assignment_coll.insert_one(body)
+    if response.inserted_id == None:
+        raise Exception.internal_server_error
+    return str(response.inserted_id)
 
 
 def edit_assignment(
