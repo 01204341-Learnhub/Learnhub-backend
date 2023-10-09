@@ -10,13 +10,34 @@ from ....dependencies import Exception, CheckHttpFileType, student_type
 from .schemas import (
     PatchAssignmentRequestModel,
     PostClassAssignmentRequestModel,
-    PutAssigmentSubmitRequestModel,
+    PutAssignmentSubmitRequestModel,
 )
 
 from .config import (
     AssignmentStatus,
     SubmissionStatus,
 )
+
+
+# STUDENT
+def query_student_profile(student_id: str) -> dict:
+    try:
+        filter = {"_id": ObjectId(student_id), "type": student_type}
+        student = db_client.user_coll.find_one(filter)
+        if student == None:
+            raise Exception.not_found
+        student_res = {
+            "student_id": student_id,
+            "student_name": student["fullname"],
+        }
+        if "profile_pic" not in student:
+            student_res["profile_pic"] = None
+        else:
+            student_res["profile_pic"] = student["profile_pic"]
+
+        return student_res
+    except InvalidId:
+        raise Exception.bad_request
 
 
 # ASSIGNMENTS
@@ -175,11 +196,21 @@ def edit_assignment(
 
 
 # SUBMISSION
+def query_list_submission_by_assignment_id(class_id: str, assignment_id: str) -> Cursor:
+    filter = {
+        "class_id": ObjectId(class_id),
+        "assignment_id": ObjectId(assignment_id),
+    }
+
+    subs_cur = db_client.assignment_submission_coll.find(filter)
+    return subs_cur
+
+
 def update_submission(
     class_id: str,
     assignment_id: str,
     student_id: str,
-    request: PutAssigmentSubmitRequestModel,
+    request: PutAssignmentSubmitRequestModel,
 ) -> str:
     try:
         filter = {
@@ -195,6 +226,7 @@ def update_submission(
         if submission["status"] != SubmissionStatus.unsubmit:
             err = Exception.unprocessable_content
             err.__setattr__("detail", "Required submission unsubmit")
+            raise err
 
         set_content = dict()
         set_content["student_id"] = ObjectId(student_id)

@@ -4,6 +4,13 @@ from datetime import datetime
 from bson import ObjectId
 
 
+# STUDENT
+class StudentModelBody(BaseModel):
+    student_id: str
+    student_name: str
+    profile_pic: str | None = None
+
+
 # ATTACHMENT
 class AttachmentModelBody(BaseModel):
     attachment_type: str
@@ -63,9 +70,19 @@ class PatchAssignmentRequestModel(BaseModel):
 
 
 # SUBMISSION
-class PutAssigmentSubmitRequestModel(BaseModel):
+class ListAssignmentSubmissionModelBody(BaseModel):
+    status: str  # check | uncheck | unsubmit
+    score: float
+    student: StudentModelBody
+
+
+class ListAssignmentSubmissionResponseModel(BaseModel):
+    submissions: list[ListAssignmentSubmissionModelBody]
+
+
+class PutAssignmentSubmitRequestModel(BaseModel):
     attachments: list[AttachmentModelBody]
 
 
-class PutAssigmentSubmitResponseModel(BaseModel):
+class PutAssignmentSubmitResponseModel(BaseModel):
     student_id: str

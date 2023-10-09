@@ -9,17 +9,19 @@ from ....dependencies import (
 
 from .schemas import (
     GetClassAssignmentResponseModel,
+    ListAssignmentSubmissionResponseModel,
     ListClassAssignmentsResponseModel,
     PatchAssignmentRequestModel,
     PostClassAssignmentRequestModel,
     PostClassAssignmentResponseModel,
-    PutAssigmentSubmitRequestModel,
-    PutAssigmentSubmitResponseModel,
+    PutAssignmentSubmitRequestModel,
+    PutAssignmentSubmitResponseModel,
 )
 
 from .services import (
     get_assignment_response,
     list_assignment_response,
+    list_assignment_submissions_response,
     patch_assignment_request,
     patch_assignment_unsubmit_request,
     post_assignment_request,
@@ -92,17 +94,28 @@ def patch_assignment(
 
 
 # SUBMISSION
+@router.get(
+    "/{class_id}/assignments/{assignment_id}/submissions",
+    status_code=200,
+    response_model_exclude_none=True,
+    response_model=ListAssignmentSubmissionResponseModel,
+)
+def list_assignment_submissions(class_id: str, assignment_id: str):
+    response_body = list_assignment_submissions_response(class_id, assignment_id)
+    return response_body
+
+
 @router.put(
     "/{class_id}/assignments/{assignment_id}/submissions/{student_id}/submit",
     status_code=200,
     response_model_exclude_none=True,
-    response_model=PutAssigmentSubmitResponseModel,
+    response_model=PutAssignmentSubmitResponseModel,
 )
 def put_assignment_submit(
     class_id: str,
     assignment_id: str,
     student_id: str,
-    request_body: PutAssigmentSubmitRequestModel,
+    request_body: PutAssignmentSubmitRequestModel,
 ):
     response_body = put_assignment_submit_request(
         class_id, assignment_id, student_id, request_body

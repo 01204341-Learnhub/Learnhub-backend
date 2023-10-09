@@ -8,20 +8,25 @@ from ....dependencies import GenericOKResponse, Exception, CheckHttpFileType
 from .schemas import (
     AttachmentModelBody,
     GetClassAssignmentResponseModel,
+    ListAssignmentSubmissionModelBody,
+    ListAssignmentSubmissionResponseModel,
     ListClassAssignmentsModelBody,
     ListClassAssignmentsResponseModel,
     PatchAssignmentRequestModel,
     PostClassAssignmentRequestModel,
     PostClassAssignmentResponseModel,
-    PutAssigmentSubmitRequestModel,
-    PutAssigmentSubmitResponseModel,
+    PutAssignmentSubmitRequestModel,
+    PutAssignmentSubmitResponseModel,
+    StudentModelBody,
 )
 
 from .database import (
     create_assignment,
     query_assignments_by_class_id,
+    query_list_submission_by_assignment_id,
     query_single_assignment,
     edit_assignment,
+    query_student_profile,
     unsubmit_submission,
     update_submission,
 )
@@ -86,14 +91,34 @@ def patch_assignment_request(
 
 
 # SUBMISSION
+def list_assignment_submissions_response(
+    class_id: str, assignment_id: str
+) -> ListAssignmentSubmissionResponseModel:
+    submissions_cur = query_list_submission_by_assignment_id(class_id, assignment_id)
+    # assign
+    submissions = []
+    for sub_ in submissions_cur:
+        student = query_student_profile(str(sub_["student_id"]))
+
+        submissions.append(
+            ListAssignmentSubmissionModelBody(
+                status=sub_["status"],
+                score=sub_["score"],
+                student=StudentModelBody(**student),
+            )
+        )
+
+    return ListAssignmentSubmissionResponseModel(submissions=submissions)
+
+
 def put_assignment_submit_request(
     class_id: str,
     assignment_id: str,
     student_id: str,
-    request: PutAssigmentSubmitRequestModel,
-) -> PutAssigmentSubmitResponseModel:
+    request: PutAssignmentSubmitRequestModel,
+) -> PutAssignmentSubmitResponseModel:
     student_id = update_submission(class_id, assignment_id, student_id, request)
-    return PutAssigmentSubmitResponseModel(student_id=student_id)
+    return PutAssignmentSubmitResponseModel(student_id=student_id)
 
 
 def patch_assignment_unsubmit_request(
