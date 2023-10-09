@@ -34,8 +34,11 @@ def query_teacher_profile(teacher_id: str) -> dict:
     teacher_res = {
         "teacher_id": teacher_id,
         "teacher_name": teacher["fullname"],
-        "profile_pic": teacher["profile_pic"],
     }
+    if "profile_pic" not in teacher:
+        teacher_res["profile_pic"] = None
+    else:
+        teacher_res["profile_pic"] = teacher["profile_pic"]
     return teacher_res
 
 

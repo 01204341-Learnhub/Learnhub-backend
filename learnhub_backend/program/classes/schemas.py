@@ -137,6 +137,7 @@ class PostThreadRequestModel(BaseModel):
     text: str
     attachments: list[PostThreadAttachmentModelBody]
 
+
 class PostThreadResponseModel(BaseModel):
     thread_id: str
 
@@ -144,25 +145,11 @@ class PostThreadResponseModel(BaseModel):
 class AttachmentModelBody(BaseModel):
     attachment_type: str
     src: str
+
+
 class GetThreadResponseModel(BaseModel):
     name: str
     teacher: TeacherModelBody
     last_edit: int
     text: str
     attachments: list[AttachmentModelBody]
-
-
-# ASSIGNMENTS
-class AttachmentPatchModelBody(BaseModel):
-    op: str  # add | delete
-    src: str
-
-
-class PatchAssignmentRequestModel(BaseModel):
-    name: str | None = None
-    group_name: str | None = None
-    due_time: int | None = None
-    status: str | None = None
-    text: str | None = None
-    max_score: int | None = None
-    attachments: list[AttachmentPatchModelBody] | None = None

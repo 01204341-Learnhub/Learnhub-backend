@@ -12,16 +12,14 @@ from .database import (
     get_teacher_by_id,
     query_list_tags_by_id,
     query_class,
-    edit_assignment,
     query_list_threads,
     create_thread,
-    query_thread
+    query_thread,
 )
 from .schemas import (
     ListClassesModelBody,
     ListClassesResponseModel,
     GetClassResponseModel,
-    PatchAssignmentRequestModel,
     PatchClassRequestModel,
     PostClassRequestModel,
     PostClassResponseModel,
@@ -114,16 +112,3 @@ def get_thread_response(class_id: str, thread_id: str):
     quried_thread["teacher"] = get_teacher_by_id(str(quried_thread["teacher_id"]))
     quried_thread["last_edit"] = int(datetime.timestamp(quried_thread["last_edit"]))
     return GetThreadResponseModel(**quried_thread)
-
-
-
-
-
-# ASSIGNMENTS
-def patch_assignment_request(
-    class_id: str, assignment_id: str, patch_body: PatchAssignmentRequestModel
-):
-    response = edit_assignment(
-        class_id=class_id, assignment_id=assignment_id, patch_body_=patch_body
-    )
-    return GenericOKResponse

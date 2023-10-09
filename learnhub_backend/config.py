@@ -27,6 +27,9 @@ DB_TRANSACTION_COLLECTION = config("DB_TRANSACTION_COLLECTION", default="transac
 
 DB_USER_COLLECTION = config("DB_USER_COLLECTION", default="users")
 DB_ASSIGNMENT_COLLECTION = config("DB_ASSIGNMENT_COLLECTION", default="assignments")
+DB_ASSIGNMENT_SUBMISSIONS_COLLECTION = config(
+    "DB_ASSIGNMENT_SUBMISSIONS_COLLECTION", default="assignment_submissions"
+)
 DB_QUIZ_COLLECTION = config("DB_QUIZ_COLLECTION", default="quizzes")
 DB_QUIZ_RESULT_COLLECTION = config(
     "DB_QUIZ_RESULT_COLLECTION", default="quizzes_result"

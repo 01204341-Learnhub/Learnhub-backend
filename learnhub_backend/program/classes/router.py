@@ -9,7 +9,6 @@ from ...dependencies import (
 from .services import (
     list_classes_response,
     get_class_response,
-    patch_assignment_request,
     patch_class_request,
     post_class_request,
     list_threads_response,
@@ -20,7 +19,6 @@ from .services import (
 from .schemas import (
     ListClassesResponseModel,
     GetClassResponseModel,
-    PatchAssignmentRequestModel,
     PatchClassRequestModel,
     PostClassRequestModel,
     PostClassResponseModel,
@@ -126,20 +124,4 @@ def post_thread(class_id: str, thread_body: PostThreadRequestModel):
 )
 def get_thread(class_id: str, thread_id: str):
     response_body = get_thread_response(class_id=class_id, thread_id=thread_id)
-    return response_body
-
-
-# ASSIGNMENTS
-@router.patch(
-    "/{class_id}/assignments/{assignment_id}",
-    status_code=200,
-    response_model_exclude_none=True,
-    response_model=GenericOKResponse,
-)
-def patch_assignment(
-    class_id: str, assignment_id: str, patch_body: PatchAssignmentRequestModel
-):
-    response_body = patch_assignment_request(
-        class_id=class_id, assignment_id=assignment_id, patch_body=patch_body
-    )
     return response_body
