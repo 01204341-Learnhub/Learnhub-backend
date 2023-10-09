@@ -261,6 +261,7 @@ def edit_assignment(
     try:
         patch_body = patch_body_.model_dump()  # info to update
         filter = {"_id": ObjectId(assignment_id), "class_id": ObjectId(class_id)}
+        print(filter)
 
         # prepare update body
         update_body_add = {"$push": {"attachments": {"$each": []}}}
@@ -337,7 +338,6 @@ def edit_assignment(
                     raise Exception.unprocessable_content
 
         # update each operation
-        # TODO: change to assignment_coll
         result = db_client.assignment_coll.update_one(
             filter=filter, update=update_body_add
         )

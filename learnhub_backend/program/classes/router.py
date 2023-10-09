@@ -86,15 +86,16 @@ def patch_class(class_id: str, request_body: PatchClassRequestModel):
 
 # ASSIGNMENTS
 @router.patch(
-    "/{class_id}/assignments/{assignment_id}}",
+    "/{class_id}/assignments/{assignment_id}",
     status_code=200,
     response_model_exclude_none=True,
-    response_model=None,
+    response_model=GenericOKResponse,
 )
 def patch_assignment(
     class_id: str, assignment_id: str, patch_body: PatchAssignmentRequestModel
 ):
     # TODO: check if this works
+ 
     response_body = patch_assignment_request(
         class_id=class_id, assignment_id=assignment_id, patch_body=patch_body
     )

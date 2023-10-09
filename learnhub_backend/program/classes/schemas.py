@@ -126,7 +126,9 @@ class AttachmentPatchModelBody(BaseModel):
 
 class PatchAssignmentRequestModel(BaseModel):
     name: str | None = None
-    due_date: int | None = None
+    group_name: str | None = None
+    due_time: int | None = None
     status: str | None = None
     text: str | None = None
+    max_score: int | None = None
     attachments: list[AttachmentPatchModelBody] | None = None

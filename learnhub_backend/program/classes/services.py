@@ -60,6 +60,7 @@ def get_class_response(class_id: str) -> GetClassResponseModel:
     )
     class_["open_date"] = int(datetime.timestamp(class_["open_date"]))
     class_["class_ended_date"] = int(datetime.timestamp(class_["class_ended_date"]))
+    #TODO: add schedules
 
     return GetClassResponseModel(**class_)
 
