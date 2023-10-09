@@ -11,7 +11,6 @@ from .schemas import (
     ListClassAssignmentsModelBody,
     ListClassAssignmentsResponseModel,
     PatchAssignmentRequestModel,
-    PatchAssignmentUnsubmitRequestModel,
     PostClassAssignmentRequestModel,
     PostClassAssignmentResponseModel,
     PutAssigmentSubmitRequestModel,
@@ -88,14 +87,17 @@ def patch_assignment_request(
 
 # SUBMISSION
 def put_assignment_submit_request(
-    class_id: str, assignment_id: str, request: PutAssigmentSubmitRequestModel
+    class_id: str,
+    assignment_id: str,
+    student_id: str,
+    request: PutAssigmentSubmitRequestModel,
 ) -> PutAssigmentSubmitResponseModel:
-    submission_id = update_submission(class_id, assignment_id, request)
-    return PutAssigmentSubmitResponseModel(submission_id=submission_id)
+    student_id = update_submission(class_id, assignment_id, student_id, request)
+    return PutAssigmentSubmitResponseModel(student_id=student_id)
 
 
 def patch_assignment_unsubmit_request(
-    class_id: str, assignment_id: str, request: PatchAssignmentUnsubmitRequestModel
+    class_id: str, assignment_id: str, student_id: str
 ):
-    unsubmit_submission(class_id, assignment_id, request)
+    unsubmit_submission(class_id, assignment_id, student_id)
     return GenericOKResponse

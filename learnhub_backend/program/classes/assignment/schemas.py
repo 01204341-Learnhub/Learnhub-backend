@@ -64,13 +64,8 @@ class PatchAssignmentRequestModel(BaseModel):
 
 # SUBMISSION
 class PutAssigmentSubmitRequestModel(BaseModel):
-    student_id: str
     attachments: list[AttachmentModelBody]
 
 
 class PutAssigmentSubmitResponseModel(BaseModel):
-    submission_id: str
-
-
-class PatchAssignmentUnsubmitRequestModel(BaseModel):
     student_id: str

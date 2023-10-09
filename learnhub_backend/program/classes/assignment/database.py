@@ -9,7 +9,6 @@ from ....dependencies import Exception, CheckHttpFileType, student_type
 
 from .schemas import (
     PatchAssignmentRequestModel,
-    PatchAssignmentUnsubmitRequestModel,
     PostClassAssignmentRequestModel,
     PutAssigmentSubmitRequestModel,
 )
@@ -177,16 +176,28 @@ def edit_assignment(
 
 # SUBMISSION
 def update_submission(
-    class_id: str, assignment_id: str, request: PutAssigmentSubmitRequestModel
+    class_id: str,
+    assignment_id: str,
+    student_id: str,
+    request: PutAssigmentSubmitRequestModel,
 ) -> str:
     try:
         filter = {
-            "student_id": ObjectId(request.student_id),
+            "student_id": ObjectId(student_id),
             "assignment_id": ObjectId(assignment_id),
             "class_id": ObjectId(class_id),
         }
+
+        # check assignment status first
+        submission = db_client.assignment_submission_coll.find_one(filter)
+        if submission == None:
+            raise Exception.not_found
+        if submission["status"] != SubmissionStatus.unsubmit:
+            err = Exception.unprocessable_content
+            err.__setattr__("detail", "Required submission unsubmit")
+
         set_content = dict()
-        set_content["student_id"] = ObjectId(request.student_id)
+        set_content["student_id"] = ObjectId(student_id)
         set_content["assignment_id"] = ObjectId(assignment_id)
         set_content["class_id"] = ObjectId(class_id)
         set_content["status"] = SubmissionStatus.uncheck
@@ -202,18 +213,16 @@ def update_submission(
         if result == None:
             raise Exception.internal_server_error
 
-        return str(result["_id"])
+        return str(result["student_id"])
 
     except InvalidId:
         raise Exception.bad_request
 
 
-def unsubmit_submission(
-    class_id: str, assignment_id: str, request: PatchAssignmentUnsubmitRequestModel
-):
+def unsubmit_submission(class_id: str, assignment_id: str, student_id: str):
     try:
         filter = {
-            "student_id": ObjectId(request.student_id),
+            "student_id": ObjectId(student_id),
             "assignment_id": ObjectId(assignment_id),
             "class_id": ObjectId(class_id),
         }

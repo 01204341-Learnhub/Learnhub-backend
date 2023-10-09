@@ -11,7 +11,6 @@ from .schemas import (
     GetClassAssignmentResponseModel,
     ListClassAssignmentsResponseModel,
     PatchAssignmentRequestModel,
-    PatchAssignmentUnsubmitRequestModel,
     PostClassAssignmentRequestModel,
     PostClassAssignmentResponseModel,
     PutAssigmentSubmitRequestModel,
@@ -94,28 +93,31 @@ def patch_assignment(
 
 # SUBMISSION
 @router.put(
-    "/{class_id}/assignments/{assignment_id}/submit",
+    "/{class_id}/assignments/{assignment_id}/submissions/{student_id}/submit",
     status_code=200,
     response_model_exclude_none=True,
     response_model=PutAssigmentSubmitResponseModel,
 )
 def put_assignment_submit(
-    class_id: str, assignment_id: str, request_body: PutAssigmentSubmitRequestModel
+    class_id: str,
+    assignment_id: str,
+    student_id: str,
+    request_body: PutAssigmentSubmitRequestModel,
 ):
-    response_body = put_assignment_submit_request(class_id, assignment_id, request_body)
+    response_body = put_assignment_submit_request(
+        class_id, assignment_id, student_id, request_body
+    )
     return response_body
 
 
 @router.patch(
-    "/{class_id}/assignments/{assignment_id}/unsubmit",
+    "/{class_id}/assignments/{assignment_id}/submissions/{student_id}/unsubmit",
     status_code=200,
     response_model_exclude_none=True,
     response_model=GenericOKResponse,
 )
-def patch_assignment_unsubmit(
-    class_id: str, assignment_id: str, request_body: PatchAssignmentUnsubmitRequestModel
-):
+def patch_assignment_unsubmit(class_id: str, assignment_id: str, student_id: str):
     response_body = patch_assignment_unsubmit_request(
-        class_id, assignment_id, request_body
+        class_id, assignment_id, student_id
     )
     return response_body
