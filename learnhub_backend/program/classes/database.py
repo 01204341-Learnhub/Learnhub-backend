@@ -254,6 +254,15 @@ def edit_class(class_id: str, request: PatchClassRequestModel):
         raise Exception.bad_request
 
 
+#THREADS
+def query_list_threads(class_id: str, skip: int, limit: int):
+    try:
+        filter_= {"class_id": ObjectId(class_id)}
+        thread_cursor = db_client.thread_coll.find(filter=filter_, skip=skip, limit=limit)
+        return thread_cursor
+    except InvalidId:
+        raise Exception.bad_request
+
 # ASSIGNMENTS
 def edit_assignment(
     class_id: str, assignment_id: str, patch_body_: PatchAssignmentRequestModel

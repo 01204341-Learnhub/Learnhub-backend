@@ -13,6 +13,7 @@ from .database import (
     query_list_tags_by_id,
     query_class,
     edit_assignment,
+    query_list_threads,
 )
 from .schemas import (
     ListClassesModelBody,
@@ -22,6 +23,8 @@ from .schemas import (
     PatchClassRequestModel,
     PostClassRequestModel,
     PostClassResponseModel,
+    ListThreadModelBody,
+    ListThreadResponseModel,
 )
 
 from ...dependencies import Exception
@@ -77,6 +80,19 @@ def patch_class_request(class_id: str, request: PatchClassRequestModel):
     edit_class(class_id, request)
     return GenericOKResponse
 
+
+#THREADS
+def list_threads_response(class_id: str, skip: int, limit: int):
+    thread_cursor = query_list_threads(class_id=class_id, skip=skip, limit=limit)
+    threads = []
+    for thread in thread_cursor:
+        thread["thread_id"] = str(thread["_id"])
+        thread["teacher"] = get_teacher_by_id(str(thread["teacher_id"]))
+        thread["last_edit"] = int(datetime.timestamp(thread["last_edit"]))
+        threads.append(thread)
+    
+    ta = TypeAdapter(list[ListThreadModelBody])
+    return ListThreadResponseModel(threads=ta.validate_python(threads))
 
 # ASSIGNMENTS
 def patch_assignment_request(

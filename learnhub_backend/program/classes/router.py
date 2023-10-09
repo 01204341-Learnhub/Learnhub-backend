@@ -12,6 +12,7 @@ from .services import (
     patch_assignment_request,
     patch_class_request,
     post_class_request,
+    list_threads_response,
 )
 
 from .schemas import (
@@ -21,6 +22,7 @@ from .schemas import (
     PatchClassRequestModel,
     PostClassRequestModel,
     PostClassResponseModel,
+    ListThreadResponseModel,
 )
 
 router = APIRouter(
@@ -82,6 +84,23 @@ def get_class(class_id: str):
 def patch_class(class_id: str, request_body: PatchClassRequestModel):
     response_body = patch_class_request(class_id, request_body)
     return response_body
+
+
+#THREADS
+@router.get(
+    "/{class_id}/threads",
+    status_code=200,
+    response_model_exclude_none=True,
+    response_model=ListThreadResponseModel,
+)
+def list_threads(class_id: str ,common_paginations: common_page_params):
+    response_body = list_threads_response(
+        class_id=class_id,
+        skip=common_paginations["skip"],
+        limit=common_paginations["limit"],
+    )
+    return response_body
+
 
 
 # ASSIGNMENTS

@@ -116,6 +116,14 @@ class PatchClassRequestModel(BaseModel):
 
 
 #THREADS
+class ListThreadModelBody(BaseModel):
+    thread_id: str
+    name: str
+    teacher: TeacherModelBody
+    last_edit: int
+
+class ListThreadResponseModel(BaseModel):
+    threads: list[ListThreadModelBody]
 
 
 # ASSIGNMENTS
