@@ -17,11 +17,13 @@ from .database import (
     create_student_payment_method,
     edit_student,
     edit_student_payment_method,
+    query_assignment,
     query_class,
     query_course,
     query_list_students,
     query_multiple_classes,
     query_student,
+    query_student_assignment_submissions,
     query_student_basket,
     query_teacher_profile,
     remove_student,
@@ -34,10 +36,13 @@ from .database import (
 )
 
 from .schemas import (
+    ClassInfoModelBody,
     GetStudentBasketItemResponseModel,
     GetStudentCourseResponseModel,
     GetStudentPaymentMethodResponseModel,
     ListStudentBasketResponseModel,
+    ListStudentClassAssignmentsModelBody,
+    ListStudentClassAssignmentsResponseModel,
     ListStudentClassModelBody,
     ListStudentClassResponseModel,
     ListStudentCourseResponseModel,
@@ -57,6 +62,7 @@ from .schemas import (
     LessonProgressModelBody,
     GetStudentConfigResponseModel,
     PatchStudentConfigRequestModel,
+    SubmissionModelBody,
     TeacherModelBody,
     courseAnnouncementModelBody,
     courseChapterModelBody,
@@ -239,6 +245,32 @@ def list_student_classes_response(student_id: str) -> ListStudentClassResponseMo
 
     response = ListStudentClassResponseModel(classes=classes_response)
     return response
+
+
+def list_student_class_assignments_response(
+    student_id: str,
+) -> ListStudentClassAssignmentsResponseModel:
+    submissions_cur = query_student_assignment_submissions(student_id)
+    assignments_response = []
+    for subm_ in submissions_cur:
+        _cls = query_class(str(subm_["class_id"]))
+        _assign_ = query_assignment(str(subm_["assignment_id"]))
+        assignments_response.append(
+            ListStudentClassAssignmentsModelBody(
+                name=_assign_["name"],
+                group_name=_assign_["group_name"],
+                status=_assign_["status"],
+                class_info=ClassInfoModelBody(
+                    class_id=str(subm_["class_id"]),
+                    class_name=_cls["name"],
+                ),
+                submission=SubmissionModelBody(
+                    submission_status=subm_["status"],
+                    submission_date=int(datetime.timestamp(subm_["submission_date"])),
+                ),
+            )
+        )
+    return ListStudentClassAssignmentsResponseModel(assignments=assignments_response)
 
 
 # STUDENT CONFIG

@@ -1,4 +1,5 @@
 from logging import error
+from pymongo.cursor import Cursor
 from pymongo.results import DeleteResult, UpdateResult
 from pymongo import ReturnDocument
 from bson.objectid import ObjectId
@@ -248,6 +249,24 @@ def edit_student_course_progress(
     except InvalidId:
         raise Exception.bad_request
     return {"progress": (response["finished_count"] / total_lessons) * 100}
+
+
+# CLASS
+def query_assignment(assignment_id: str) -> dict:
+    filter = {"_id": ObjectId(assignment_id)}
+    assign = db_client.assignment_coll.find_one(filter)
+    if assign == None:
+        raise Exception.not_found
+    return assign
+
+
+def query_student_assignment_submissions(student_id: str) -> Cursor:
+    try:
+        filter = {"student_id": ObjectId(student_id)}
+        submissions_cur = db_client.assignment_submission_coll.find(filter)
+        return submissions_cur
+    except InvalidId:
+        raise Exception.bad_request
 
 
 # STUDENT CONFIG

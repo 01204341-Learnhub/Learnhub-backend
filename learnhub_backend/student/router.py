@@ -14,6 +14,7 @@ from .services import (
     get_student_course_response,
     get_student_payment_method_response,
     list_student_basket_response,
+    list_student_class_assignments_response,
     list_student_classes_response,
     list_student_courses_response,
     list_students_response,
@@ -37,6 +38,7 @@ from .schemas import (
     GetStudentPaymentMethodResponseModel,
     GetStudentResponseModel,
     ListStudentBasketResponseModel,
+    ListStudentClassAssignmentsResponseModel,
     ListStudentClassResponseModel,
     ListStudentPaymentMethodsResponseModel,
     PatchStudentPaymentMethodRequestModel,
@@ -155,17 +157,6 @@ def get_student_course(student_id: str, course_id: str):
     return response_body
 
 
-@router.get(
-    "/{student_id}/classes",
-    status_code=200,
-    response_model_exclude_none=True,
-    response_model=ListStudentClassResponseModel,
-)
-def list_students_classes(student_id: str):
-    response_body = list_student_classes_response(student_id)
-    return response_body
-
-
 # STUDENT COURSE PROGRESS
 @router.get(
     "/{student_id}/course_progress/{course_id}",
@@ -192,6 +183,29 @@ def patch_student_course_progress(
     response_body = patch_student_course_progress_request(
         student_id=student_id, course_id=course_id, requested_lesson=request_body
     )
+    return response_body
+
+
+# STUDENT CLASS
+@router.get(
+    "/{student_id}/classes",
+    status_code=200,
+    response_model_exclude_none=True,
+    response_model=ListStudentClassResponseModel,
+)
+def list_students_classes(student_id: str):
+    response_body = list_student_classes_response(student_id)
+    return response_body
+
+
+@router.get(
+    "/{student_id}/class_assignments",
+    status_code=200,
+    response_model_exclude_none=True,
+    response_model=ListStudentClassAssignmentsResponseModel,
+)
+def list_student_classes_assignments(student_id: str):
+    response_body = list_student_class_assignments_response(student_id)
     return response_body
 
 
