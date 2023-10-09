@@ -11,7 +11,8 @@ class AttachmentModelBody(BaseModel):
 
 
 class AttachmentPatchModelBody(BaseModel):
-    op: str  # add | delete
+    op: str  # add | remove
+    attachment_type: str
     src: str
 
 
@@ -54,9 +55,8 @@ class PostClassAssignmentResponseModel(BaseModel):
 
 class PatchAssignmentRequestModel(BaseModel):
     name: str | None = None
+    due_date: int | None = None
+    status: str | None = None  # open | closed
     group_name: str | None = None
-    due_time: int | None = None
-    status: str | None = None
     text: str | None = None
-    max_score: int | None = None
     attachments: list[AttachmentPatchModelBody] | None = None

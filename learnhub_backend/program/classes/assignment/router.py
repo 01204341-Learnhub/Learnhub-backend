@@ -64,7 +64,7 @@ def post_assignment(class_id: str, request_body: PostClassAssignmentRequestModel
     response_model_exclude_none=True,
     response_model=GetClassAssignmentResponseModel,
 )
-def get_assignment(class_id: str, assignment_id):
+def get_assignment(class_id: str, assignment_id: str):
     response_body = get_assignment_response(class_id, assignment_id)
     return response_body
 

@@ -77,11 +77,11 @@ def edit_assignment(
             update_body_edit["$set"]["name"] = patch_body["name"]
         if patch_body["group_name"] is not None:
             update_body_edit["$set"]["group_name"] = patch_body["group_name"]
-        if patch_body["max_score"] is not None:
-            update_body_edit["$set"]["max_score"] = patch_body["max_score"]
-        if patch_body["due_time"] is not None:
-            update_body_edit["$set"]["due_time"] = datetime.fromtimestamp(
-                patch_body["due_time"]
+        # if patch_body["max_score"] is not None:
+        #     update_body_edit["$set"]["max_score"] = patch_body["max_score"]
+        if patch_body["due_date"] is not None:
+            update_body_edit["$set"]["due_date"] = datetime.fromtimestamp(
+                patch_body["due_date"]
             )
         if patch_body["status"] is not None:
             update_body_edit["$set"]["status"] = patch_body[
@@ -98,8 +98,8 @@ def edit_assignment(
                         # document to add to array
                         {
                             "src": str(patch_body["attachments"][i]["src"]),
-                            "attachment_type": CheckHttpFileType(
-                                str(patch_body["attachments"][i]["src"])
+                            "attachment_type": str(
+                                patch_body["attachments"][i]["attachment_type"]
                             ),
                         }
                     )
