@@ -9,18 +9,25 @@ from ..database import db_client
 from ..dependencies import (
     student_type,
     course_type,
+    class_type,
     Exception,
 )
 
 from .schemas import (
-    PostCoursePurchaseRequestModel,
+    PostPurchaseRequestModel,
 )
 
 
-# COURSE PURCHASE
-def purchase_course(request: PostCoursePurchaseRequestModel) -> str:
+class _program:
+    def __init__(self, program_id: str, type: str):
+        self.program_id = program_id
+        self.type = type
+
+
+# PURCHASE
+def purchase(request: PostPurchaseRequestModel) -> str:
     transaction_id = ""
-    course_ids: list[ObjectId] = []
+    programs: list[_program] = []
 
     # get student
 
@@ -45,22 +52,39 @@ def purchase_course(request: PostCoursePurchaseRequestModel) -> str:
 
     # for item in basket buy
     for _, basket_item in enumerate(basket):
-        # get course
-        course_filter = {"_id": ObjectId(basket_item["program_id"])}
-        course = db_client.course_coll.find_one(course_filter)
+        if basket_item["type"] == "course":
+            # get course
+            course_filter = {"_id": ObjectId(basket_item["program_id"])}
+            course = db_client.course_coll.find_one(course_filter)
+            if course == None:
+                e = Exception.not_found
+                e.__setattr__("detail", "Course not found")
+                raise e
+            update_purchase_list = {
+                "type": "course",
+                "price": course["price"],
+                "program_id": ObjectId(basket_item["program_id"]),
+            }
+            total_price += course["price"]
+        elif basket_item["type"] == "class":
+            # get class
+            class_filter = {"_id": ObjectId(basket_item["program_id"])}
+            class_ = db_client.class_coll.find_one(class_filter)
+            if class_ == None:
+                e = Exception.not_found
+                e.__setattr__("detail", "Class not found")
+                raise e
+            update_purchase_list = {
+                "type": "class",
+                "price": class_["price"],
+                "program_id": ObjectId(basket_item["program_id"]),
+            }
+            total_price += class_["price"]
+        else:
+            raise Exception.unprocessable_content
 
-        course_ids.append(basket_item["program_id"])
-        if course == None:
-            e = Exception.not_found
-            e.__setattr__("detail", "Course not found")
-            raise e
-        update_purchase_list = {
-            "type": "course",
-            "price": course["price"],
-            "program_id": ObjectId(basket_item["program_id"]),
-        }
+        programs.append(_program(basket_item["program_id"], basket_item["type"]))
         transaction_body["purchase_list"].append(update_purchase_list)
-        total_price += course["price"]
 
     # create transaction
     transaction_body["total_price"] = total_price
@@ -69,14 +93,16 @@ def purchase_course(request: PostCoursePurchaseRequestModel) -> str:
         raise Exception.internal_server_error
     transaction_id = str(transaction_add_result.inserted_id)
 
-    # update own courses
-    _update_own_course_on_purchase(str(request.student_id), course_ids)
+    # update own programs
+    _update_own_program_on_purchase(str(request.student_id), programs)
 
     # create student's course progress
-    _update_course_progress_on_purchase(str(request.student_id), course_ids)
+    _update_course_progress_on_purchase(str(request.student_id), programs)
 
-    # update course's fields
-    _update_course_on_purchase(course_ids)
+    _update_assignment_submission_on_purchase(str(request.student_id), programs)
+
+    # update course's and class's fields
+    _update_programs_on_purchase(programs)
 
     # remove student's basket items
     _update_basket_on_purchase_complete(str(request.student_id))
@@ -91,44 +117,74 @@ def _update_basket_on_purchase_complete(student_id: str):
         raise Exception.internal_server_error
 
 
-def _update_own_course_on_purchase(student_id: str, course_ids: list[ObjectId]):
+def _update_own_program_on_purchase(student_id: str, programs: list[_program]):
     filter = {"type": student_type, "_id": ObjectId(student_id)}
-    own_course = []
-    for course_id in course_ids:
-        own_course.append({"type": course_type, "program_id": course_id})
+    own_programs = []
+    for prog_ in programs:
+        own_programs.append({"type": prog_.type, "program_id": prog_.program_id})
 
-    update = {"$push": {"owned_programs": {"$each": own_course}}}
+    update = {"$push": {"owned_programs": {"$each": own_programs}}}
 
     result = db_client.user_coll.update_one(filter, update)
     if result.matched_count == 0:
         raise Exception.internal_server_error
 
 
-def _update_course_progress_on_purchase(student_id: str, course_ids: list[ObjectId]):
+def _update_assignment_submission_on_purchase(
+    student_id: str, programs: list[_program]
+):
+    submissions = []
+    for prog_ in programs:
+        if prog_.type == class_type:
+            assignment_filter = {"class_id": ObjectId(prog_.program_id)}
+            assignments_cur = db_client.assignment_coll.find(assignment_filter)
+            for assignment_ in assignments_cur:
+                submissions.append(
+                    {
+                        "class_id": ObjectId(prog_.program_id),
+                        "assignment_id": assignment_["_id"],
+                        "status": "unsubmit",
+                        "score": 0,
+                        "submission_date": datetime.fromtimestamp(0),
+                        "attachments": [],
+                        "student_id": ObjectId(student_id),
+                    }
+                )
+    if len(submissions) == 0:
+        return
+    result = db_client.assignment_submission_coll.insert_many(submissions)
+    if len(result.inserted_ids) == 0:
+        raise Exception.internal_server_error
+
+
+def _update_course_progress_on_purchase(student_id: str, programs: list[_program]):
     progresses = []
-    for course_id in course_ids:
-        progress = dict()
-        progress["student_id"] = ObjectId(student_id)
-        progress["course_id"] = course_id
-        progress["finished"] = False
-        progress["finished_count"] = 0
-        progress["lessons"] = []
+    for _program in programs:
+        if _program.type == course_type:
+            progress = dict()
+            progress["student_id"] = ObjectId(student_id)
+            progress["course_id"] = _program.program_id
+            progress["finished"] = False
+            progress["finished_count"] = 0
+            progress["lessons"] = []
 
-        lessons_filter = {"course_id": ObjectId(course_id)}
-        lessons_cur = db_client.lesson_coll.find(lessons_filter)
-        for lesson in lessons_cur:
-            if lesson["lesson_type"] == "quiz":
-                _create_student_quiz_result(student_id, str(lesson["quiz_id"]))
-            progress["lessons"].append(
-                {
-                    "lesson_id": lesson["_id"],
-                    "chapter_id": lesson["chapter_id"],
-                    "finished": False,
-                    "lesson_completed": 0,
-                }
-            )
-        progresses.append(progress)
+            lessons_filter = {"course_id": ObjectId(_program.program_id)}
+            lessons_cur = db_client.lesson_coll.find(lessons_filter)
+            for lesson in lessons_cur:
+                if lesson["lesson_type"] == "quiz":
+                    _create_student_quiz_result(student_id, str(lesson["src"]))
+                progress["lessons"].append(
+                    {
+                        "lesson_id": lesson["_id"],
+                        "chapter_id": lesson["chapter_id"],
+                        "finished": False,
+                        "lesson_completed": 0,
+                    }
+                )
+            progresses.append(progress)
 
+    if len(progresses) == 0:
+        return
     _ = db_client.course_progress_coll.insert_many(progresses)
 
 
@@ -162,10 +218,15 @@ def _create_student_quiz_result(student_id: str, quiz_id: str):
     _ = db_client.quiz_result_coll.insert_one(body)
 
 
-def _update_course_on_purchase(course_ids: list[ObjectId]):
-    for course_id in course_ids:
-        filter = {"_id": course_id}
+def _update_programs_on_purchase(programs: list[_program]):
+    for prog_ in programs:
+        filter = {"_id": prog_.program_id}
         update = {"$inc": {"student_count": 1}}
-        result = db_client.course_coll.update_one(filter, update)
+        if prog_.type == course_type:
+            result = db_client.course_coll.update_one(filter, update)
+        elif prog_.type == class_type:
+            result = db_client.class_coll.update_one(filter, update)
+        else:
+            raise Exception.unprocessable_content
         if result.matched_count == 0:
             raise Exception.internal_server_error

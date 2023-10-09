@@ -6,17 +6,17 @@ from pymongo.results import DeleteResult, UpdateResult
 from learnhub_backend.dependencies import GenericOKResponse
 
 from .database import (
-    purchase_course,
+    purchase,
 )
 
 from .schemas import (
-    PostCoursePurchaseRequestModel,
-    PostCoursePurchaseResponseModel,
+    PostPurchaseRequestModel,
+    PostPurchaseResponseModel,
 )
 
 
-def post_purchase_course(
-    request: PostCoursePurchaseRequestModel,
-) -> PostCoursePurchaseResponseModel:
-    transaction_id = purchase_course(request)
-    return PostCoursePurchaseResponseModel(transaction_id=transaction_id)
+def post_purchase(
+    request: PostPurchaseRequestModel,
+) -> PostPurchaseResponseModel:
+    transaction_id = purchase(request)
+    return PostPurchaseResponseModel(transaction_id=transaction_id)

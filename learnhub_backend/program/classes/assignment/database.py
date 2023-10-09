@@ -61,6 +61,12 @@ def query_single_assignment(class_id: str, assignment_id: str) -> dict | None:
 
 def create_assignment(class_id: str, request: PostClassAssignmentRequestModel) -> str:
     try:
+        # check valid class
+        class_filter = {"_id": ObjectId(class_id)}
+        class_ = db_client.class_coll.find_one(class_filter)
+        if class_ == None:
+            raise Exception.not_found
+
         body = {
             "class_id": ObjectId(class_id),
             "name": request.name,
@@ -78,6 +84,14 @@ def create_assignment(class_id: str, request: PostClassAssignmentRequestModel) -
         }
         response = db_client.assignment_coll.insert_one(body)
         if response.inserted_id == None:
+            raise Exception.internal_server_error
+
+        # update class assignment_count
+        inc_content = {"assignment_count": 1}
+        update_res = db_client.class_coll.update_one(
+            class_filter, {"$inc": inc_content}
+        )
+        if update_res.matched_count == 0:
             raise Exception.internal_server_error
 
         _create_class_students_submission(class_id, str(response.inserted_id))
@@ -108,6 +122,8 @@ def _create_class_students_submission(class_id: str, assignment_id: str):
         body = body_template
         body["student_id"] = ObjectId(stu_["_id"])
         bodies.append(body)
+    if len(bodies) == 0:
+        return
     _ = db_client.assignment_submission_coll.insert_many(bodies)
 
 

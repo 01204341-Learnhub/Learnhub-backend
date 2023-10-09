@@ -2,11 +2,11 @@ from typing import Optional, Union
 from pydantic import BaseModel, HttpUrl, validator
 
 
-## COURSE PURCHASE
-class PostCoursePurchaseRequestModel(BaseModel):
+## PURCHASE
+class PostPurchaseRequestModel(BaseModel):
     student_id: str
     payment_method_id: str
 
 
-class PostCoursePurchaseResponseModel(BaseModel):
+class PostPurchaseResponseModel(BaseModel):
     transaction_id: str

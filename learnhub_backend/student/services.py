@@ -379,7 +379,7 @@ def list_student_basket_response(student_id: str) -> ListStudentBasketResponseMo
             basket[i]["name"] = cls["name"]
             basket[i]["type"] = "class"
             basket[i]["teacher"] = query_teacher_profile(str(cls["teacher_id"]))
-            basket[i]["program_pic"] = cls["course_pic"]
+            basket[i]["program_pic"] = cls["class_pic"]
             basket[i]["rating"] = cls["rating"]
             basket[i]["review_count"] = cls["review_count"]
             basket[i]["difficulty_level"] = cls["difficulty_level"]
@@ -419,7 +419,7 @@ def get_student_basket_item_response(
         basket_item["name"] = cls["name"]
         basket_item["type"] = "class"
         basket_item["teacher"] = query_teacher_profile(str(cls["teacher_id"]))
-        basket_item["program_pic"] = cls["course_pic"]
+        basket_item["program_pic"] = cls["class_pic"]
         basket_item["rating"] = cls["rating"]
         basket_item["review_count"] = cls["review_count"]
         basket_item["difficulty_level"] = cls["difficulty_level"]

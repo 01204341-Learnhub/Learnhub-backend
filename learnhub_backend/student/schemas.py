@@ -182,7 +182,7 @@ class GetStudentBasketItemResponseModel(BaseModel):
     program_pic: HttpUrl
     rating: float
     review_count: int
-    total_video_length: int
+    total_video_length: int | None = None
     difficulty_level: str
     price: float
 
