@@ -1,5 +1,6 @@
 from bson.objectid import ObjectId
 from bson.errors import InvalidId
+from pymongo.cursor import Cursor
 
 from .schemas import (
     PatchTeacherPaymentMethodRequestModel,
@@ -102,6 +103,13 @@ def edit_teacher(teacher_id: str, request: PatchTeacherRequestModel):
 
     except InvalidId:
         raise Exception.bad_request
+
+
+# PROGRAM
+def query_course_by_teacher(teacher_id: str) -> Cursor:
+    filter = {"teacher_id": ObjectId(teacher_id)}
+    courses_cur = db_client.course_coll.find(filter)
+    return courses_cur
 
 
 # PAYMENT METHOD

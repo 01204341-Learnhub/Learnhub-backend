@@ -8,6 +8,7 @@ from .database import (
     create_teacher_payment_method,
     edit_teacher,
     edit_teacher_payment_method,
+    query_course_by_teacher,
     query_list_teachers,
     query_teacher,
     remove_teacher_payment_method,
@@ -16,6 +17,8 @@ from .database import (
 from .schemas import (
     GetTeacherPaymentMethodResponseModel,
     GetTeacherResponseModel,
+    ListTeacherCoursesModelBody,
+    ListTeacherCoursesResponseModel,
     ListTeacherPaymentMethodsResponseModel,
     ListTeachersModelBody,
     ListTeachersResponseModel,
@@ -56,6 +59,24 @@ def get_teacher_response(teacher_id: str) -> GetTeacherResponseModel:
 def patch_teacher_request(teacher_id: str, request: PatchTeacherRequestModel):
     edit_teacher(teacher_id, request)
     return GenericOKResponse
+
+
+# PROGRAM
+def list_teacher_courses_response(teacher_id: str) -> ListTeacherCoursesResponseModel:
+    courses_cur = query_course_by_teacher(teacher_id)
+    courses = []
+    for course_ in courses_cur:
+        courses.append(
+            ListTeacherCoursesModelBody(
+                course_id=str(course_["_id"]),
+                course_pic=course_["course_pic"],
+                name=course_["name"],
+                rating=course_["rating"],
+                student_count=course_["student_count"],
+            )
+        )
+
+    return ListTeacherCoursesResponseModel(courses=courses)
 
 
 # PAYMENT METHOD
