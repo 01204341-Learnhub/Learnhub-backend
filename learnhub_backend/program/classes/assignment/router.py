@@ -13,6 +13,7 @@ from .schemas import (
     ListAssignmentSubmissionResponseModel,
     ListClassAssignmentsResponseModel,
     PatchAssignmentRequestModel,
+    PatchAssignmentSubmissionScoreRequestModel,
     PostClassAssignmentRequestModel,
     PostClassAssignmentResponseModel,
     PutAssignmentSubmitRequestModel,
@@ -25,6 +26,7 @@ from .services import (
     list_assignment_response,
     list_assignment_submissions_response,
     patch_assignment_request,
+    patch_assignment_submission_score_request,
     patch_assignment_unsubmit_request,
     post_assignment_request,
     put_assignment_submit_request,
@@ -116,6 +118,24 @@ def list_assignment_submissions(class_id: str, assignment_id: str):
 def get_assignment_submission(class_id: str, assignment_id: str, student_id: str):
     response_body = get_assignment_submission_response(
         class_id, assignment_id, student_id
+    )
+    return response_body
+
+
+@router.patch(
+    "/{class_id}/assignments/{assignment_id}/submissions/{student_id}/score",
+    status_code=200,
+    response_model_exclude_none=True,
+    response_model=GenericOKResponse,
+)
+def patch_assignment_submission_score(
+    class_id: str,
+    assignment_id: str,
+    student_id: str,
+    request_body: PatchAssignmentSubmissionScoreRequestModel,
+):
+    response_body = patch_assignment_submission_score_request(
+        class_id, assignment_id, student_id, request_body
     )
     return response_body
 

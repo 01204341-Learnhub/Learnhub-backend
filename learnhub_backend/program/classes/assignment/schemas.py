@@ -87,6 +87,10 @@ class GetAssignmentSubmissionResponseModel(BaseModel):
     attachments: list[AttachmentModelBody]
 
 
+class PatchAssignmentSubmissionScoreRequestModel(BaseModel):
+    score: float  # max 100
+
+
 class PutAssignmentSubmitRequestModel(BaseModel):
     attachments: list[AttachmentModelBody]
 

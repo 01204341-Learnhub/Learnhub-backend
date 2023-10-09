@@ -14,6 +14,7 @@ from .schemas import (
     ListClassAssignmentsModelBody,
     ListClassAssignmentsResponseModel,
     PatchAssignmentRequestModel,
+    PatchAssignmentSubmissionScoreRequestModel,
     PostClassAssignmentRequestModel,
     PostClassAssignmentResponseModel,
     PutAssignmentSubmitRequestModel,
@@ -29,6 +30,7 @@ from .database import (
     edit_assignment,
     query_single_submission_by_student_id,
     query_student_profile,
+    score_submission,
     unsubmit_submission,
     update_submission,
 )
@@ -132,6 +134,16 @@ def get_assignment_submission_response(
         attachments=ta.validate_python(submission["attachments"]),
     )
     return response
+
+
+def patch_assignment_submission_score_request(
+    class_id: str,
+    assignment_id: str,
+    student_id: str,
+    request: PatchAssignmentSubmissionScoreRequestModel,
+):
+    score_submission(class_id, assignment_id, student_id, request.score)
+    return GenericOKResponse
 
 
 def put_assignment_submit_request(

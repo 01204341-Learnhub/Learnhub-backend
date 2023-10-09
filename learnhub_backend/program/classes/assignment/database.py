@@ -219,6 +219,29 @@ def query_single_submission_by_student_id(
     return submission
 
 
+def score_submission(class_id: str, assignment_id: str, student_id: str, score: float):
+    filter = {
+        "student_id": ObjectId(student_id),
+        "class_id": ObjectId(class_id),
+        "assignment_id": ObjectId(assignment_id),
+    }
+
+    # Check if submission status is not unsubmit
+    subm = db_client.assignment_submission_coll.find_one(filter)
+    if subm == None:
+        raise Exception.not_found
+    if subm["status"] == SubmissionStatus.unsubmit:
+        err = Exception.unprocessable_content
+        err.__setattr__("detail", "Submission not yet submit")
+        raise err
+    set_content = {"score": score}
+    result = db_client.assignment_submission_coll.update_one(
+        filter, {"$set": set_content}
+    )
+    if result.matched_count == 0:
+        raise Exception.not_found
+
+
 def update_submission(
     class_id: str,
     assignment_id: str,
