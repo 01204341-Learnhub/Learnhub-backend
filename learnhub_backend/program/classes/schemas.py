@@ -115,15 +115,30 @@ class PatchClassRequestModel(BaseModel):
     class_ended_date: int | None = None
 
 
-#THREADS
+# THREADS
 class ListThreadModelBody(BaseModel):
     thread_id: str
     name: str
     teacher: TeacherModelBody
     last_edit: int
 
+
 class ListThreadResponseModel(BaseModel):
     threads: list[ListThreadModelBody]
+
+
+class PostThreadAttachmentModelBody(BaseModel):
+    # attachment_type: str
+    src: str
+
+
+class PostThreadRequestModel(BaseModel):
+    name: str
+    text: str
+    attachments: list[PostThreadAttachmentModelBody]
+
+class PostThreadResponseModel(BaseModel):
+    thread_id: str
 
 
 # ASSIGNMENTS

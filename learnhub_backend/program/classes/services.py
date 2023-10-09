@@ -14,6 +14,7 @@ from .database import (
     query_class,
     edit_assignment,
     query_list_threads,
+    create_thread,
 )
 from .schemas import (
     ListClassesModelBody,
@@ -25,6 +26,8 @@ from .schemas import (
     PostClassResponseModel,
     ListThreadModelBody,
     ListThreadResponseModel,
+    PostThreadRequestModel,
+    PostThreadResponseModel,
 )
 
 from ...dependencies import Exception
@@ -65,8 +68,12 @@ def get_class_response(class_id: str) -> GetClassResponseModel:
     class_["class_ended_date"] = int(datetime.timestamp(class_["class_ended_date"]))
     for i in range(len(class_["schedules"])):
         print(class_["schedules"][i]["start"])
-        class_["schedules"][i]["start"] = int(datetime.timestamp(class_["schedules"][i]["start"]))
-        class_["schedules"][i]["end"] = int(datetime.timestamp(class_["schedules"][i]["end"]))
+        class_["schedules"][i]["start"] = int(
+            datetime.timestamp(class_["schedules"][i]["start"])
+        )
+        class_["schedules"][i]["end"] = int(
+            datetime.timestamp(class_["schedules"][i]["end"])
+        )
 
     return GetClassResponseModel(**class_)
 
@@ -81,7 +88,7 @@ def patch_class_request(class_id: str, request: PatchClassRequestModel):
     return GenericOKResponse
 
 
-#THREADS
+# THREADS
 def list_threads_response(class_id: str, skip: int, limit: int):
     thread_cursor = query_list_threads(class_id=class_id, skip=skip, limit=limit)
     threads = []
@@ -90,9 +97,18 @@ def list_threads_response(class_id: str, skip: int, limit: int):
         thread["teacher"] = get_teacher_by_id(str(thread["teacher_id"]))
         thread["last_edit"] = int(datetime.timestamp(thread["last_edit"]))
         threads.append(thread)
-    
+
     ta = TypeAdapter(list[ListThreadModelBody])
     return ListThreadResponseModel(threads=ta.validate_python(threads))
+
+
+def post_thread_request(class_id: str, thread_body: PostThreadRequestModel):
+    thread_id = create_thread(class_id=class_id, thread_body=thread_body)
+    return PostThreadResponseModel(thread_id=thread_id)
+
+
+
+
 
 # ASSIGNMENTS
 def patch_assignment_request(

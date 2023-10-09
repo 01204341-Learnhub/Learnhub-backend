@@ -8,6 +8,7 @@ from .schemas import (
     PostClassRequestModel,
     TagModelBody,
     PatchAssignmentRequestModel,
+    PostThreadRequestModel,
 )
 
 from ...dependencies import Exception, CheckHttpFileType
@@ -254,14 +255,43 @@ def edit_class(class_id: str, request: PatchClassRequestModel):
         raise Exception.bad_request
 
 
-#THREADS
+# THREADS
 def query_list_threads(class_id: str, skip: int, limit: int):
     try:
-        filter_= {"class_id": ObjectId(class_id)}
-        thread_cursor = db_client.thread_coll.find(filter=filter_, skip=skip, limit=limit)
+        filter_ = {"class_id": ObjectId(class_id)}
+        thread_cursor = db_client.thread_coll.find(
+            filter=filter_, skip=skip, limit=limit
+        )
         return thread_cursor
     except InvalidId:
         raise Exception.bad_request
+
+
+def create_thread(class_id: str, thread_body: PostThreadRequestModel):
+    try:
+        # check valid class
+        valid_class_filter = {"_id": ObjectId(class_id)}
+        class_result = db_client.class_coll.find_one(filter=valid_class_filter)
+        if class_result == None:
+            raise Exception.unprocessable_content
+
+        # insert thread
+        thread_to_insert = thread_body.model_dump()
+        thread_to_insert["class_id"] = ObjectId(class_id)
+        thread_to_insert["teacher_id"] = class_result["teacher_id"]
+        thread_to_insert["last_edit"] = datetime.now(
+            tz=timezone(timedelta(hours=7))
+        )  # bangkok time
+        for i in range(len(thread_to_insert["attachments"])):
+            thread_to_insert["attachments"][i]["attachment_type"] = CheckHttpFileType(
+                thread_to_insert["attachments"][i]["src"]
+            )
+        
+        result = db_client.thread_coll.insert_one(thread_to_insert)
+        return str(result.inserted_id)
+    except InvalidId:
+        raise Exception.bad_request
+
 
 # ASSIGNMENTS
 def edit_assignment(
