@@ -118,8 +118,7 @@ class PatchClassRequestModel(BaseModel):
 # ASSIGNMENTS
 class AttachmentPatchModelBody(BaseModel):
     op: str  # add | delete
-    old_src: str | None = None
-    new_src: str | None = None
+    src: str
 
 
 class PatchAssignmentRequestModel(BaseModel):

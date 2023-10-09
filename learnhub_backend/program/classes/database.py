@@ -304,9 +304,9 @@ def edit_assignment(
                     update_body_add["$push"]["attachments"]["$each"].append(
                         # document to add to array
                         {
-                            "src": str(patch_body["attachments"][i]["new_src"]),
+                            "src": str(patch_body["attachments"][i]["src"]),
                             "attachment_type": CheckHttpFileType(
-                                str(patch_body["attachments"][i]["new_src"])
+                                str(patch_body["attachments"][i]["src"])
                             ),
                         }
                     )
@@ -314,7 +314,7 @@ def edit_assignment(
                 elif patch_body["attachments"][i]["op"] == "remove":
                     update_body_delete["$pull"]["attachments"]["src"]["$in"].append(
                         # id of document to delete from array
-                        str(patch_body["attachments"][i]["old_src"])
+                        str(patch_body["attachments"][i]["src"])
                     )
                 else:
                     raise Exception.unprocessable_content
