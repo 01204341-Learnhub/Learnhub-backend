@@ -261,7 +261,6 @@ def edit_assignment(
     try:
         patch_body = patch_body_.model_dump()  # info to update
         filter = {"_id": ObjectId(assignment_id), "class_id": ObjectId(class_id)}
-        print(filter)
 
         # prepare update body
         update_body_add = {"$push": {"attachments": {"$each": []}}}
@@ -312,28 +311,11 @@ def edit_assignment(
                         }
                     )
 
-                elif patch_body["attachments"][i]["op"] == "delete":
+                elif patch_body["attachments"][i]["op"] == "remove":
                     update_body_delete["$pull"]["attachments"]["src"]["$in"].append(
                         # id of document to delete from array
                         str(patch_body["attachments"][i]["old_src"])
                     )
-
-                elif patch_body["attachments"][i]["op"] == "edit":
-                    array_filter.append(
-                        # filter to find document to update in array
-                        {f"elem{i}.src": str(patch_body["attachments"][i]["old_src"])}
-                    )
-                    # update body for document to update in array
-                    update_body_edit["$set"][f"attachments.$[elem{i}].src"] = str(
-                        patch_body["attachments"][i]["new_src"]
-                    )
-
-                    update_body_edit["$set"][
-                        f"attachments.$[elem{i}].attachment_type"
-                    ] = str(
-                        CheckHttpFileType(str(patch_body["attachments"][i]["new_src"]))
-                    )
-
                 else:
                     raise Exception.unprocessable_content
 
