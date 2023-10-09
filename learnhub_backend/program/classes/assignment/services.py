@@ -13,6 +13,8 @@ from .schemas import (
     PatchAssignmentRequestModel,
     PostClassAssignmentRequestModel,
     PostClassAssignmentResponseModel,
+    PutAssigmentSubmitRequestModel,
+    PutAssigmentSubmitResponseModel,
 )
 
 from .database import (
@@ -20,6 +22,7 @@ from .database import (
     query_assignments_by_class_id,
     query_single_assignment,
     edit_assignment,
+    update_submission,
 )
 
 
@@ -79,3 +82,11 @@ def patch_assignment_request(
         class_id=class_id, assignment_id=assignment_id, patch_body_=patch_body
     )
     return GenericOKResponse
+
+
+# SUBMISSION
+def put_assignment_submission_request(
+    class_id: str, assignment_id: str, request: PutAssigmentSubmitRequestModel
+) -> PutAssigmentSubmitResponseModel:
+    submission_id = update_submission(class_id, assignment_id, request)
+    return PutAssigmentSubmitResponseModel(submission_id=submission_id)

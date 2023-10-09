@@ -60,3 +60,13 @@ class PatchAssignmentRequestModel(BaseModel):
     group_name: str | None = None
     text: str | None = None
     attachments: list[AttachmentPatchModelBody] | None = None
+
+
+# SUBMISSION
+class PutAssigmentSubmitRequestModel(BaseModel):
+    student_id: str
+    attachments: list[AttachmentModelBody]
+
+
+class PutAssigmentSubmitResponseModel(BaseModel):
+    submission_id: str

@@ -13,6 +13,8 @@ from .schemas import (
     PatchAssignmentRequestModel,
     PostClassAssignmentRequestModel,
     PostClassAssignmentResponseModel,
+    PutAssigmentSubmitRequestModel,
+    PutAssigmentSubmitResponseModel,
 )
 
 from .services import (
@@ -20,6 +22,7 @@ from .services import (
     list_assignment_response,
     patch_assignment_request,
     post_assignment_request,
+    put_assignment_submission_request,
 )
 
 router = APIRouter(
@@ -80,5 +83,24 @@ def patch_assignment(
 ):
     response_body = patch_assignment_request(
         class_id=class_id, assignment_id=assignment_id, patch_body=patch_body
+    )
+    return response_body
+
+
+# TODO: Delete assignment
+
+
+# SUBMISSION
+@router.put(
+    "/{class_id}/assignments/{assignment_id}/submit",
+    status_code=200,
+    response_model_exclude_none=True,
+    response_model=PutAssigmentSubmitResponseModel,
+)
+def put_assignment_submit(
+    class_id: str, assignment_id: str, request_body: PutAssigmentSubmitRequestModel
+):
+    response_body = put_assignment_submission_request(
+        class_id, assignment_id, request_body
     )
     return response_body
