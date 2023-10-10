@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone, timedelta
 from typing import Annotated, Union
 from pydantic import TypeAdapter
 from pymongo.results import UpdateResult
@@ -112,7 +112,7 @@ def post_thread_request(class_id: str, thread_body: PostThreadRequestModel):
 def get_thread_response(class_id: str, thread_id: str):
     quried_thread = query_thread(class_id=class_id, thread_id=thread_id)
     quried_thread["teacher"] = get_teacher_by_id(str(quried_thread["teacher_id"]))
-    quried_thread["last_edit"] = int(datetime.timestamp(quried_thread["last_edit"]))
+    quried_thread["last_edit"] = int(quried_thread["last_edit"].replace(tzinfo=timezone.utc).timestamp()) # make timestamp timezone aware that db return utc time
     return GetThreadResponseModel(**quried_thread)
 
 
