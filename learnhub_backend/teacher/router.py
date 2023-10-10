@@ -10,6 +10,7 @@ from .services import (
     delete_teacher_payment_method_request,
     get_teacher_payment_method_response,
     get_teacher_response,
+    list_teacher_classes_response,
     list_teacher_courses_response,
     list_teacher_payment_methods_response,
     list_teachers_response,
@@ -22,6 +23,7 @@ from .services import (
 from .schemas import (
     GetTeacherPaymentMethodResponseModel,
     GetTeacherResponseModel,
+    ListTeacherClassesResponseModel,
     ListTeacherCoursesResponseModel,
     ListTeacherPaymentMethodsResponseModel,
     ListTeachersResponseModel,
@@ -112,6 +114,17 @@ def delete_teacher(teacher_id: str):
 )
 def list_teacher_courses(teacher_id: str):
     response_body = list_teacher_courses_response(teacher_id)
+    return response_body
+
+
+@router.get(
+    "/{teacher_id}/classes",
+    status_code=200,
+    response_model_exclude_none=True,
+    response_model=ListTeacherClassesResponseModel,
+)
+def list_teacher_classes(teacher_id: str):
+    response_body = list_teacher_classes_response(teacher_id)
     return response_body
 
 
