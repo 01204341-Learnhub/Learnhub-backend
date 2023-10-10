@@ -81,7 +81,6 @@ def create_class(request: PostClassRequestModel) -> str:
             "tags": [ObjectId(tag_) for tag_ in request.tag_ids],
             "assignment_count": 0,
             "meeting_count": len(request.schedules),
-            "chapter_count": 0,
             "schedules": [],
             "open_date": datetime.fromtimestamp(request.open_date),
             "registration_ended_date": datetime.fromtimestamp(
