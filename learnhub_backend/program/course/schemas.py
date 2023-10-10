@@ -22,6 +22,7 @@ class ListCoursesModelBody(BaseModel):
     tags: list[TagModelBody]
     rating: float
     review_count: int
+    difficulty_level: str
     price: float
 
 
@@ -64,6 +65,21 @@ class GetCourseResponseModel(BaseModel):
     quiz_count: int
     file_count: int
     video_count: int
+
+
+class PatchCourseReviewRequestModel(BaseModel):
+    student_id: str
+    rating: float
+
+    @validator("rating")
+    def rating_validator(cls, v: float):
+        if v > 5 or v < 0:
+            raise ValueError("Rating needs to be between 0-5")
+        return v
+
+
+class PatchCourseReviewResponseModel(BaseModel):
+    review_id: str
 
 
 # COURSE CHAPTERS

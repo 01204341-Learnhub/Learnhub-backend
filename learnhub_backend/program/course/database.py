@@ -19,6 +19,9 @@ from .schemas import (
 from ...dependencies import (
     Exception,
     teacher_type,
+    student_type,
+    course_type,
+    class_type,
 )
 
 from ...dependencies import student_type
@@ -114,6 +117,80 @@ def create_course(course_body: PostCourseRequestModel) -> InsertOneResult:
         raise Exception.bad_request
 
     # TODO: Patch course
+
+
+def student_is_own_program(student_id: str, _type: str, program_id: str) -> bool:
+    owned = False
+    result = None
+    if _type == course_type:
+        filter = {
+            "_id": ObjectId(student_id),
+            "owned_programs.program_id": ObjectId(program_id),
+            "owned_programs.type": course_type,
+        }
+        result = db_client.user_coll.find_one(filter)
+    elif _type == class_type:
+        filter = {
+            "_id": ObjectId(student_id),
+            "owned_programs.program_id": ObjectId(program_id),
+            "owned_programs.type": class_type,
+        }
+        result = db_client.user_coll.find_one(filter)
+
+    if result != None:
+        owned = True
+    return owned
+
+
+def review_course(course_id: str, student_id: str, rating: float) -> str:
+    _course = query_course(course_id)
+    if _course == None:
+        err = Exception.not_found
+        err.__setattr__("detail", "Course not found")
+        raise err
+
+    review_filter = {
+        "student_id": ObjectId(student_id),
+        "course_id": ObjectId(course_id),
+    }
+    review_result = db_client.course_review_coll.find_one(review_filter)
+
+    filter = {"_id": ObjectId(course_id)}
+    set_content = dict()
+    if review_result == None:  # First review
+        current_rating_full = _course["rating"] * _course["review_count"]
+        new_rating = (current_rating_full + rating) / (_course["review_count"] + 1)
+        set_content = {
+            "rating": new_rating,
+            "review_count": _course["review_count"] + 1,
+        }
+    else:  # Change review
+        current_rating_full = _course["rating"] * _course["review_count"]
+        new_rating = (current_rating_full + rating - review_result["rating"]) / (
+            _course["review_count"]
+        )
+        set_content = {
+            "rating": new_rating,
+        }
+
+    result = db_client.course_coll.update_one(filter, {"$set": set_content})
+    if result.matched_count == 0:
+        raise Exception.not_found
+
+    if review_result == None:  # First review
+        body = {
+            "course_id": ObjectId(course_id),
+            "student_id": ObjectId(student_id),
+            "rating": rating,
+        }
+        insert_res = db_client.course_review_coll.insert_one(body)
+        return str(insert_res.inserted_id)
+    else:  # Change review
+        set_review = {"rating": rating}
+        patch_res = db_client.course_review_coll.find_one_and_update(
+            review_filter, {"$set": set_review}
+        )
+        return str(patch_res["_id"])
 
 
 # CHAPTER

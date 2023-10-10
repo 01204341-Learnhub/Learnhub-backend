@@ -1,3 +1,4 @@
+from datetime import datetime, timezone
 from pydantic import BaseModel
 from fastapi import HTTPException
 import mimetypes
@@ -49,3 +50,7 @@ def CheckHttpFileType(url: str) -> str:
         result = response.split(";")[0]
     file_type, extension = result.split("/")  # 'video/mp4'
     return file_type
+
+
+def get_timestamp_from_datetime(dt: datetime) -> int:
+    return int(datetime.replace(dt, tzinfo=timezone.utc).timestamp())

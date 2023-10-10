@@ -20,6 +20,7 @@ from .schemas import (
     PutAssignmentSubmitRequestModel,
     PutAssignmentSubmitResponseModel,
     StudentModelBody,
+    SubmissionCountModelBody,
 )
 
 from .database import (
@@ -35,6 +36,11 @@ from .database import (
     update_submission,
 )
 
+from .config import (
+    SubmissionStatus,
+    AssignmentStatus,
+)
+
 
 # ASSIGNMENTS
 def list_assignment_response(class_id: str) -> ListClassAssignmentsResponseModel:
@@ -42,6 +48,17 @@ def list_assignment_response(class_id: str) -> ListClassAssignmentsResponseModel
     assignments = []
 
     for assg_ in assignments_cur:
+        submissions_cur = query_list_submission_by_assignment_id(
+            class_id, str(assg_["_id"])
+        )
+        submit_count = 0
+        unsubmit_count = 0
+        for submission_ in submissions_cur:
+            if submission_["status"] == SubmissionStatus.unsubmit:
+                unsubmit_count += 1
+            else:
+                submit_count += 1
+
         assignments.append(
             ListClassAssignmentsModelBody(
                 assignment_id=str(assg_["_id"]),
@@ -52,6 +69,9 @@ def list_assignment_response(class_id: str) -> ListClassAssignmentsResponseModel
                 status=assg_["status"],
                 max_score=assg_["max_score"],
                 text=assg_["text"],
+                submission_count=SubmissionCountModelBody(
+                    submit_count=submit_count, unsubmit_count=unsubmit_count
+                ),
             )
         )
     return ListClassAssignmentsResponseModel(assignments=assignments)
