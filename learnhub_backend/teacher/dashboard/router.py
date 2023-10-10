@@ -6,6 +6,8 @@ from learnhub_backend.teacher.dashboard.schemas import (
 )
 
 
+from .services import get_teacher_dashboard_response
+
 from ...dependencies import (
     common_pagination_parameters,
     GenericOKResponse,
@@ -33,4 +35,5 @@ common_page_params = Annotated[dict, Depends(router.dependencies[0].dependency)]
     response_model=GetTeacherDashboardResponseModel,
 )
 def get_teacher_dashboard(teacher_id: str):
-    pass
+    response_body = get_teacher_dashboard_response(teacher_id)
+    return response_body

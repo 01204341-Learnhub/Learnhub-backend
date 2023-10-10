@@ -2,18 +2,11 @@ from typing import Optional, Union
 from pydantic import BaseModel, HttpUrl, validator
 
 
-# AUX
-class TagModelBody(BaseModel):
-    tag_id: str
-    tag_name: str
-
-
 # DASHBOARD
 class GetTeacherDashboardCourseModelBody(BaseModel):
     course_id: str
     name: str
     course_pic: HttpUrl
-    tags: list[TagModelBody]
     rating: float
     review_count: int
     price: float
@@ -31,6 +24,6 @@ class GetTeacherDashboardClassModelBody(BaseModel):
     price: float
 
 
-class GetTeacherDashboard(BaseModel):
+class GetTeacherDashboardResponseModel(BaseModel):
     courses: list[GetTeacherDashboardCourseModelBody]
     classes: list[GetTeacherDashboardClassModelBody]
