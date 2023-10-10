@@ -129,7 +129,6 @@ def _update_own_program_on_purchase(student_id: str, programs: list[_program]):
     if result.matched_count == 0:
         raise Exception.internal_server_error
 
-
 def _update_assignment_submission_on_purchase(
     student_id: str, programs: list[_program]
 ):
