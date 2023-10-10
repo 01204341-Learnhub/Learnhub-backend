@@ -20,11 +20,14 @@ from .services import (
     edit_course_lesson_request,
     add_course_lesson_request,
     list_courses_response,
+    patch_course_review_request,
 )
 
 from .schemas import (
     GetCourseResponseModel,
     ListCoursesResponseModel,
+    PatchCourseReviewRequestModel,
+    PatchCourseReviewResponseModel,
     PostCourseRequestModel,
     PostCourseResponseModel,
     ListCourseChaptersResponseModel,
@@ -86,6 +89,17 @@ def add_course(course_body: PostCourseRequestModel):
 )
 def get_course(course_id: str):
     response_body = get_course_response(course_id)
+    return response_body
+
+
+@router.patch(
+    "/{course_id}/review",
+    status_code=200,
+    response_model_exclude_none=True,
+    response_model=PatchCourseReviewResponseModel,
+)
+def patch_course_review(course_id: str, request: PatchCourseReviewRequestModel):
+    response_body = patch_course_review_request(course_id, request)
     return response_body
 
 

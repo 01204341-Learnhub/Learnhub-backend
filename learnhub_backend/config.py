@@ -19,6 +19,7 @@ DB_ANNOUNCEMENT_COLLECTION = config(
 DB_COURSE_PROGRESS_COLLECTION = config(
     "DB_COURSE_PROGRESS", default="course_progresses"
 )
+DB_COURSE_REVIEW_COLLECTION = config("DB_COURSE_COLLECTION", default="course_reviews")
 
 DB_CLASS_COLLECTION = config("DB_CLASS_COLLECTION", default="classes")
 

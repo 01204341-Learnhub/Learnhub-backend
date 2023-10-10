@@ -3,6 +3,7 @@ from pydantic import TypeAdapter
 from pymongo.results import UpdateResult
 
 from learnhub_backend.dependencies import GenericOKResponse
+from learnhub_backend.student.database import query_student
 
 from .database import (
     create_course,
@@ -20,9 +21,13 @@ from .database import (
     query_course_lesson,
     create_course_lesson,
     remove_course_lesson,
+    review_course,
+    student_is_own_program,
 )
 from .schemas import (
     GetCourseResponseModel,
+    PatchCourseReviewRequestModel,
+    PatchCourseReviewResponseModel,
     PostCourseRequestModel,
     PostCourseResponseModel,
     TagModelBody,
@@ -43,7 +48,13 @@ from .schemas import (
     PostCourseLessonResponseModel,
 )
 
-from ...dependencies import Exception
+from ...dependencies import (
+    Exception,
+    student_type,
+    teacher_type,
+    course_type,
+    class_type,
+)
 
 
 # COURSE
@@ -58,6 +69,7 @@ def list_courses_response(skip: int = 0, limit: int = 100):
         course_response["review_count"] = course["review_count"]
         course_response["price"] = course["price"]
         course_response["course_pic"] = course["course_pic"]
+        course_response["difficulty_level"] = course["difficulty_level"]
 
         # teacher
         teacher = query_teacher_by_id(course["teacher_id"])
@@ -111,6 +123,20 @@ def get_course_response(course_id: str):
     course["tags"] = tags
 
     return GetCourseResponseModel(**course)
+
+
+def patch_course_review_request(
+    course_id: str, request: PatchCourseReviewRequestModel
+) -> PatchCourseReviewResponseModel:
+    if not student_is_own_program(request.student_id, course_type, course_id):
+        err = Exception.not_found
+        err.__setattr__("detail", "Course's not owned by the request's student")
+        raise err
+
+    assert request.rating >= 0 and request.rating <= 5
+
+    review_id = review_course(course_id, request.student_id, request.rating)
+    return PatchCourseReviewResponseModel(review_id=review_id)
 
 
 # COURSE CHAPTERS
