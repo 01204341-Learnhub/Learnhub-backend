@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
 from pymongo.results import DeleteResult, UpdateResult
 from pymongo import ReturnDocument
 from bson.objectid import ObjectId
@@ -74,6 +74,14 @@ def purchase(request: PostPurchaseRequestModel) -> str:
                 e = Exception.not_found
                 e.__setattr__("detail", "Class not found")
                 raise e
+
+            if class_["registration_ended_date"] > datetime.now(
+                tz=timezone(timedelta(hours=7))
+            ):
+                e = Exception.unprocessable_content
+                e.__setattr__("detail", "Registration period has ended")
+                raise e
+
             update_purchase_list = {
                 "type": "class",
                 "price": class_["price"],
@@ -128,6 +136,7 @@ def _update_own_program_on_purchase(student_id: str, programs: list[_program]):
     result = db_client.user_coll.update_one(filter, update)
     if result.matched_count == 0:
         raise Exception.internal_server_error
+
 
 def _update_assignment_submission_on_purchase(
     student_id: str, programs: list[_program]
