@@ -55,7 +55,6 @@ class GetClassResponseModel(BaseModel):
     class_objective: list[str]
     class_requirement: str
     difficulty_level: str
-    chapter_count: int
     meeting_count: int
     student_count: int
     max_student: int
@@ -156,7 +155,7 @@ class GetThreadResponseModel(BaseModel):
 
 
 class PatchThreadAttachmentModelBody(BaseModel):
-    op: str # add | remove
+    op: str  # add | remove
     src: str
 
 
