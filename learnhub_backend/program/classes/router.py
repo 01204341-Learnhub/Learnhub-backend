@@ -14,6 +14,7 @@ from .services import (
     list_threads_response,
     post_thread_request,
     get_thread_response,
+    patch_thread_request,
 )
 
 from .schemas import (
@@ -26,6 +27,7 @@ from .schemas import (
     PostThreadRequestModel,
     PostThreadResponseModel,
     GetThreadResponseModel,
+    PatchThreadRequestModel,
 )
 
 router = APIRouter(
@@ -124,4 +126,15 @@ def post_thread(class_id: str, thread_body: PostThreadRequestModel):
 )
 def get_thread(class_id: str, thread_id: str):
     response_body = get_thread_response(class_id=class_id, thread_id=thread_id)
+    return response_body
+
+
+@router.patch(
+    "/{class_id}/threads/{thread_id}",
+    status_code=200,
+    response_model_exclude_none=True,
+    response_model=GenericOKResponse,
+)
+def patch_thread(class_id: str, thread_id: str, thread_body: PatchThreadRequestModel):
+    response_body = patch_thread_request(class_id=class_id, thread_id=thread_id, thread_body=thread_body)
     return response_body

@@ -153,3 +153,14 @@ class GetThreadResponseModel(BaseModel):
     last_edit: int
     text: str
     attachments: list[AttachmentModelBody]
+
+
+class PatchThreadAttachmentModelBody(BaseModel):
+    op: str # add | remove
+    src: str
+
+
+class PatchThreadRequestModel(BaseModel):
+    name: str | None = None
+    text: str | None = None
+    attachments: list[PatchThreadAttachmentModelBody] | None = None

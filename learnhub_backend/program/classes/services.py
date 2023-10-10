@@ -15,6 +15,7 @@ from .database import (
     query_list_threads,
     create_thread,
     query_thread,
+    edit_thread,
 )
 from .schemas import (
     ListClassesModelBody,
@@ -28,6 +29,7 @@ from .schemas import (
     PostThreadRequestModel,
     PostThreadResponseModel,
     GetThreadResponseModel,
+    PatchThreadRequestModel,
 )
 
 from ...dependencies import Exception
@@ -112,3 +114,8 @@ def get_thread_response(class_id: str, thread_id: str):
     quried_thread["teacher"] = get_teacher_by_id(str(quried_thread["teacher_id"]))
     quried_thread["last_edit"] = int(datetime.timestamp(quried_thread["last_edit"]))
     return GetThreadResponseModel(**quried_thread)
+
+
+def patch_thread_request(class_id: str, thread_id: str, thread_body: PatchThreadRequestModel):
+    edit_thread(class_id=class_id, thread_id=thread_id, thread_body=thread_body)
+    return GenericOKResponse

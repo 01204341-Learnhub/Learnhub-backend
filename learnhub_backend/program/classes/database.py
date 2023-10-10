@@ -9,6 +9,7 @@ from .schemas import (
     PostClassRequestModel,
     TagModelBody,
     PostThreadRequestModel,
+    PatchThreadRequestModel,
 )
 
 from ...dependencies import Exception, CheckHttpFileType
@@ -300,5 +301,65 @@ def query_thread(class_id: str, thread_id: str):
         filter_ = {"_id": ObjectId(thread_id), "class_id": ObjectId(class_id)}
         thread = db_client.thread_coll.find_one(filter=filter_)
         return thread
+    except InvalidId:
+        raise Exception.bad_request
+
+
+def edit_thread(class_id: str, thread_id: str, thread_body: PatchThreadRequestModel):
+    try:
+        filter_ = {"_id": ObjectId(thread_id), "class_id": ObjectId(class_id)}
+
+        # prepare update body
+        set_content = dict()
+        push_content = dict()
+        pull_content = dict()
+
+        # set update body for each field
+        set_content["last_edit"] = datetime.now(tz=timezone(timedelta(hours=7)))
+        if thread_body.name != None:
+            set_content["name"] = thread_body.name
+        if thread_body.text != None:
+            set_content["text"] = thread_body.text
+        if thread_body.attachments != None:
+            for attachment_ in thread_body.attachments:
+                if attachment_.op == "add":
+                    if "attachments" not in push_content:  # first time add/push
+                        push_content["attachments"] = {}
+                        push_content["attachments"]["$each"] = []
+                    push_content["attachments"]["$each"].append(
+                        {
+                            "attachment_type": CheckHttpFileType(attachment_.src),
+                            "src": attachment_.src,
+                        }
+                    )
+                elif attachment_.op == "remove":
+                    if "attachments" not in pull_content:  # first time remove/pull
+                        pull_content["attachments"] = {}
+                        pull_content["attachments"]["src"] = {}
+                        pull_content["attachments"]["src"]["$in"] = []
+                    pull_content["attachments"]["src"]["$in"].append(
+                        attachment_.src
+                    )  # src is id of attachments to delete
+
+        if len(set_content) != 0:
+            patch_result = db_client.thread_coll.update_one(
+                filter=filter_, update={"$set": set_content}
+            )
+            if patch_result.matched_count == 0:
+                raise Exception.not_found
+        if len(push_content) != 0:
+            patch_result = db_client.thread_coll.update_one(
+                filter=filter_, update={"$push": push_content}
+            )
+            if patch_result.matched_count == 0:
+                raise Exception.not_found
+        if len(pull_content) != 0:
+            patch_result = db_client.thread_coll.update_one(
+                filter=filter_, update={"$pull": pull_content}
+            )
+            if patch_result.matched_count == 0:
+                raise Exception.not_found
+
+        return True
     except InvalidId:
         raise Exception.bad_request
