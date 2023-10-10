@@ -1,6 +1,10 @@
 from fastapi import APIRouter, Depends
 from typing import Annotated, Union
 
+from learnhub_backend.teacher.dashboard.schemas import (
+    GetTeacherDashboardResponseModel,
+)
+
 
 from ...dependencies import (
     common_pagination_parameters,
@@ -20,3 +24,13 @@ router = APIRouter(
 )
 
 common_page_params = Annotated[dict, Depends(router.dependencies[0].dependency)]
+
+
+@router.get(
+    "/{teacher_id}/dashboard",
+    status_code=200,
+    response_model_exclude_none=True,
+    response_model=GetTeacherDashboardResponseModel,
+)
+def get_teacher_dashboard(teacher_id: str):
+    pass
