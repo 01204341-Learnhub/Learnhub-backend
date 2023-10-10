@@ -31,3 +31,21 @@ class ListProgramsCourseModelBody(BaseModel):
 
 class ListProgramsResponseModel(BaseModel):
     programs: list[Union[ListProgramsClassModelBody, ListProgramsCourseModelBody]]
+
+
+# TAGS
+class TagModelBody(BaseModel):
+    tag_id: str
+    tag_name: str
+
+
+class ListTagsResponseModel(BaseModel):
+    tags: list[TagModelBody]
+
+
+class PostTagRequestModel(BaseModel):
+    tag_name: str
+
+
+class PostTagResponseModel(BaseModel):
+    tag_id: str

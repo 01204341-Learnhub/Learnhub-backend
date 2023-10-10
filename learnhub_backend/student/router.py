@@ -14,6 +14,8 @@ from .services import (
     get_student_course_response,
     get_student_payment_method_response,
     list_student_basket_response,
+    list_student_class_assignments_response,
+    list_student_classes_response,
     list_student_courses_response,
     list_students_response,
     get_student_response,
@@ -36,6 +38,8 @@ from .schemas import (
     GetStudentPaymentMethodResponseModel,
     GetStudentResponseModel,
     ListStudentBasketResponseModel,
+    ListStudentClassAssignmentsResponseModel,
+    ListStudentClassResponseModel,
     ListStudentPaymentMethodsResponseModel,
     PatchStudentPaymentMethodRequestModel,
     PostStudentBasketItemRequestModel,
@@ -182,6 +186,29 @@ def patch_student_course_progress(
     return response_body
 
 
+# STUDENT CLASS
+@router.get(
+    "/{student_id}/classes",
+    status_code=200,
+    response_model_exclude_none=True,
+    response_model=ListStudentClassResponseModel,
+)
+def list_students_classes(student_id: str):
+    response_body = list_student_classes_response(student_id)
+    return response_body
+
+
+@router.get(
+    "/{student_id}/class_assignments",
+    status_code=200,
+    response_model_exclude_none=True,
+    response_model=ListStudentClassAssignmentsResponseModel,
+)
+def list_student_classes_assignments(student_id: str):
+    response_body = list_student_class_assignments_response(student_id)
+    return response_body
+
+
 # STUDENT CONFIG
 @router.get(
     "/{student_id}/config",
@@ -209,7 +236,7 @@ def edit_student_config(student_id: str, request_body: PatchStudentConfigRequest
 
 # PAYMENT METHOD
 @router.get(
-    "/{student_id}/payment-methods",
+    "/{student_id}/payment_methods",
     status_code=200,
     response_model_exclude_none=True,
     response_model=ListStudentPaymentMethodsResponseModel,
@@ -220,7 +247,7 @@ def list_student_payment_method(student_id: str):
 
 
 @router.post(
-    "/{student_id}/payment-methods",
+    "/{student_id}/payment_methods",
     status_code=200,
     response_model_exclude_none=True,
     response_model=PostStudentPaymentMethodResponseModel,
@@ -233,7 +260,7 @@ def post_student_payment_method(
 
 
 @router.get(
-    "/{student_id}/payment-methods/{payment_method_id}",
+    "/{student_id}/payment_methods/{payment_method_id}",
     status_code=200,
     response_model_exclude_none=True,
     response_model=GetStudentPaymentMethodResponseModel,
@@ -244,7 +271,7 @@ def get_student_payment_method(student_id: str, payment_method_id: str):
 
 
 @router.patch(
-    "/{student_id}/payment-methods/{payment_method_id}",
+    "/{student_id}/payment_methods/{payment_method_id}",
     status_code=200,
     response_model_exclude_none=True,
     response_model=GenericOKResponse,
@@ -261,7 +288,7 @@ def patch_student_payment_method(
 
 
 @router.delete(
-    "/{student_id}/payment-methods/{payment_method_id}",
+    "/{student_id}/payment_methods/{payment_method_id}",
     status_code=200,
     response_model_exclude_none=True,
     response_model=GenericOKResponse,

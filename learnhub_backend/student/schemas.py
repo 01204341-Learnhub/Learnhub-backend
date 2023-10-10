@@ -2,6 +2,13 @@ from typing import Optional, Union
 from pydantic import BaseModel, HttpUrl, validator
 
 
+# CLASS
+class ClassInfoModelBody(BaseModel):
+    class_id: str
+    class_name: str
+
+
+# TEACHER
 class TeacherModelBody(BaseModel):
     teacher_id: str
     teacher_name: str
@@ -40,6 +47,7 @@ class PatchStudentRequestModel(BaseModel):
 
 
 # STUDENTS PROGRAMS
+# COURSE
 class ListStudentCoursesModelBody(BaseModel):
     course_id: str
     course_pic: HttpUrl
@@ -71,6 +79,38 @@ class GetStudentCourseResponseModel(BaseModel):
     teacher: TeacherModelBody
     chapters: list[courseChapterModelBody]
     announcements: list[courseAnnouncementModelBody]
+
+
+# CLASS
+class ListStudentClassModelBody(BaseModel):
+    class_id: str
+    name: str
+    class_pic: HttpUrl
+    status: str
+    progress: float
+    class_ended_date: int
+    teacher: TeacherModelBody
+
+
+class ListStudentClassResponseModel(BaseModel):
+    classes: list[ListStudentClassModelBody]
+
+
+class SubmissionModelBody(BaseModel):
+    submission_status: str  # check | uncheck | unsubmit
+    submission_date: int
+
+
+class ListStudentClassAssignmentsModelBody(BaseModel):
+    name: str
+    class_info: ClassInfoModelBody
+    group_name: str
+    status: str  # open | closed
+    submission: SubmissionModelBody
+
+
+class ListStudentClassAssignmentsResponseModel(BaseModel):
+    assignments: list[ListStudentClassAssignmentsModelBody]
 
 
 # STUDENT COURSE PROGRESS
@@ -142,7 +182,7 @@ class GetStudentBasketItemResponseModel(BaseModel):
     program_pic: HttpUrl
     rating: float
     review_count: int
-    total_video_length: int
+    total_video_length: int | None = None
     difficulty_level: str
     price: float
 

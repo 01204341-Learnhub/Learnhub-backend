@@ -1,7 +1,6 @@
 from datetime import datetime, timedelta, timezone
 from bson.objectid import ObjectId
 from bson.errors import InvalidId
-import pprint
 
 from .schemas import (
     PostCourseAnnouncementRequestModel,
@@ -19,7 +18,6 @@ def get_teacher_by_id(teacher_id: str):
             raise Exception.not_found
         teacher["teacher_id"] = str(teacher["_id"])
         teacher["teacher_name"] = teacher["fullname"]
-        pprint.pprint(teacher)
         return teacher
     except InvalidId:
         raise Exception.bad_request
@@ -107,6 +105,9 @@ def edit_course_announcement(
         array_filter = []
 
         # set update body for each field
+        update_body_edit["$set"]["last_edit"] = datetime.now(
+            tz=timezone(timedelta(hours=7))
+        )  # bangkok time
         if announcement_body["name"] is not None:
             update_body_edit["$set"]["name"] = announcement_body["name"]
         if announcement_body["text"] is not None:
@@ -126,7 +127,7 @@ def edit_course_announcement(
                         }
                     )
 
-                elif announcement_body["attachments"][i]["op"] == "delete":
+                elif announcement_body["attachments"][i]["op"] == "remove":
                     update_body_delete["$pull"]["attachments"]["src"]["$in"].append(
                         # id of document to delete from array
                         str(announcement_body["attachments"][i]["old_src"])

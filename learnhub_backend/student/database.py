@@ -1,4 +1,5 @@
 from logging import error
+from pymongo.cursor import Cursor
 from pymongo.results import DeleteResult, UpdateResult
 from pymongo import ReturnDocument
 from bson.objectid import ObjectId
@@ -34,8 +35,11 @@ def query_teacher_profile(teacher_id: str) -> dict:
     teacher_res = {
         "teacher_id": teacher_id,
         "teacher_name": teacher["fullname"],
-        "profile_pic": teacher["profile_pic"],
     }
+    if "profile_pic" not in teacher:
+        teacher_res["profile_pic"] = None
+    else:
+        teacher_res["profile_pic"] = teacher["profile_pic"]
     return teacher_res
 
 
@@ -54,6 +58,12 @@ def query_class(class_id: str):
     if cls == None:
         raise Exception.not_found
     return cls
+
+
+def query_multiple_classes(class_ids: list[str]):
+    filter = {"_id": {"$in": [ObjectId(id_) for id_ in class_ids]}}
+    classes_cur = db_client.class_coll.find(filter)
+    return classes_cur
 
 
 # STUDENT
@@ -239,6 +249,24 @@ def edit_student_course_progress(
     except InvalidId:
         raise Exception.bad_request
     return {"progress": (response["finished_count"] / total_lessons) * 100}
+
+
+# CLASS
+def query_assignment(assignment_id: str) -> dict:
+    filter = {"_id": ObjectId(assignment_id)}
+    assign = db_client.assignment_coll.find_one(filter)
+    if assign == None:
+        raise Exception.not_found
+    return assign
+
+
+def query_student_assignment_submissions(student_id: str) -> Cursor:
+    try:
+        filter = {"student_id": ObjectId(student_id)}
+        submissions_cur = db_client.assignment_submission_coll.find(filter)
+        return submissions_cur
+    except InvalidId:
+        raise Exception.bad_request
 
 
 # STUDENT CONFIG

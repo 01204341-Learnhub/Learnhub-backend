@@ -2,11 +2,11 @@ from fastapi import APIRouter, Depends
 from typing import Annotated, Union
 
 from learnhub_backend.transaction.schemas import (
-    PostCoursePurchaseRequestModel,
-    PostCoursePurchaseResponseModel,
+    PostPurchaseRequestModel,
+    PostPurchaseResponseModel,
 )
 from .services import (
-    post_purchase_course,
+    post_purchase,
 )
 
 
@@ -30,11 +30,11 @@ common_page_params = Annotated[dict, Depends(router.dependencies[0].dependency)]
 
 
 @router.post(
-    "/course/purchase",
+    "/purchase",
     status_code=200,
     response_model_exclude_none=True,
-    response_model=PostCoursePurchaseResponseModel,
+    response_model=PostPurchaseResponseModel,
 )
-def PostCoursePurchase(request_body: PostCoursePurchaseRequestModel):
-    response_body = post_purchase_course(request_body)
+def PostPurchase(request_body: PostPurchaseRequestModel):
+    response_body = post_purchase(request_body)
     return response_body

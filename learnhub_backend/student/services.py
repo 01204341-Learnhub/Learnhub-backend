@@ -9,6 +9,7 @@ from learnhub_backend.program.course.announcements.database import (
     list_course_announcement,
 )
 from learnhub_backend.program.course.database import query_list_course_chapters
+from learnhub_backend.teacher.database import query_teacher
 
 from .database import (
     create_student,
@@ -16,10 +17,13 @@ from .database import (
     create_student_payment_method,
     edit_student,
     edit_student_payment_method,
+    query_assignment,
     query_class,
     query_course,
     query_list_students,
+    query_multiple_classes,
     query_student,
+    query_student_assignment_submissions,
     query_student_basket,
     query_teacher_profile,
     remove_student,
@@ -32,10 +36,15 @@ from .database import (
 )
 
 from .schemas import (
+    ClassInfoModelBody,
     GetStudentBasketItemResponseModel,
     GetStudentCourseResponseModel,
     GetStudentPaymentMethodResponseModel,
     ListStudentBasketResponseModel,
+    ListStudentClassAssignmentsModelBody,
+    ListStudentClassAssignmentsResponseModel,
+    ListStudentClassModelBody,
+    ListStudentClassResponseModel,
     ListStudentCourseResponseModel,
     ListStudentCoursesModelBody,
     ListStudentPaymentMethodsResponseModel,
@@ -53,6 +62,7 @@ from .schemas import (
     LessonProgressModelBody,
     GetStudentConfigResponseModel,
     PatchStudentConfigRequestModel,
+    SubmissionModelBody,
     TeacherModelBody,
     courseAnnouncementModelBody,
     courseChapterModelBody,
@@ -97,6 +107,7 @@ def delete_student_request(student_id: str) -> DeleteResult:
     return result
 
 
+# PROGRAM
 # STUDENT COURSE
 def list_student_courses_response(student_id: str) -> ListStudentCourseResponseModel:
     student = query_student(student_id)
@@ -206,6 +217,62 @@ def patch_student_course_progress_request(
     return response
 
 
+# STUDENT CLASS
+def list_student_classes_response(student_id: str) -> ListStudentClassResponseModel:
+    student = query_student(student_id)
+    if student == None:
+        raise Exception.not_found
+
+    owned_programs = []
+    for program_ in student["owned_programs"]:
+        if program_["type"] == "class":
+            owned_programs.append(str(program_["program_id"]))
+    classes = query_multiple_classes(owned_programs)
+    classes_response = []
+    for class_ in classes:
+        teacher = query_teacher_profile(str(class_["teacher_id"]))
+        classes_response.append(
+            ListStudentClassModelBody(
+                class_id=str(class_["_id"]),
+                name=class_["name"],
+                class_pic=class_["class_pic"],
+                status=class_["status"],
+                progress=0,  # TODO: implement this
+                class_ended_date=int(datetime.timestamp(class_["class_ended_date"])),
+                teacher=TeacherModelBody(**teacher),
+            )
+        )
+
+    response = ListStudentClassResponseModel(classes=classes_response)
+    return response
+
+
+def list_student_class_assignments_response(
+    student_id: str,
+) -> ListStudentClassAssignmentsResponseModel:
+    submissions_cur = query_student_assignment_submissions(student_id)
+    assignments_response = []
+    for subm_ in submissions_cur:
+        _cls = query_class(str(subm_["class_id"]))
+        _assign_ = query_assignment(str(subm_["assignment_id"]))
+        assignments_response.append(
+            ListStudentClassAssignmentsModelBody(
+                name=_assign_["name"],
+                group_name=_assign_["group_name"],
+                status=_assign_["status"],
+                class_info=ClassInfoModelBody(
+                    class_id=str(subm_["class_id"]),
+                    class_name=_cls["name"],
+                ),
+                submission=SubmissionModelBody(
+                    submission_status=subm_["status"],
+                    submission_date=int(datetime.timestamp(subm_["submission_date"])),
+                ),
+            )
+        )
+    return ListStudentClassAssignmentsResponseModel(assignments=assignments_response)
+
+
 # STUDENT CONFIG
 def get_student_config_response(student_id: str) -> GetStudentConfigResponseModel:
     student_config = query_student_config(student_id)
@@ -312,7 +379,7 @@ def list_student_basket_response(student_id: str) -> ListStudentBasketResponseMo
             basket[i]["name"] = cls["name"]
             basket[i]["type"] = "class"
             basket[i]["teacher"] = query_teacher_profile(str(cls["teacher_id"]))
-            basket[i]["program_pic"] = cls["course_pic"]
+            basket[i]["program_pic"] = cls["class_pic"]
             basket[i]["rating"] = cls["rating"]
             basket[i]["review_count"] = cls["review_count"]
             basket[i]["difficulty_level"] = cls["difficulty_level"]
@@ -352,7 +419,7 @@ def get_student_basket_item_response(
         basket_item["name"] = cls["name"]
         basket_item["type"] = "class"
         basket_item["teacher"] = query_teacher_profile(str(cls["teacher_id"]))
-        basket_item["program_pic"] = cls["course_pic"]
+        basket_item["program_pic"] = cls["class_pic"]
         basket_item["rating"] = cls["rating"]
         basket_item["review_count"] = cls["review_count"]
         basket_item["difficulty_level"] = cls["difficulty_level"]

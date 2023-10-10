@@ -35,6 +35,7 @@ class Exception:
 student_type = "student"
 teacher_type = "teacher"
 course_type = "course"
+class_type = "class"
 
 
 # FIX: Doesn't work for youtube video
