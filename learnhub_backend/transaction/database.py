@@ -74,7 +74,7 @@ def purchase(request: PostPurchaseRequestModel) -> str:
                 e = Exception.not_found
                 e.__setattr__("detail", "Class not found")
                 raise e
-            if utc_datetime(class_["registration_ended_date"]) > utc_datetime_now():
+            if utc_datetime(class_["registration_ended_date"]) < utc_datetime_now():
                 e = Exception.unprocessable_content
                 e.__setattr__("detail", "Class registration period has ended")
                 raise e
