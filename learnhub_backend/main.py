@@ -15,6 +15,7 @@ from .teacher.router import router as teacher_router
 from .teacher.dashboard.router import router as teacher_dashboard_router
 from .quiz.router import router as quiz_router
 from .transaction.router import router as transaction_router
+from .student.wishlist.router import router as wishlist_router
 
 app = FastAPI()
 app.include_router(program_router)
@@ -28,6 +29,7 @@ app.include_router(teacher_router)
 app.include_router(teacher_dashboard_router)
 app.include_router(quiz_router)
 app.include_router(transaction_router)
+app.include_router(wishlist_router)
 
 app.add_middleware(
     CORSMiddleware,
