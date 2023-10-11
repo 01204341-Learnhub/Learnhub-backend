@@ -17,6 +17,7 @@ from .database import (
 )
 
 from .schemas import (
+    ClassSchedule,
     GetTeacherPaymentMethodResponseModel,
     GetTeacherResponseModel,
     ListTeacherClassesModelBody,
@@ -37,6 +38,7 @@ from .schemas import (
 from ..dependencies import (
     Exception,
     get_timestamp_from_datetime,
+    mongo_datetime_to_timestamp,
 )
 
 
@@ -104,6 +106,13 @@ def list_teacher_classes_response(teacher_id: str) -> ListTeacherClassesResponse
                 ),
                 student_count=class_["student_count"],
                 max_student=class_["max_student"],
+                schedules=[
+                    ClassSchedule(
+                        start=mongo_datetime_to_timestamp(_sched["start"]),
+                        end=mongo_datetime_to_timestamp(_sched["end"]),
+                    )
+                    for _sched in class_["schedules"]
+                ],
             )
         )
 
