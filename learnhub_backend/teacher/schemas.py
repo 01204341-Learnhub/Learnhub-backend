@@ -36,8 +36,8 @@ class GetTeacherResponseModel(BaseModel):
 
 
 class PatchTeacherRequestModel(BaseModel):
-    username: str | None
-    fullname: str | None
+    username: str | None = None
+    fullname: str | None = None
     profile_pic: HttpUrl | None = None
 
 
