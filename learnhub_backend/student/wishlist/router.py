@@ -7,12 +7,11 @@ from learnhub_backend.dependencies import (
     Exception,
 )
 
-from .services import (
-    place_holder_service
-)
+from .services import place_holder_service,get_wishlist_response
 
 from .schemas import (
     place_holder_model,
+    GetWishListResponseModel,
 )
 
 
@@ -33,14 +32,12 @@ common_page_params = Annotated[dict, Depends(router.dependencies[0].dependency)]
     "/",
     status_code=200,
     response_model_exclude_none=True,
-    response_model=dict,
+    response_model=GetWishListResponseModel,
 )
-def list_students(student_id:str ,common_paginations: common_page_params):
-    return {"id": student_id}
-    response_body = list_students_response(
-        skip=common_paginations["skip"],
-        limit=common_paginations["limit"],
+def get_wishlist(
+    student_id: str,
+):
+    response_body = get_wishlist_response(
+        student_id=student_id,
     )
     return response_body
-
-
