@@ -62,7 +62,7 @@ def mongo_datetime_to_timestamp(dt: datetime) -> int:
     Returns:
         int: The Unix timestamp (in UTC) equivalent of the datetime object.
     """
-    return int({dt}.replace(tzinfo=timezone.utc).timestamp())
+    return int(dt.replace(tzinfo=timezone.utc).timestamp())
 
 
 def timestamp_to_utc_datetime(timestamp: int) -> datetime:
