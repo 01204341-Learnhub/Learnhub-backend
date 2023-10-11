@@ -1,5 +1,9 @@
 from pydantic import TypeAdapter
-from learnhub_backend.dependencies import GenericOKResponse, Exception, mongo_datetime_to_timestamp
+from learnhub_backend.dependencies import (
+    GenericOKResponse,
+    Exception,
+    mongo_datetime_to_timestamp,
+)
 from .database import (
     create_course_announcement,
     list_course_announcement,

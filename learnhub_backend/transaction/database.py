@@ -1,5 +1,3 @@
-from pymongo.results import DeleteResult, UpdateResult
-from pymongo import ReturnDocument
 from bson.objectid import ObjectId
 from bson.errors import InvalidId
 

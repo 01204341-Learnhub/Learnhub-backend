@@ -1,4 +1,3 @@
-from datetime import datetime, timedelta, timezone
 from bson.objectid import ObjectId
 from bson.errors import InvalidId
 
@@ -7,7 +6,12 @@ from .schemas import (
     PatchCourseAnnouncementRequestModel,
 )
 from learnhub_backend.database import db_client
-from learnhub_backend.dependencies import Exception, CheckHttpFileType, mongo_datetime_to_timestamp, utc_datetime_now
+from learnhub_backend.dependencies import (
+    Exception,
+    CheckHttpFileType,
+    mongo_datetime_to_timestamp,
+    utc_datetime_now,
+)
 
 
 # TODO: optional add this to dependencies
@@ -33,7 +37,9 @@ def list_course_announcement(course_id: str, skip: int = 0, limit: int = 100):
         announcements = []
         for announcement in announcements_cursor:
             announcement["announcement_id"] = str(announcement["_id"])
-            announcement["last_edit"] = mongo_datetime_to_timestamp(announcement["last_edit"])
+            announcement["last_edit"] = mongo_datetime_to_timestamp(
+                announcement["last_edit"]
+            )
             announcements.append(announcement)
     except InvalidId:
         raise Exception.bad_request

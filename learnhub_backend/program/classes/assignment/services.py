@@ -1,9 +1,12 @@
-from datetime import datetime, timezone, timedelta
-from typing import Annotated, Union
 from pydantic import TypeAdapter
-from pymongo.results import UpdateResult
 
-from ....dependencies import GenericOKResponse, Exception, CheckHttpFileType, utc_datetime_now, utc_datetime, mongo_datetime_to_timestamp, timestamp_to_utc_datetime
+
+from ....dependencies import (
+    GenericOKResponse,
+    Exception,
+    utc_datetime_now,
+    mongo_datetime_to_timestamp,
+)
 
 from .schemas import (
     AttachmentModelBody,

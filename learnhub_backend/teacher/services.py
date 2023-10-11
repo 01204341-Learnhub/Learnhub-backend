@@ -1,4 +1,3 @@
-from typing import Annotated, Union
 from pydantic import TypeAdapter
 
 from learnhub_backend.dependencies import GenericOKResponse

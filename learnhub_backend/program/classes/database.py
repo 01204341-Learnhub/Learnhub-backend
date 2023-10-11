@@ -1,5 +1,4 @@
 from pymongo.cursor import Cursor
-from datetime import datetime, timedelta, timezone
 from ..database import db_client
 from bson.objectid import ObjectId
 from bson.errors import InvalidId
@@ -11,7 +10,12 @@ from .schemas import (
     PatchThreadRequestModel,
 )
 
-from ...dependencies import Exception, CheckHttpFileType, utc_datetime_now, timestamp_to_utc_datetime
+from ...dependencies import (
+    Exception,
+    CheckHttpFileType,
+    utc_datetime_now,
+    timestamp_to_utc_datetime,
+)
 
 
 def get_teacher_by_id(teacher_id: str):
@@ -82,8 +86,8 @@ def create_class(request: PostClassRequestModel) -> str:
             "meeting_count": len(request.schedules),
             "schedules": [],
             "open_date": timestamp_to_utc_datetime(request.open_date),
-            "registration_ended_date": timestamp_to_utc_datetime
-                (request.registration_ended_date
+            "registration_ended_date": timestamp_to_utc_datetime(
+                request.registration_ended_date
             ),
             "class_ended_date": timestamp_to_utc_datetime(request.class_ended_date),
             "status": "started",

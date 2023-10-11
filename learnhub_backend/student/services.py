@@ -1,4 +1,3 @@
-from typing import Annotated, Union
 from bson.objectid import ObjectId
 from pydantic import TypeAdapter
 from pymongo.results import DeleteResult, UpdateResult

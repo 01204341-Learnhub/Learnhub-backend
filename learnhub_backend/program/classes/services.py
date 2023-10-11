@@ -118,7 +118,9 @@ def post_thread_request(class_id: str, thread_body: PostThreadRequestModel):
 def get_thread_response(class_id: str, thread_id: str):
     quried_thread = query_thread(class_id=class_id, thread_id=thread_id)
     quried_thread["teacher"] = get_teacher_by_id(str(quried_thread["teacher_id"]))
-    quried_thread["last_edit"] = mongo_datetime_to_timestamp(quried_thread["last_edit"])# make timestamp timezone aware that db return utc time
+    quried_thread["last_edit"] = mongo_datetime_to_timestamp(
+        quried_thread["last_edit"]
+    )  # make timestamp timezone aware that db return utc time
     return GetThreadResponseModel(**quried_thread)
 
 

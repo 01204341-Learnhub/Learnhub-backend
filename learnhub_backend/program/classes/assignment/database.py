@@ -1,11 +1,14 @@
 from pymongo.cursor import Cursor
-from pymongo.results import UpdateResult
-from datetime import datetime, timedelta, timezone
 from ..database import db_client
 from bson.objectid import ObjectId
 from bson.errors import InvalidId
 
-from ....dependencies import Exception, CheckHttpFileType, student_type, utc_datetime_now, utc_datetime, mongo_datetime_to_timestamp, timestamp_to_utc_datetime
+from ....dependencies import (
+    Exception,
+    student_type,
+    utc_datetime_now,
+    timestamp_to_utc_datetime,
+)
 
 from .schemas import (
     PatchAssignmentRequestModel,
