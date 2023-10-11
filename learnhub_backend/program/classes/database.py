@@ -15,6 +15,10 @@ from ...dependencies import (
     CheckHttpFileType,
     utc_datetime_now,
     timestamp_to_utc_datetime,
+    teacher_type,
+    student_type,
+    class_type,
+    course_type,
 )
 
 
@@ -67,6 +71,18 @@ def query_class(class_id: str) -> dict | None:
 
 def create_class(request: PostClassRequestModel) -> str:
     try:
+        # Check valid teacher
+        teacher_filter = {"type": teacher_type, "_id": ObjectId(request.teacher_id)}
+        teacher_result = db_client.user_coll.find_one(filter=teacher_filter)
+        if teacher_result == None:
+            raise Exception.unprocessable_content
+
+        # Check valid tag
+        for tag_id in request.tag_ids:
+            tag_result = db_client.tag_coll.find_one(ObjectId(tag_id))
+            if tag_result == None:
+                raise Exception.unprocessable_content
+
         body = {
             "name": request.name,
             "description": request.description,
@@ -101,11 +117,24 @@ def create_class(request: PostClassRequestModel) -> str:
                     "end": timestamp_to_utc_datetime(sched_.end),
                 }
             )
-        result = db_client.class_coll.insert_one(body)
-        if result.inserted_id == None:
+        insert_class_result = db_client.class_coll.insert_one(body)
+        if insert_class_result.inserted_id == None:
             raise Exception.internal_server_error
-        else:
-            return str(result.inserted_id)
+
+        # add class to teacher's owned programs
+        push_content = {
+            "owned_programs": {
+                "type": class_type,
+                "program_id": insert_class_result.inserted_id,
+            }
+        }
+        push_result = db_client.user_coll.update_one(
+            teacher_filter, {"$push": push_content}
+        )
+        if push_result.matched_count == 0:
+            raise Exception.internal_server_error
+        return str(insert_class_result.inserted_id)
+
     except InvalidId:
         raise Exception.bad_request
 
