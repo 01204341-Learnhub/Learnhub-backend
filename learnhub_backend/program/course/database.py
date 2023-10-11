@@ -111,8 +111,23 @@ def create_course(course_body: PostCourseRequestModel) -> InsertOneResult:
             "status": "started",  # TODO: add not deployed status
         }
 
-        result = db_client.course_coll.insert_one(document=body)
-        return result
+        insert_course_result = db_client.course_coll.insert_one(document=body)
+        if insert_course_result.inserted_id == None:
+            raise Exception.internal_server_error
+
+        # Add teacher owned program
+        push_content = {
+            "owned_programs": {
+                "type": course_type,
+                "program_id": insert_course_result.inserted_id,
+            }
+        }
+        push_result = db_client.user_coll.update_one(
+            teacher_filter, {"$push": push_content}
+        )
+        if push_result.matched_count == 0:
+            raise Exception.internal_server_error
+        return insert_course_result
 
     except InvalidId:
         raise Exception.bad_request
