@@ -3,12 +3,11 @@ from pydantic import TypeAdapter
 from learnhub_backend.dependencies import (
     GenericOKResponse,
     Exception,
-    mongo_datetime_to_timestamp,
 )
 from .database import (
-    query_wishlist, 
-    query_class_or_course, 
-    add_wishlist_item
+    query_wishlist,
+    query_class_or_course,
+    add_wishlist_item,
 )
 from .schemas import (
     GetWishListResponseModel,

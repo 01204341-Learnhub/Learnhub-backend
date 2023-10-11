@@ -18,4 +18,4 @@ class GetWishListResponseModel(BaseModel):
 
 class PostWishListItemRequestModel(BaseModel):
     type: str
-    program_id: str 
+    program_id: str

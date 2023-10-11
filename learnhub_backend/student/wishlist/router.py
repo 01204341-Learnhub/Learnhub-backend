@@ -7,7 +7,7 @@ from learnhub_backend.dependencies import (
     Exception,
 )
 
-from .services import get_wishlist_response,post_wishlist_item_request
+from .services import get_wishlist_response, post_wishlist_item_request
 
 from .schemas import (
     GetWishListResponseModel,
