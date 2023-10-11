@@ -12,12 +12,14 @@ from .schemas import (
     PatchCourseChapterRequestModel,
     PatchCourseLessonRequestModel,
     PostCourseLessonRequestModel,
+    PatchCourseRequestModel,
 )
 
 from ...dependencies import (
     Exception,
     teacher_type,
     utc_datetime_now,
+    timestamp_to_utc_datetime
 )
 
 from ...dependencies import student_type
@@ -112,7 +114,87 @@ def create_course(course_body: PostCourseRequestModel) -> InsertOneResult:
     except InvalidId:
         raise Exception.bad_request
 
-    # TODO: Patch course
+
+def edit_course(course_id: str, course_body: PatchCourseRequestModel):
+    try:
+        filter = {"_id": ObjectId(course_id)}
+
+        # prepare update body
+        set_content = dict()
+        push_content = dict()
+        pull_content = dict()
+        if course_body.name != None:
+            set_content["name"] = course_body.name
+        if course_body.course_pic != None:
+            set_content["course_pic"] = str(course_body.course_pic)
+        if course_body.price != None:
+            set_content["price"] = course_body.price
+        if course_body.description != None:
+            set_content["description"] = course_body.description
+        if course_body.course_requirement != None:
+            set_content["course_requirement"] = course_body.course_requirement
+        if course_body.difficulty_level != None:
+            set_content["difficulty_level"] = course_body.difficulty_level
+       
+        # course objective
+        if course_body.course_objective != None:
+            for objective_ in course_body.course_objective:
+                if objective_.op == "add":
+                    if "course_objective" not in push_content:
+                        push_content["course_objective"] = {}
+                        push_content["course_objective"]["$each"] = []
+                    push_content["course_objective"]["$each"].append(objective_.value)
+                elif objective_.op == "remove":
+                    if "course_objective" not in pull_content:
+                        pull_content["course_objective"] = {}
+                        pull_content["course_objective"]["$in"] = []
+                    pull_content["course_objective"]["$in"].append(objective_.value)
+
+        # tags
+        if course_body.tag != None:
+            #  Check duplicate tags
+            _course_tag_filter = {
+                "_id": ObjectId(course_id),
+                "tags": ObjectId(course_body.tag.tag_id),
+            }
+            _course_tag_check_result = db_client.course_coll.find_one(_course_tag_filter)
+            if _course_tag_check_result != None:
+                err = Exception.unprocessable_content
+                err.__setattr__("detail", "duplicate course's tag")
+                raise err
+
+            tag_filter = {"_id": ObjectId(course_body.tag.tag_id)}
+            tag = db_client.tag_coll.find_one(tag_filter)
+            if tag == None:
+                err = Exception.unprocessable_content
+                err.__setattr__("detail", "Invalid tag_id")
+                raise err
+
+            if course_body.tag.op == "add":
+                push_content["tags"] = ObjectId(course_body.tag.tag_id)
+            elif course_body.tag.op == "remove":
+                pull_content["tags"]["$in"] = [ObjectId(course_body.tag.tag_id)]
+
+        
+        # mongo doesn't allow multi operation edit
+        patch_result = None
+        if len(set_content) != 0:
+            patch_result = db_client.course_coll.update_one(
+                filter, {"$set": set_content}
+            )
+        if len(push_content) != 0:
+            patch_result = db_client.course_coll.update_one(
+                filter, {"$push": push_content}
+            )
+        if len(pull_content) != 0:
+            patch_result = db_client.course_coll.update_one(
+                filter, {"$pull": pull_content}
+            )
+
+        if patch_result == None:
+            raise Exception.internal_server_error
+    except InvalidId:
+        raise Exception.bad_request
 
 
 # CHAPTER

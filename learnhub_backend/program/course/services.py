@@ -18,6 +18,7 @@ from .database import (
     query_course_lesson,
     create_course_lesson,
     remove_course_lesson,
+    edit_course,
 )
 from .schemas import (
     GetCourseResponseModel,
@@ -39,6 +40,7 @@ from .schemas import (
     PatchCourseLessonRequestModel,
     PostCourseLessonRequestModel,
     PostCourseLessonResponseModel,
+    PatchCourseRequestModel,
 )
 
 from ...dependencies import Exception
@@ -109,6 +111,11 @@ def get_course_response(course_id: str):
     course["tags"] = tags
 
     return GetCourseResponseModel(**course)
+
+
+def patch_course_request(course_id: str, course_body: PatchCourseRequestModel):
+    edit_course(course_id=course_id, course_body=course_body)
+    return GenericOKResponse
 
 
 # COURSE CHAPTERS
