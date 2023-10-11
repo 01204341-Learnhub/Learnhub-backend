@@ -5,9 +5,8 @@ from learnhub_backend.dependencies import (
     Exception,
     mongo_datetime_to_timestamp,
 )
-from .database import place_holder_db,query_wishlist,query_class_or_course
+from .database import query_wishlist, query_class_or_course
 from .schemas import (
-    place_holder_model,
     GetWishListResponseModel,
 )
 
@@ -24,7 +23,9 @@ def get_wishlist_response(
     for item in wishlist:
         item["wishlist_item_id"] = str(item["wishlist_item_id"])
         item["program_id"] = str(item["program_id"])
-        program = query_class_or_course(program_id=item["program_id"], program_type=item["type"])
+        program = query_class_or_course(
+            program_id=item["program_id"], program_type=item["type"]
+        )
         item["name"] = program["name"]
         item["price"] = program["price"]
 

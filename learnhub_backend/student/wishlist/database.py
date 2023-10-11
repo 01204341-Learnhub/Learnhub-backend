@@ -5,7 +5,7 @@ from pymongo import ReturnDocument
 from bson.objectid import ObjectId
 from bson.errors import InvalidId
 
-from .schemas import place_holder_model
+from .schemas import GetWishListResponseModel
 from ..database import db_client
 
 
@@ -18,10 +18,7 @@ from learnhub_backend.dependencies import (
 )
 
 
-def place_holder_db():
-    pass
-
-
+# WISSLIST
 def query_class_or_course(program_id: str, program_type: str) -> Cursor:
     try:
         filter_ = {"_id": ObjectId(program_id)}

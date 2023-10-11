@@ -7,10 +7,9 @@ from learnhub_backend.dependencies import (
     Exception,
 )
 
-from .services import place_holder_service,get_wishlist_response
+from .services import get_wishlist_response
 
 from .schemas import (
-    place_holder_model,
     GetWishListResponseModel,
 )
 

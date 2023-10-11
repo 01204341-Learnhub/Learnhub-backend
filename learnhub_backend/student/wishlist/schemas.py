@@ -1,10 +1,8 @@
 from pydantic import BaseModel, HttpUrl
 
 
-class place_holder_model(BaseModel):
-    pass
+# WISSLIST
 
-#WISSLIST
 
 class WishListItemModelBody(BaseModel):
     wishlist_item_id: str
