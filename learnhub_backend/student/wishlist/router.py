@@ -7,10 +7,11 @@ from learnhub_backend.dependencies import (
     Exception,
 )
 
-from .services import get_wishlist_response
+from .services import get_wishlist_response,post_wishlist_item_request
 
 from .schemas import (
     GetWishListResponseModel,
+    PostWishListItemRequestModel,
 )
 
 
@@ -38,5 +39,21 @@ def get_wishlist(
 ):
     response_body = get_wishlist_response(
         student_id=student_id,
+    )
+    return response_body
+
+
+@router.post(
+    "/",
+    status_code=200,
+    response_model_exclude_none=True,
+    response_model=GenericOKResponse,
+)
+def post_wishlist_item(
+    student_id: str, wishlist_item_body: PostWishListItemRequestModel
+):
+    response_body = post_wishlist_item_request(
+        student_id=student_id,
+        wishlist_item_body=wishlist_item_body,
     )
     return response_body

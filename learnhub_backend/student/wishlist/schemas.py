@@ -14,3 +14,8 @@ class WishListItemModelBody(BaseModel):
 
 class GetWishListResponseModel(BaseModel):
     wishlist: list[WishListItemModelBody]
+
+
+class PostWishListItemRequestModel(BaseModel):
+    type: str
+    program_id: str 
