@@ -30,6 +30,7 @@ class ListClassesModelBody(BaseModel):
     open_date: int
     class_ended_date: int
     price: float
+    difficulty_level: str
 
 
 class ListClassesResponseModel(BaseModel):
