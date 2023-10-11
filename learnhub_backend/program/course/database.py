@@ -1,6 +1,4 @@
-from datetime import datetime
-
-from pymongo.results import InsertOneResult, UpdateResult
+from pymongo.results import InsertOneResult
 from bson.objectid import ObjectId
 from bson.errors import InvalidId
 
@@ -19,6 +17,7 @@ from .schemas import (
 from ...dependencies import (
     Exception,
     teacher_type,
+    utc_datetime_now,
 )
 
 from ...dependencies import student_type
@@ -89,7 +88,7 @@ def create_course(course_body: PostCourseRequestModel) -> InsertOneResult:
             "name": course_body.name,
             "teacher_id": ObjectId(course_body.teacher_id),
             "description": course_body.description,
-            "created_date": datetime.now(),
+            "created_date": utc_datetime_now(),
             "course_pic": str(course_body.course_pic),
             "student_count": 0,
             "rating": 0,

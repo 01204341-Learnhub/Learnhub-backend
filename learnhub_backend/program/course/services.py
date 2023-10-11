@@ -1,6 +1,4 @@
-from typing import Annotated, Union
 from pydantic import TypeAdapter
-from pymongo.results import UpdateResult
 
 from learnhub_backend.dependencies import GenericOKResponse
 

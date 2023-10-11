@@ -1,7 +1,4 @@
-from typing import Optional, Union
 from pydantic import BaseModel, HttpUrl
-from datetime import datetime
-from bson import ObjectId
 
 
 # CLASSES

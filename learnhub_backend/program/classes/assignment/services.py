@@ -3,7 +3,7 @@ from typing import Annotated, Union
 from pydantic import TypeAdapter
 from pymongo.results import UpdateResult
 
-from ....dependencies import GenericOKResponse, Exception, CheckHttpFileType
+from ....dependencies import GenericOKResponse, Exception, CheckHttpFileType, utc_datetime_now, utc_datetime, mongo_datetime_to_timestamp, timestamp_to_utc_datetime
 
 from .schemas import (
     AttachmentModelBody,
@@ -47,8 +47,8 @@ def list_assignment_response(class_id: str) -> ListClassAssignmentsResponseModel
                 assignment_id=str(assg_["_id"]),
                 name=assg_["name"],
                 group_name=assg_["group_name"],
-                last_edit=int(datetime.timestamp(assg_["last_edit"])),
-                due_date=int(datetime.timestamp(assg_["due_date"])),
+                last_edit=mongo_datetime_to_timestamp(assg_["last_edit"]),
+                due_date=mongo_datetime_to_timestamp(assg_["due_date"]),
                 status=assg_["status"],
                 max_score=assg_["max_score"],
                 text=assg_["text"],
@@ -67,8 +67,8 @@ def get_assignment_response(
     response_body = GetClassAssignmentResponseModel(
         name=assignment["name"],
         group_name=assignment["group_name"],
-        last_edit=int(datetime.timestamp(assignment["last_edit"])),
-        due_date=int(datetime.timestamp(assignment["due_date"])),
+        last_edit=mongo_datetime_to_timestamp(assignment["last_edit"]),
+        due_date=mongo_datetime_to_timestamp(assignment["due_date"]),
         status=assignment["status"],
         max_score=assignment["max_score"],
         text=assignment["text"],
@@ -81,7 +81,7 @@ def post_assignment_request(
     class_id: str, request: PostClassAssignmentRequestModel
 ) -> PostClassAssignmentResponseModel:
     inserted_id = create_assignment(class_id, request)
-    if request.due_date <= datetime.now(tz=timezone(timedelta(hours=7))).timestamp():
+    if request.due_date <= mongo_datetime_to_timestamp(utc_datetime_now()):
         err = Exception.unprocessable_content
         err.__setattr__("detail", "required due_date to be later that present")
     return PostClassAssignmentResponseModel(assignment_id=inserted_id)
@@ -110,7 +110,7 @@ def list_assignment_submissions_response(
             ListAssignmentSubmissionModelBody(
                 status=sub_["status"],
                 score=sub_["score"],
-                submission_date=int(datetime.timestamp(sub_["submission_date"])),
+                submission_date=mongo_datetime_to_timestamp(sub_["submission_date"]),
                 student=StudentModelBody(**student),
             )
         )
@@ -134,7 +134,7 @@ def get_assignment_submission_response(
         status=submission["status"],
         score=submission["score"],
         student=StudentModelBody(**student),
-        submission_date=int(datetime.timestamp(submission["submission_date"])),
+        submission_date=mongo_datetime_to_timestamp(submission["submission_date"]),
         attachments=ta.validate_python(submission["attachments"]),
     )
     return response
