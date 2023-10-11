@@ -1,5 +1,6 @@
 from pydantic import BaseModel
 from fastapi import HTTPException
+from datetime import datetime, timezone
 import mimetypes
 import httpx
 
@@ -49,3 +50,29 @@ def CheckHttpFileType(url: str) -> str:
         result = response.split(";")[0]
     file_type, extension = result.split("/")  # 'video/mp4'
     return file_type
+
+
+def mongo_datetime_to_timestamp(dt: datetime)->int:
+    """
+    Converts a datetime object to a Unix timestamp.
+    
+    Args:
+        dt (datetime): The datetime object to convert.
+    
+    Returns:
+        int: The Unix timestamp (in UTC) equivalent of the datetime object.
+    """
+    return int({dt}.replace(tzinfo=timezone.utc).timestamp())
+
+
+def timestamp_to_mongo_datetime(timestamp: int)->datetime:
+    """
+    Converts a Unix timestamp to a datetime object.
+    
+    Args:
+        timestamp (int): The Unix timestamp (in UTC) to convert.
+    
+    Returns:
+        datetime: The datetime object (in UTC) equivalent of the Unix timestamp.
+    """
+    return datetime.fromtimestamp(timestamp, tz=timezone.utc)
