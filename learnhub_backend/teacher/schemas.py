@@ -54,6 +54,21 @@ class ListTeacherCoursesResponseModel(BaseModel):
     courses: list[ListTeacherCoursesModelBody]
 
 
+class ListTeacherClassesModelBody(BaseModel):
+    class_id: str
+    name: str
+    class_pic: HttpUrl
+    status: str
+    registration_ended_date: int
+    class_ended_date: int
+    student_count: int
+    max_student: int
+
+
+class ListTeacherClassesResponseModel(BaseModel):
+    classes: list[ListTeacherClassesModelBody]
+
+
 # PAYMENT METHOD
 class GetTeacherPaymentMethodResponseModel(BaseModel):
     payment_method_id: str

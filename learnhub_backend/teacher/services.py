@@ -1,4 +1,6 @@
 from pydantic import TypeAdapter
+from typing import Annotated, Union
+from pydantic import HttpUrl, TypeAdapter
 
 from learnhub_backend.dependencies import GenericOKResponse
 
@@ -7,6 +9,7 @@ from .database import (
     create_teacher_payment_method,
     edit_teacher,
     edit_teacher_payment_method,
+    query_class_by_teacher,
     query_course_by_teacher,
     query_list_teachers,
     query_teacher,
@@ -16,6 +19,8 @@ from .database import (
 from .schemas import (
     GetTeacherPaymentMethodResponseModel,
     GetTeacherResponseModel,
+    ListTeacherClassesModelBody,
+    ListTeacherClassesResponseModel,
     ListTeacherCoursesModelBody,
     ListTeacherCoursesResponseModel,
     ListTeacherPaymentMethodsResponseModel,
@@ -29,7 +34,10 @@ from .schemas import (
     PostTeacherResponseModel,
 )
 
-from ..dependencies import Exception
+from ..dependencies import (
+    Exception,
+    get_timestamp_from_datetime,
+)
 
 
 # TEACHERS
@@ -76,6 +84,30 @@ def list_teacher_courses_response(teacher_id: str) -> ListTeacherCoursesResponse
         )
 
     return ListTeacherCoursesResponseModel(courses=courses)
+
+
+def list_teacher_classes_response(teacher_id: str) -> ListTeacherClassesResponseModel:
+    classes_cur = query_class_by_teacher(teacher_id)
+    classes = []
+    for class_ in classes_cur:
+        classes.append(
+            ListTeacherClassesModelBody(
+                class_id=str(class_["_id"]),
+                name=class_["name"],
+                class_pic=HttpUrl(class_["class_pic"]),
+                status=class_["status"],
+                registration_ended_date=get_timestamp_from_datetime(
+                    class_["registration_ended_date"]
+                ),
+                class_ended_date=get_timestamp_from_datetime(
+                    class_["class_ended_date"]
+                ),
+                student_count=class_["student_count"],
+                max_student=class_["max_student"],
+            )
+        )
+
+    return ListTeacherClassesResponseModel(classes=classes)
 
 
 # PAYMENT METHOD

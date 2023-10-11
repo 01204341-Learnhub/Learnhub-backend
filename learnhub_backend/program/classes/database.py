@@ -74,8 +74,6 @@ def create_class(request: PostClassRequestModel) -> str:
             "class_pic": str(request.class_pic),
             "student_count": 0,
             "max_student": request.max_student,
-            "rating": 0,
-            "review_count": 0,
             "price": request.price,
             "teacher_id": ObjectId(request.teacher_id),
             "class_objective": request.class_objective,

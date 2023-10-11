@@ -4,6 +4,7 @@ from .config import (
     DB_ASSIGNMENT_SUBMISSIONS_COLLECTION,
     DB_CLASS_COLLECTION,
     DB_COURSE_PROGRESS_COLLECTION,
+    DB_COURSE_REVIEW_COLLECTION,
     DB_TAG_COLLECTION,
     DB_TRANSACTION_COLLECTION,
     MONGODB_URI,
@@ -31,6 +32,7 @@ class DB_client(MongoClient):
         self.lesson_coll = self.db[DB_LESSON_COLLECTION]
         self.announcement_coll = self.db[DB_ANNOUNCEMENT_COLLECTION]
         self.course_progress_coll = self.db[DB_COURSE_PROGRESS_COLLECTION]
+        self.course_review_coll = self.db[DB_COURSE_REVIEW_COLLECTION]
 
         self.class_coll = self.db[DB_CLASS_COLLECTION]
 

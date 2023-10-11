@@ -21,6 +21,11 @@ class AttachmentPatchModelBody(BaseModel):
 
 
 # ASSIGNMENTS
+class SubmissionCountModelBody(BaseModel):
+    submit_count: int
+    unsubmit_count: int
+
+
 class ListClassAssignmentsModelBody(BaseModel):
     assignment_id: str
     name: str
@@ -29,6 +34,7 @@ class ListClassAssignmentsModelBody(BaseModel):
     due_date: int
     status: str
     max_score: float
+    submission_count: SubmissionCountModelBody
     text: str
 
 

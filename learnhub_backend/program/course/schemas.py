@@ -1,5 +1,5 @@
 from typing import Optional
-from pydantic import BaseModel, HttpUrl
+from pydantic import BaseModel, HttpUrl, validator
 
 
 class TeacherModelBody(BaseModel):
@@ -22,6 +22,7 @@ class ListCoursesModelBody(BaseModel):
     tags: list[TagModelBody]
     rating: float
     review_count: int
+    difficulty_level: str
     price: float
 
 
@@ -85,6 +86,21 @@ class PatchCourseRequestModel(BaseModel):
     course_requirement: str | None = None
     difficulty_level: str | None = None
     tag: PatchTagModelBody | None = None
+
+
+class PatchCourseReviewRequestModel(BaseModel):
+    student_id: str
+    rating: float
+
+    @validator("rating")
+    def rating_validator(cls, v: float):
+        if v > 5 or v < 0:
+            raise ValueError("Rating needs to be between 0-5")
+        return v
+
+
+class PatchCourseReviewResponseModel(BaseModel):
+    review_id: str
 
 
 # COURSE CHAPTERS

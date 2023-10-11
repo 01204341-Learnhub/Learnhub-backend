@@ -7,6 +7,16 @@ class ClassInfoModelBody(BaseModel):
     class_name: str
 
 
+class ClassScheduleModelBody(BaseModel):
+    start: int
+    end: int
+
+
+class SubmissionModelBody(BaseModel):
+    submission_status: str  # check | uncheck | unsubmit
+    submission_date: int
+
+
 # TEACHER
 class TeacherModelBody(BaseModel):
     teacher_id: str
@@ -45,7 +55,6 @@ class PatchStudentRequestModel(BaseModel):
     profile_pic: HttpUrl | None = None
 
 
-# STUDENTS PROGRAMS
 # COURSE
 class ListStudentCoursesModelBody(BaseModel):
     course_id: str
@@ -93,11 +102,6 @@ class ListStudentClassModelBody(BaseModel):
 
 class ListStudentClassResponseModel(BaseModel):
     classes: list[ListStudentClassModelBody]
-
-
-class SubmissionModelBody(BaseModel):
-    submission_status: str  # check | uncheck | unsubmit
-    submission_date: int
 
 
 class ListStudentClassAssignmentsModelBody(BaseModel):

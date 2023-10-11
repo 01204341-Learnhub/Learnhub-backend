@@ -17,9 +17,12 @@ from .schemas import (
 
 from ...dependencies import (
     Exception,
-    teacher_type,
     utc_datetime_now,
-    timestamp_to_utc_datetime
+    timestamp_to_utc_datetime,
+    student_type,
+    teacher_type,
+    course_type,
+    class_type,
 )
 
 from ...dependencies import student_type
@@ -135,7 +138,7 @@ def edit_course(course_id: str, course_body: PatchCourseRequestModel):
             set_content["course_requirement"] = course_body.course_requirement
         if course_body.difficulty_level != None:
             set_content["difficulty_level"] = course_body.difficulty_level
-       
+
         # course objective
         if course_body.course_objective != None:
             for objective_ in course_body.course_objective:
@@ -157,7 +160,9 @@ def edit_course(course_id: str, course_body: PatchCourseRequestModel):
                 "_id": ObjectId(course_id),
                 "tags": ObjectId(course_body.tag.tag_id),
             }
-            _course_tag_check_result = db_client.course_coll.find_one(_course_tag_filter)
+            _course_tag_check_result = db_client.course_coll.find_one(
+                _course_tag_filter
+            )
             if _course_tag_check_result != None:
                 err = Exception.unprocessable_content
                 err.__setattr__("detail", "duplicate course's tag")
@@ -175,7 +180,6 @@ def edit_course(course_id: str, course_body: PatchCourseRequestModel):
             elif course_body.tag.op == "remove":
                 pull_content["tags"]["$in"] = [ObjectId(course_body.tag.tag_id)]
 
-        
         # mongo doesn't allow multi operation edit
         patch_result = None
         if len(set_content) != 0:
@@ -195,6 +199,80 @@ def edit_course(course_id: str, course_body: PatchCourseRequestModel):
             raise Exception.internal_server_error
     except InvalidId:
         raise Exception.bad_request
+
+
+def student_is_own_program(student_id: str, _type: str, program_id: str) -> bool:
+    owned = False
+    result = None
+    if _type == course_type:
+        filter = {
+            "_id": ObjectId(student_id),
+            "owned_programs.program_id": ObjectId(program_id),
+            "owned_programs.type": course_type,
+        }
+        result = db_client.user_coll.find_one(filter)
+    elif _type == class_type:
+        filter = {
+            "_id": ObjectId(student_id),
+            "owned_programs.program_id": ObjectId(program_id),
+            "owned_programs.type": class_type,
+        }
+        result = db_client.user_coll.find_one(filter)
+
+    if result != None:
+        owned = True
+    return owned
+
+
+def review_course(course_id: str, student_id: str, rating: float) -> str:
+    _course = query_course(course_id)
+    if _course == None:
+        err = Exception.not_found
+        err.__setattr__("detail", "Course not found")
+        raise err
+
+    review_filter = {
+        "student_id": ObjectId(student_id),
+        "course_id": ObjectId(course_id),
+    }
+    review_result = db_client.course_review_coll.find_one(review_filter)
+
+    filter = {"_id": ObjectId(course_id)}
+    set_content = dict()
+    if review_result == None:  # First review
+        current_rating_full = _course["rating"] * _course["review_count"]
+        new_rating = (current_rating_full + rating) / (_course["review_count"] + 1)
+        set_content = {
+            "rating": new_rating,
+            "review_count": _course["review_count"] + 1,
+        }
+    else:  # Change review
+        current_rating_full = _course["rating"] * _course["review_count"]
+        new_rating = (current_rating_full + rating - review_result["rating"]) / (
+            _course["review_count"]
+        )
+        set_content = {
+            "rating": new_rating,
+        }
+
+    result = db_client.course_coll.update_one(filter, {"$set": set_content})
+    if result.matched_count == 0:
+        raise Exception.not_found
+
+    if review_result == None:  # First review
+        body = {
+            "course_id": ObjectId(course_id),
+            "student_id": ObjectId(student_id),
+            "rating": rating,
+        }
+        insert_res = db_client.course_review_coll.insert_one(body)
+        return str(insert_res.inserted_id)
+    else:  # Change review
+        set_review = {"rating": rating}
+        patch_res = db_client.course_review_coll.find_one_and_update(
+            review_filter, {"$set": set_review}
+        )
+        return str(patch_res["_id"])
 
 
 # CHAPTER

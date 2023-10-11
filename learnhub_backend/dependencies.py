@@ -1,3 +1,4 @@
+from datetime import datetime, timezone
 from pydantic import BaseModel
 from fastapi import HTTPException
 from datetime import datetime, timezone
@@ -99,3 +100,7 @@ def utc_datetime_now() -> datetime:
         datetime: The current datetime in UTC.
     """
     return datetime.now(tz=timezone.utc)
+
+
+def get_timestamp_from_datetime(dt: datetime) -> int:
+    return int(datetime.replace(dt, tzinfo=timezone.utc).timestamp())
