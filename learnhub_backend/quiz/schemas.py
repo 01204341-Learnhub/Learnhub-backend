@@ -1,5 +1,3 @@
-from datetime import datetime
-from typing import Any
 from pydantic import BaseModel, HttpUrl, validator
 
 
@@ -46,8 +44,11 @@ class PostQuizProblemModelBody(BaseModel):
     explanation: str
 
     @validator("correct_answer")
-    def choice_validator(cls, v: AnswerModelBody , values):
-        if "multiple_correct_answers" in values and values["multiple_correct_answers"] == False:
+    def choice_validator(cls, v: AnswerModelBody, values):
+        if (
+            "multiple_correct_answers" in values
+            and values["multiple_correct_answers"] == False
+        ):
             answer_count = 0
 
             for answer in v.dict().values():
@@ -56,7 +57,6 @@ class PostQuizProblemModelBody(BaseModel):
             if answer_count > 1:
                 raise ValueError("Multiple correct answers are not allowed")
         return v
-
 
 
 class PostQuizRequestModel(BaseModel):

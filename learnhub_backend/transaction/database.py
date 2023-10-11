@@ -1,6 +1,3 @@
-from datetime import datetime
-from pymongo.results import DeleteResult, UpdateResult
-from pymongo import ReturnDocument
 from bson.objectid import ObjectId
 from bson.errors import InvalidId
 
@@ -11,6 +8,9 @@ from ..dependencies import (
     course_type,
     class_type,
     Exception,
+    utc_datetime,
+    utc_datetime_now,
+    timestamp_to_utc_datetime,
 )
 
 from .schemas import (
@@ -47,7 +47,7 @@ def purchase(request: PostPurchaseRequestModel) -> str:
     total_price = 0
     transaction_body = dict()  # update transaction body
     transaction_body["user_id"] = ObjectId(request.student_id)
-    transaction_body["purchase_time"] = datetime.now()
+    transaction_body["purchase_time"] = utc_datetime_now()
     transaction_body["purchase_list"] = []
 
     # for item in basket buy
@@ -73,6 +73,10 @@ def purchase(request: PostPurchaseRequestModel) -> str:
             if class_ == None:
                 e = Exception.not_found
                 e.__setattr__("detail", "Class not found")
+                raise e
+            if utc_datetime(class_["registration_ended_date"]) > utc_datetime_now():
+                e = Exception.unprocessable_content
+                e.__setattr__("detail", "Class registration period has ended")
                 raise e
             update_purchase_list = {
                 "type": "class",
@@ -129,6 +133,7 @@ def _update_own_program_on_purchase(student_id: str, programs: list[_program]):
     if result.matched_count == 0:
         raise Exception.internal_server_error
 
+
 def _update_assignment_submission_on_purchase(
     student_id: str, programs: list[_program]
 ):
@@ -144,7 +149,7 @@ def _update_assignment_submission_on_purchase(
                         "assignment_id": assignment_["_id"],
                         "status": "unsubmit",
                         "score": 0,
-                        "submission_date": datetime.fromtimestamp(0),
+                        "submission_date": timestamp_to_utc_datetime(0),
                         "attachments": [],
                         "student_id": ObjectId(student_id),
                     }

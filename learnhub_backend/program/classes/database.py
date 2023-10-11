@@ -1,6 +1,4 @@
 from pymongo.cursor import Cursor
-from pymongo.results import UpdateResult
-from datetime import datetime, timedelta, timezone
 from ..database import db_client
 from bson.objectid import ObjectId
 from bson.errors import InvalidId
@@ -12,7 +10,12 @@ from .schemas import (
     PatchThreadRequestModel,
 )
 
-from ...dependencies import Exception, CheckHttpFileType
+from ...dependencies import (
+    Exception,
+    CheckHttpFileType,
+    utc_datetime_now,
+    timestamp_to_utc_datetime,
+)
 
 
 def get_teacher_by_id(teacher_id: str):
@@ -67,7 +70,7 @@ def create_class(request: PostClassRequestModel) -> str:
         body = {
             "name": request.name,
             "description": request.description,
-            "created_date": datetime.now(tz=timezone(timedelta(hours=7))),
+            "created_date": utc_datetime_now(),
             "class_pic": str(request.class_pic),
             "student_count": 0,
             "max_student": request.max_student,
@@ -80,11 +83,11 @@ def create_class(request: PostClassRequestModel) -> str:
             "assignment_count": 0,
             "meeting_count": len(request.schedules),
             "schedules": [],
-            "open_date": datetime.fromtimestamp(request.open_date),
-            "registration_ended_date": datetime.fromtimestamp(
+            "open_date": timestamp_to_utc_datetime(request.open_date),
+            "registration_ended_date": timestamp_to_utc_datetime(
                 request.registration_ended_date
             ),
-            "class_ended_date": datetime.fromtimestamp(request.class_ended_date),
+            "class_ended_date": timestamp_to_utc_datetime(request.class_ended_date),
             "status": "started",
         }
 
@@ -94,8 +97,8 @@ def create_class(request: PostClassRequestModel) -> str:
                 err.__setattr__("detail", "required schedule's start <= end")
             body["schedules"].append(
                 {
-                    "start": datetime.fromtimestamp(sched_.start),
-                    "end": datetime.fromtimestamp(sched_.end),
+                    "start": timestamp_to_utc_datetime(sched_.start),
+                    "end": timestamp_to_utc_datetime(sched_.end),
                 }
             )
         result = db_client.class_coll.insert_one(body)
@@ -132,13 +135,13 @@ def edit_class(class_id: str, request: PatchClassRequestModel):
         if request.difficulty_level != None:
             set_content["difficulty_level"] = request.difficulty_level
         if request.open_date != None:
-            set_content["open_date"] = datetime.fromtimestamp(request.open_date)
+            set_content["open_date"] = timestamp_to_utc_datetime(request.open_date)
         if request.registration_ended_date != None:
-            set_content["registration_ended_date"] = datetime.fromtimestamp(
+            set_content["registration_ended_date"] = timestamp_to_utc_datetime(
                 request.registration_ended_date
             )
         if request.class_ended_date != None:
-            set_content["class_ended_date"] = datetime.fromtimestamp(
+            set_content["class_ended_date"] = timestamp_to_utc_datetime(
                 request.class_ended_date
             )
 
@@ -189,8 +192,8 @@ def edit_class(class_id: str, request: PatchClassRequestModel):
                     "_id": ObjectId(class_id),
                     "schedules": {
                         "$elemMatch": {
-                            "start": datetime.fromtimestamp(request.schedules.start),
-                            "end": datetime.fromtimestamp(request.schedules.end),
+                            "start": timestamp_to_utc_datetime(request.schedules.start),
+                            "end": timestamp_to_utc_datetime(request.schedules.end),
                         }
                     },
                 }
@@ -208,8 +211,8 @@ def edit_class(class_id: str, request: PatchClassRequestModel):
                 push_content["schedules"] = {}
                 push_content["schedules"]["$each"] = [
                     {
-                        "start": datetime.fromtimestamp(request.schedules.start),
-                        "end": datetime.fromtimestamp(request.schedules.end),
+                        "start": timestamp_to_utc_datetime(request.schedules.start),
+                        "end": timestamp_to_utc_datetime(request.schedules.end),
                     }
                 ]
                 if "meeting_count" not in inc_content:
@@ -219,8 +222,8 @@ def edit_class(class_id: str, request: PatchClassRequestModel):
                 pull_content["schedules"] = {
                     "$in": [
                         {
-                            "start": datetime.fromtimestamp(request.schedules.start),
-                            "end": datetime.fromtimestamp(request.schedules.end),
+                            "start": timestamp_to_utc_datetime(request.schedules.start),
+                            "end": timestamp_to_utc_datetime(request.schedules.end),
                         }
                     ]
                 }
@@ -279,9 +282,7 @@ def create_thread(class_id: str, thread_body: PostThreadRequestModel):
         thread_to_insert = thread_body.model_dump()
         thread_to_insert["class_id"] = ObjectId(class_id)
         thread_to_insert["teacher_id"] = class_result["teacher_id"]
-        thread_to_insert["last_edit"] = datetime.now(
-            tz=timezone(timedelta(hours=7))
-        )  # bangkok time
+        thread_to_insert["last_edit"] = utc_datetime_now()
         for i in range(len(thread_to_insert["attachments"])):
             thread_to_insert["attachments"][i]["attachment_type"] = CheckHttpFileType(
                 thread_to_insert["attachments"][i]["src"]
@@ -312,7 +313,7 @@ def edit_thread(class_id: str, thread_id: str, thread_body: PatchThreadRequestMo
         pull_content = dict()
 
         # set update body for each field
-        set_content["last_edit"] = datetime.now(tz=timezone(timedelta(hours=7)))
+        set_content["last_edit"] = utc_datetime_now()
         if thread_body.name != None:
             set_content["name"] = thread_body.name
         if thread_body.text != None:

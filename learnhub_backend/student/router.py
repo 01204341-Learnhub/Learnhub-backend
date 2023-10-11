@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends
-from typing import Annotated, Union
+from typing import Annotated
 
 from ..dependencies import (
     common_pagination_parameters,

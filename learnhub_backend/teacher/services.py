@@ -1,3 +1,4 @@
+from pydantic import TypeAdapter
 from typing import Annotated, Union
 from pydantic import HttpUrl, TypeAdapter
 
@@ -33,7 +34,10 @@ from .schemas import (
     PostTeacherResponseModel,
 )
 
-from ..dependencies import Exception, get_timestamp_from_datetime
+from ..dependencies import (
+    Exception,
+    get_timestamp_from_datetime,
+)
 
 
 # TEACHERS

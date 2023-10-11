@@ -1,6 +1,7 @@
 from datetime import datetime, timezone
 from pydantic import BaseModel
 from fastapi import HTTPException
+from datetime import datetime, timezone
 import mimetypes
 import httpx
 
@@ -50,6 +51,55 @@ def CheckHttpFileType(url: str) -> str:
         result = response.split(";")[0]
     file_type, extension = result.split("/")  # 'video/mp4'
     return file_type
+
+
+def mongo_datetime_to_timestamp(dt: datetime) -> int:
+    """
+    Converts a datetime object to a Unix timestamp.
+
+    Args:
+        dt (datetime): The datetime object to convert.
+
+    Returns:
+        int: The Unix timestamp (in UTC) equivalent of the datetime object.
+    """
+    return int(dt.replace(tzinfo=timezone.utc).timestamp())
+
+
+def timestamp_to_utc_datetime(timestamp: int) -> datetime:
+    """
+    Converts a Unix timestamp to a datetime object.
+
+    Args:
+        timestamp (int): The Unix timestamp (in UTC) to convert.
+
+    Returns:
+        datetime: The datetime object (in UTC) equivalent of the Unix timestamp.
+    """
+    return datetime.fromtimestamp(timestamp, tz=timezone.utc)
+
+
+def utc_datetime(dt: datetime) -> datetime:
+    """
+    Adds utc timezone to a datetime object.
+
+    Args:
+        dt (datetime): The datetime object to add timezone to.
+
+    Returns:
+        datetime: The datetime object with timezone.
+    """
+    return dt.replace(tzinfo=timezone.utc)
+
+
+def utc_datetime_now() -> datetime:
+    """
+    Gets the current datetime in UTC.
+
+    Returns:
+        datetime: The current datetime in UTC.
+    """
+    return datetime.now(tz=timezone.utc)
 
 
 def get_timestamp_from_datetime(dt: datetime) -> int:

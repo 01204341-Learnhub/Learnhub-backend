@@ -1,6 +1,9 @@
 from pydantic import TypeAdapter
-from datetime import datetime
-from learnhub_backend.dependencies import GenericOKResponse, Exception
+from learnhub_backend.dependencies import (
+    GenericOKResponse,
+    Exception,
+    mongo_datetime_to_timestamp,
+)
 from .database import (
     create_course_announcement,
     list_course_announcement,
@@ -48,7 +51,7 @@ def get_course_announcement_response(
     )
     response_body["announcement_id"] = str(response_body["_id"])
     response_body["teacher"] = get_teacher_by_id(str(response_body["teacher_id"]))
-    response_body["last_edit"] = int(datetime.timestamp(response_body["last_edit"]))
+    response_body["last_edit"] = mongo_datetime_to_timestamp(response_body["last_edit"])
 
     return GetCourseAnnouncementResponseModel(**response_body)
 

@@ -1,4 +1,4 @@
-from typing import Annotated, Union
+from typing import Union
 from pydantic import TypeAdapter
 
 from .database import (

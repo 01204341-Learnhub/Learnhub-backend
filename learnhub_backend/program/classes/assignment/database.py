@@ -1,11 +1,14 @@
 from pymongo.cursor import Cursor
-from pymongo.results import UpdateResult
-from datetime import datetime, timedelta, timezone
 from ..database import db_client
 from bson.objectid import ObjectId
 from bson.errors import InvalidId
 
-from ....dependencies import Exception, CheckHttpFileType, student_type
+from ....dependencies import (
+    Exception,
+    student_type,
+    utc_datetime_now,
+    timestamp_to_utc_datetime,
+)
 
 from .schemas import (
     PatchAssignmentRequestModel,
@@ -70,7 +73,7 @@ def create_assignment(class_id: str, request: PostClassAssignmentRequestModel) -
         body = {
             "class_id": ObjectId(class_id),
             "name": request.name,
-            "created_date": datetime.now(tz=timezone(timedelta(hours=7))),
+            "created_date": utc_datetime_now(),
             "group_name": request.group_name,
             "max_score": request.max_score,
             "text": request.text,
@@ -78,9 +81,9 @@ def create_assignment(class_id: str, request: PostClassAssignmentRequestModel) -
                 {"attachment_type": at_.attachment_type, "src": at_.src}
                 for at_ in request.attachments
             ],
-            "last_edit": datetime.now(tz=timezone(timedelta(hours=7))),
+            "last_edit": utc_datetime_now(),
             "status": AssignmentStatus.open,
-            "due_date": datetime.fromtimestamp(request.due_date),
+            "due_date": timestamp_to_utc_datetime(request.due_date),
         }
         response = db_client.assignment_coll.insert_one(body)
         if response.inserted_id == None:
@@ -107,7 +110,7 @@ def _create_class_students_submission(class_id: str, assignment_id: str):
         "class_id": ObjectId(class_id),
         "status": SubmissionStatus.unsubmit,
         "score": 0,
-        "submission_date": datetime.fromtimestamp(0),
+        "submission_date": timestamp_to_utc_datetime(0),
         "attachments": [],
     }
     bodies = []
@@ -149,9 +152,7 @@ def edit_assignment(
         array_filter = []
 
         # set update body for each field
-        update_body_edit["$set"]["last_edit"] = datetime.now(
-            tz=timezone(timedelta(hours=7))
-        )  # bangkok time
+        update_body_edit["$set"]["last_edit"] = utc_datetime_now()
         if patch_body["name"] is not None:
             update_body_edit["$set"]["name"] = patch_body["name"]
         if patch_body["group_name"] is not None:
@@ -159,7 +160,7 @@ def edit_assignment(
         # if patch_body["max_score"] is not None:
         #     update_body_edit["$set"]["max_score"] = patch_body["max_score"]
         if patch_body["due_date"] is not None:
-            update_body_edit["$set"]["due_date"] = datetime.fromtimestamp(
+            update_body_edit["$set"]["due_date"] = timestamp_to_utc_datetime(
                 patch_body["due_date"]
             )
         if patch_body["status"] is not None:
@@ -287,7 +288,7 @@ def update_submission(
         set_content["class_id"] = ObjectId(class_id)
         set_content["status"] = SubmissionStatus.uncheck
         set_content["score"] = 0
-        set_content["submission_date"] = datetime.now(tz=timezone(timedelta(hours=7)))
+        set_content["submission_date"] = utc_datetime_now()
         set_content["attachments"] = [
             {"attachment_type": at_.attachment_type, "src": at_.src}
             for at_ in request.attachments

@@ -1,4 +1,3 @@
-from datetime import datetime, timedelta, timezone
 from bson.objectid import ObjectId
 from bson.errors import InvalidId
 
@@ -7,7 +6,12 @@ from .schemas import (
     PatchCourseAnnouncementRequestModel,
 )
 from learnhub_backend.database import db_client
-from learnhub_backend.dependencies import Exception, CheckHttpFileType
+from learnhub_backend.dependencies import (
+    Exception,
+    CheckHttpFileType,
+    mongo_datetime_to_timestamp,
+    utc_datetime_now,
+)
 
 
 # TODO: optional add this to dependencies
@@ -33,8 +37,8 @@ def list_course_announcement(course_id: str, skip: int = 0, limit: int = 100):
         announcements = []
         for announcement in announcements_cursor:
             announcement["announcement_id"] = str(announcement["_id"])
-            announcement["last_edit"] = int(
-                datetime.timestamp(announcement["last_edit"])
+            announcement["last_edit"] = mongo_datetime_to_timestamp(
+                announcement["last_edit"]
             )
             announcements.append(announcement)
     except InvalidId:
@@ -55,9 +59,7 @@ def create_course_announcement(
     announcement_body_to_inserted = announcement_body.model_dump()
     announcement_body_to_inserted["course_id"] = ObjectId(course_id)
     announcement_body_to_inserted["teacher_id"] = course_result["teacher_id"]
-    announcement_body_to_inserted["last_edit"] = datetime.now(
-        tz=timezone(timedelta(hours=7))
-    )  # bangkok time
+    announcement_body_to_inserted["last_edit"] = utc_datetime_now()
     for i in range(len(announcement_body_to_inserted["attachments"])):
         announcement_body_to_inserted["attachments"][i]["src"] = str(
             announcement_body_to_inserted["attachments"][i]["src"]
@@ -105,9 +107,7 @@ def edit_course_announcement(
         array_filter = []
 
         # set update body for each field
-        update_body_edit["$set"]["last_edit"] = datetime.now(
-            tz=timezone(timedelta(hours=7))
-        )  # bangkok time
+        update_body_edit["$set"]["last_edit"] = utc_datetime_now()
         if announcement_body["name"] is not None:
             update_body_edit["$set"]["name"] = announcement_body["name"]
         if announcement_body["text"] is not None:

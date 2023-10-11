@@ -1,5 +1,3 @@
-from datetime import datetime
-from typing import Annotated, Union
 from bson.objectid import ObjectId
 from pydantic import TypeAdapter
 from pymongo.results import DeleteResult, UpdateResult
@@ -68,7 +66,7 @@ from .schemas import (
     courseChapterModelBody,
 )
 
-from ..dependencies import Exception
+from ..dependencies import Exception, mongo_datetime_to_timestamp
 
 
 # STUDENTS
@@ -238,7 +236,9 @@ def list_student_classes_response(student_id: str) -> ListStudentClassResponseMo
                 class_pic=class_["class_pic"],
                 status=class_["status"],
                 progress=0,  # TODO: implement this
-                class_ended_date=int(datetime.timestamp(class_["class_ended_date"])),
+                class_ended_date=mongo_datetime_to_timestamp(
+                    class_["class_ended_date"]
+                ),
                 teacher=TeacherModelBody(**teacher),
             )
         )
@@ -266,7 +266,9 @@ def list_student_class_assignments_response(
                 ),
                 submission=SubmissionModelBody(
                     submission_status=subm_["status"],
-                    submission_date=int(datetime.timestamp(subm_["submission_date"])),
+                    submission_date=mongo_datetime_to_timestamp(
+                        subm_["submission_date"]
+                    ),
                 ),
             )
         )

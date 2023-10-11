@@ -1,4 +1,4 @@
-from typing import Optional, Union
+from typing import Optional
 from pydantic import BaseModel, HttpUrl, validator
 
 
@@ -65,6 +65,27 @@ class GetCourseResponseModel(BaseModel):
     quiz_count: int
     file_count: int
     video_count: int
+
+
+class PatchCourseObjectiveModelBody(BaseModel):
+    op: str  # add | remove
+    value: str
+
+
+class PatchTagModelBody(BaseModel):
+    op: str  # add | remove
+    tag_id: str  # tag_id
+
+
+class PatchCourseRequestModel(BaseModel):
+    name: str | None = None
+    course_pic: HttpUrl | None = None
+    price: float | None = None
+    description: str | None = None
+    course_objective: list[PatchCourseObjectiveModelBody] | None = None
+    course_requirement: str | None = None
+    difficulty_level: str | None = None
+    tag: PatchTagModelBody | None = None
 
 
 class PatchCourseReviewRequestModel(BaseModel):
