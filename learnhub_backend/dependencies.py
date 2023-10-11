@@ -65,7 +65,7 @@ def mongo_datetime_to_timestamp(dt: datetime)->int:
     return int({dt}.replace(tzinfo=timezone.utc).timestamp())
 
 
-def timestamp_to_mongo_datetime(timestamp: int)->datetime:
+def timestamp_to_utc_datetime(timestamp: int)->datetime:
     """
     Converts a Unix timestamp to a datetime object.
     
@@ -76,3 +76,24 @@ def timestamp_to_mongo_datetime(timestamp: int)->datetime:
         datetime: The datetime object (in UTC) equivalent of the Unix timestamp.
     """
     return datetime.fromtimestamp(timestamp, tz=timezone.utc)
+
+def utc_datetime(dt: datetime)->datetime:
+    """
+    Adds utc timezone to a datetime object.
+    
+    Args:
+        dt (datetime): The datetime object to add timezone to.
+    
+    Returns:
+        datetime: The datetime object with timezone.
+    """
+    return dt.replace(tzinfo=timezone.utc)
+
+def utc_datetime_now()->datetime:
+    """
+    Gets the current datetime in UTC.
+    
+    Returns:
+        datetime: The current datetime in UTC.
+    """
+    return datetime.now(tz=timezone.utc)
