@@ -42,7 +42,7 @@ def list_classes_response(skip: int, limit: int) -> ListClassesResponseModel:
     classes_corsor = query_list_classes(skip=skip, limit=limit)
     quried_classes = []
     for class_ in classes_corsor:
-        if utc_datetime(class_["registration_ended_date"]) > utc_datetime_now():
+        if utc_datetime(class_["registration_ended_date"]) < utc_datetime_now():
             continue  # continue if you can't buy class anymore
         class_["class_id"] = str(class_["_id"])
         class_["teacher"] = get_teacher_by_id(str(class_["teacher_id"]))
