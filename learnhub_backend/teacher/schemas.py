@@ -42,6 +42,11 @@ class PatchTeacherRequestModel(BaseModel):
 
 
 # PROGRAM
+class ClassSchedule(BaseModel):
+    start: int
+    end: int
+
+
 class ListTeacherCoursesModelBody(BaseModel):
     course_id: str
     course_pic: HttpUrl
@@ -63,6 +68,7 @@ class ListTeacherClassesModelBody(BaseModel):
     class_ended_date: int
     student_count: int
     max_student: int
+    schedules: list[ClassSchedule]
 
 
 class ListTeacherClassesResponseModel(BaseModel):
