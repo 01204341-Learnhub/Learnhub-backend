@@ -16,6 +16,10 @@ from ..dependencies import (
     Exception,
 )
 
+from .dependencies import (
+    _Program,
+)
+
 
 # TEACHERS
 def query_list_teachers(skip: int = 0, limit: int = 100) -> list:
@@ -71,7 +75,7 @@ def create_teacher(request: PostTeacherRequestModel):
         raise Exception.bad_request
 
 
-def query_teacher(teacher_id: str):
+def query_teacher(teacher_id: str) -> dict:
     try:
         filter = {"type": teacher_type, "_id": ObjectId(teacher_id)}
         teacher = db_client.user_coll.find_one(filter)
@@ -116,6 +120,22 @@ def query_class_by_teacher(teacher_id: str) -> Cursor:
     filter = {"teacher_id": ObjectId(teacher_id)}
     classes_cur = db_client.class_coll.find(filter)
     return classes_cur
+
+
+# TRANSACTION
+def query_transaction_by_programs(programs: list[_Program]) -> Cursor:
+    _filter = {
+        "purchase_list": {
+            "$elemMatch": {
+                "type": {"$in": [_program.type for _program in programs]},
+                "program_id": {
+                    "$in": [ObjectId(_program.program_id) for _program in programs]
+                },
+            }
+        }
+    }
+    transactions_cur = db_client.transaction_coll.find(_filter)
+    return transactions_cur
 
 
 # PAYMENT METHOD

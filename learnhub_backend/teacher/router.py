@@ -12,6 +12,7 @@ from .services import (
     get_teacher_response,
     list_teacher_classes_response,
     list_teacher_courses_response,
+    list_teacher_incomes_response,
     list_teacher_payment_methods_response,
     list_teachers_response,
     patch_teacher_payment_method_request,
@@ -25,6 +26,7 @@ from .schemas import (
     GetTeacherResponseModel,
     ListTeacherClassesResponseModel,
     ListTeacherCoursesResponseModel,
+    ListTeacherIncomesResponseModel,
     ListTeacherPaymentMethodsResponseModel,
     ListTeachersResponseModel,
     PatchTeacherPaymentMethodRequestModel,
@@ -125,6 +127,18 @@ def list_teacher_courses(teacher_id: str):
 )
 def list_teacher_classes(teacher_id: str):
     response_body = list_teacher_classes_response(teacher_id)
+    return response_body
+
+
+# INCOME
+@router.get(
+    "/{teacher_id}/incomes",
+    status_code=200,
+    response_model_exclude_none=True,
+    response_model=ListTeacherIncomesResponseModel,
+)
+def list_teacher_incomes(teacher_id: str):
+    response_body = list_teacher_incomes_response(teacher_id)
     return response_body
 
 
