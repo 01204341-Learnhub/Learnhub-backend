@@ -88,6 +88,7 @@ class ListTeacherIncomesModelBody(BaseModel):
     name: str
     buyer: StudentModelBody
     price: float
+    purchase_time: int
 
 
 class ListTeacherIncomesResponseModel(BaseModel):
