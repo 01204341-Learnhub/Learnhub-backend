@@ -23,7 +23,7 @@ from .schemas import (
     GetTeacherDashboardResponseModel,
 )
 
-from .config import (
+from ..dependencies import (
     _Program,
 )
 
