@@ -75,6 +75,25 @@ class ListTeacherClassesResponseModel(BaseModel):
     classes: list[ListTeacherClassesModelBody]
 
 
+# INCOMES
+class StudentModelBody(BaseModel):
+    student_id: str
+    student_name: str
+
+
+class ListTeacherIncomesModelBody(BaseModel):
+    type: str  # course | class
+    program_id: str
+    program_pic: HttpUrl
+    name: str
+    buyer: StudentModelBody
+    price: float
+
+
+class ListTeacherIncomesResponseModel(BaseModel):
+    incomes: list[ListTeacherIncomesModelBody]
+
+
 # PAYMENT METHOD
 class GetTeacherPaymentMethodResponseModel(BaseModel):
     payment_method_id: str
