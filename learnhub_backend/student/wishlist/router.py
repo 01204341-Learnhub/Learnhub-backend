@@ -11,6 +11,7 @@ from .services import (
     get_wishlist_response,
     post_wishlist_item_request,
     get_wishlist_item_response,
+    delete_wishlist_item_request,
 )
 
 from .schemas import (
@@ -75,6 +76,22 @@ def get_wishlist_item(
     wishlist_item_id: str,
 ):
     response_body = get_wishlist_item_response(
+        student_id=student_id, wishlist_item_id=wishlist_item_id
+    )
+    return response_body
+
+
+@router.delete(
+    "/{wishlist_item_id}",
+    status_code=200,
+    response_model_exclude_none=True,
+    response_model=GenericOKResponse,
+)
+def delete_wishlist_item(
+    student_id: str,
+    wishlist_item_id: str,
+):
+    response_body = delete_wishlist_item_request(
         student_id=student_id, wishlist_item_id=wishlist_item_id
     )
     return response_body

@@ -8,6 +8,7 @@ from .database import (
     query_wishlist,
     query_class_or_course,
     add_wishlist_item,
+    remove_wishlist_item,
 )
 from .schemas import (
     GetWishListResponseModel,
@@ -52,3 +53,10 @@ def get_wishlist_item_response(student_id: str,wishlist_item_id: str,):
             item["name"] = program["name"]
             item["price"] = program["price"]
             return WishListItemModelBody(**item)
+    
+    raise Exception.not_found
+
+
+def delete_wishlist_item_request(student_id: str,wishlist_item_id: str,):
+    remove_wishlist_item(student_id=student_id, wishlist_item_id=wishlist_item_id)
+    return GenericOKResponse

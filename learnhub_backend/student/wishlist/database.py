@@ -83,3 +83,18 @@ def add_wishlist_item(
             raise Exception.not_found
     except InvalidId:
         raise Exception.bad_request
+
+
+def remove_wishlist_item(student_id: str, wishlist_item_id: str):
+    try:
+        filter_ = {"_id": ObjectId(student_id), "type": student_type}
+        pull_content = {}
+        pull_content["wishlist"] = {"wishlist_item_id": ObjectId(wishlist_item_id)}
+        update_result = db_client.user_coll.update_one(
+            filter=filter_, update={"$pull": pull_content}
+        )
+        if update_result.matched_count == 0:
+            raise Exception.not_found
+        return True
+    except InvalidId:
+        raise Exception.bad_request
