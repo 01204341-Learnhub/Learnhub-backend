@@ -164,7 +164,9 @@ def list_teacher_incomes_response(teacher_id: str) -> ListTeacherIncomesResponse
                                 student_name=student["fullname"],
                             ),
                             price=course["price"],
-                            purchase_time=purchase_["purchase_time"],
+                            purchase_time=mongo_datetime_to_timestamp(
+                                transaction_["purchase_time"]
+                            ),
                         )
                     )
                 elif purchase_["type"] == class_type:
@@ -182,7 +184,9 @@ def list_teacher_incomes_response(teacher_id: str) -> ListTeacherIncomesResponse
                                 student_name=student["fullname"],
                             ),
                             price=class_["price"],
-                            purchase_time=purchase_["purchase_time"],
+                            purchase_time=mongo_datetime_to_timestamp(
+                                transaction_["purchase_time"]
+                            ),
                         )
                     )
     return ListTeacherIncomesResponseModel(incomes=incomes)
