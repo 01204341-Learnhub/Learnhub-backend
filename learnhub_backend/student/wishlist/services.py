@@ -12,6 +12,7 @@ from .database import (
 from .schemas import (
     GetWishListResponseModel,
     PostWishListItemRequestModel,
+    WishListItemModelBody,
 )
 
 
@@ -37,3 +38,17 @@ def post_wishlist_item_request(
 ):
     add_wishlist_item(student_id=student_id, wishlist_item_body=wishlist_item_body)
     return GenericOKResponse
+
+
+def get_wishlist_item_response(student_id: str,wishlist_item_id: str,):
+    wishlist = query_wishlist(student_id=student_id)
+    for item in wishlist:
+        item["wishlist_item_id"] = str(item["wishlist_item_id"])
+        if item["wishlist_item_id"] == wishlist_item_id:
+            item["program_id"] = str(item["program_id"])
+            program = query_class_or_course(
+                program_id=item["program_id"], program_type=item["type"]
+            )
+            item["name"] = program["name"]
+            item["price"] = program["price"]
+            return WishListItemModelBody(**item)
