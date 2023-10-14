@@ -1,4 +1,4 @@
-from pydantic import TypeAdapter
+from pydantic import HttpUrl, TypeAdapter
 
 from learnhub_backend.dependencies import (
     GenericOKResponse,
@@ -12,6 +12,7 @@ from .database import (
     edit_class,
     query_list_classes,
     get_teacher_by_id,
+    query_list_students_by_class,
     query_list_tags_by_id,
     query_class,
     query_list_threads,
@@ -20,6 +21,7 @@ from .database import (
     edit_thread,
 )
 from .schemas import (
+    ListClassStudentsResponseModel,
     ListClassesModelBody,
     ListClassesResponseModel,
     GetClassResponseModel,
@@ -32,6 +34,7 @@ from .schemas import (
     PostThreadResponseModel,
     GetThreadResponseModel,
     PatchThreadRequestModel,
+    StudentModelBody,
 )
 
 from ...dependencies import Exception
@@ -94,6 +97,21 @@ def post_class_request(request: PostClassRequestModel) -> PostClassResponseModel
 def patch_class_request(class_id: str, request: PatchClassRequestModel):
     edit_class(class_id, request)
     return GenericOKResponse
+
+
+# STUDENTS
+def list_class_students_response(class_id: str) -> ListClassStudentsResponseModel:
+    students_cur = query_list_students_by_class(class_id)
+    students: list[StudentModelBody] = []
+    for _student in students_cur:
+        students.append(
+            StudentModelBody(
+                student_id=str(_student["_id"]),
+                name=_student["fullname"],
+                profile_pic=HttpUrl(_student["profile_pic"]),
+            )
+        )
+    return ListClassStudentsResponseModel(students=students)
 
 
 # THREADS

@@ -112,6 +112,17 @@ class PatchClassRequestModel(BaseModel):
     class_ended_date: int | None = None
 
 
+# CLASS STUDENT
+class StudentModelBody(BaseModel):
+    student_id: str
+    name: str
+    profile_pic: HttpUrl
+
+
+class ListClassStudentsResponseModel(BaseModel):
+    students: list[StudentModelBody]
+
+
 # THREADS
 class ListThreadModelBody(BaseModel):
     thread_id: str

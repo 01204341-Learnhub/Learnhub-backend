@@ -7,6 +7,7 @@ from ...dependencies import (
 )
 
 from .services import (
+    list_class_students_response,
     list_classes_response,
     get_class_response,
     patch_class_request,
@@ -18,6 +19,7 @@ from .services import (
 )
 
 from .schemas import (
+    ListClassStudentsResponseModel,
     ListClassesResponseModel,
     GetClassResponseModel,
     PatchClassRequestModel,
@@ -91,6 +93,18 @@ def patch_class(class_id: str, request_body: PatchClassRequestModel):
     return response_body
 
 
+# STUDENTS
+@router.get(
+    "/{class_id}/students",
+    status_code=200,
+    response_model_exclude_none=True,
+    response_model=ListClassStudentsResponseModel,
+)
+def list_class_students(class_id: str):
+    response_body = list_class_students_response(class_id)
+    return response_body
+
+
 # THREADS
 @router.get(
     "/{class_id}/threads",
@@ -136,5 +150,7 @@ def get_thread(class_id: str, thread_id: str):
     response_model=GenericOKResponse,
 )
 def patch_thread(class_id: str, thread_id: str, thread_body: PatchThreadRequestModel):
-    response_body = patch_thread_request(class_id=class_id, thread_id=thread_id, thread_body=thread_body)
+    response_body = patch_thread_request(
+        class_id=class_id, thread_id=thread_id, thread_body=thread_body
+    )
     return response_body
