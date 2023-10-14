@@ -285,6 +285,18 @@ def edit_class(class_id: str, request: PatchClassRequestModel):
         raise Exception.bad_request
 
 
+# STUDENT
+def query_list_students_by_class(class_id: str) -> Cursor:
+    student_filter = {
+        "type": student_type,
+        "owned_programs": {
+            "$elemMatch": {"type": class_type, "program_id": ObjectId(class_id)}
+        },
+    }
+    students_cur = db_client.user_coll.find(student_filter)
+    return students_cur
+
+
 # THREADS
 def query_list_threads(class_id: str, skip: int, limit: int) -> Cursor:
     try:
