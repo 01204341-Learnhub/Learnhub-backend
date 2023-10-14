@@ -3,6 +3,9 @@ from typing import Annotated, Union
 from pydantic import HttpUrl, TypeAdapter
 
 from learnhub_backend.dependencies import GenericOKResponse
+from learnhub_backend.program.classes.database import query_class
+from learnhub_backend.program.course.database import query_course
+from learnhub_backend.student.database import query_student
 
 from .database import (
     create_teacher,
@@ -13,6 +16,7 @@ from .database import (
     query_course_by_teacher,
     query_list_teachers,
     query_teacher,
+    query_transaction_by_programs,
     remove_teacher_payment_method,
 )
 
@@ -24,6 +28,8 @@ from .schemas import (
     ListTeacherClassesResponseModel,
     ListTeacherCoursesModelBody,
     ListTeacherCoursesResponseModel,
+    ListTeacherIncomesModelBody,
+    ListTeacherIncomesResponseModel,
     ListTeacherPaymentMethodsResponseModel,
     ListTeachersModelBody,
     ListTeachersResponseModel,
@@ -33,12 +39,20 @@ from .schemas import (
     PostTeacherPaymentMethodResponseModel,
     PostTeacherRequestModel,
     PostTeacherResponseModel,
+    StudentModelBody,
 )
 
+from .dependencies import (
+    _Program,
+)
 from ..dependencies import (
     Exception,
     get_timestamp_from_datetime,
     mongo_datetime_to_timestamp,
+    course_type,
+    class_type,
+    student_type,
+    teacher_type,
 )
 
 
@@ -117,6 +131,65 @@ def list_teacher_classes_response(teacher_id: str) -> ListTeacherClassesResponse
         )
 
     return ListTeacherClassesResponseModel(classes=classes)
+
+
+# INCOMES
+def list_teacher_incomes_response(teacher_id: str) -> ListTeacherIncomesResponseModel:
+    teacher = query_teacher(teacher_id)
+    programs: list[_Program] = []
+    for program_ in teacher["owned_programs"]:
+        programs.append(_Program(str(program_["program_id"]), program_["type"]))
+    transaction_cur = query_transaction_by_programs(programs)
+
+    incomes: list[ListTeacherIncomesModelBody] = []
+
+    program_ids = {str(program_.program_id) for program_ in programs}
+
+    for transaction_ in transaction_cur:
+        student = query_student(str(transaction_["user_id"]))
+        for purchase_ in transaction_["purchase_list"]:
+            if str(purchase_["program_id"]) in program_ids:
+                if purchase_["type"] == course_type:
+                    course = query_course(str(purchase_["program_id"]))
+                    if course == None:
+                        raise Exception.not_found
+                    incomes.append(
+                        ListTeacherIncomesModelBody(
+                            type=purchase_["type"],
+                            program_id=str(purchase_["program_id"]),
+                            program_pic=HttpUrl(course["course_pic"]),
+                            name=course["name"],
+                            buyer=StudentModelBody(
+                                student_id=str(student["_id"]),
+                                student_name=student["fullname"],
+                            ),
+                            price=course["price"],
+                            purchase_time=mongo_datetime_to_timestamp(
+                                transaction_["purchase_time"]
+                            ),
+                        )
+                    )
+                elif purchase_["type"] == class_type:
+                    class_ = query_class(str(purchase_["program_id"]))
+                    if class_ == None:
+                        raise Exception.not_found
+                    incomes.append(
+                        ListTeacherIncomesModelBody(
+                            type=purchase_["type"],
+                            program_id=str(purchase_["program_id"]),
+                            program_pic=HttpUrl(class_["class_pic"]),
+                            name=class_["name"],
+                            buyer=StudentModelBody(
+                                student_id=str(student["_id"]),
+                                student_name=student["fullname"],
+                            ),
+                            price=class_["price"],
+                            purchase_time=mongo_datetime_to_timestamp(
+                                transaction_["purchase_time"]
+                            ),
+                        )
+                    )
+    return ListTeacherIncomesResponseModel(incomes=incomes)
 
 
 # PAYMENT METHOD
