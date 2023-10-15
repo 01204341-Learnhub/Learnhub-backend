@@ -144,7 +144,7 @@ def edit_student(student_id: str, request: PatchStudentRequestModel) -> UpdateRe
     if request.fullname != None:
         update_body["fullname"] = request.fullname
     if request.profile_pic != None:
-        update_body["profile_pic"] = request.profile_pic
+        update_body["profile_pic"] = str(request.profile_pic)
     update = {"$set": update_body}
 
     result = db_client.user_coll.update_one(filter=filter, update=update)
