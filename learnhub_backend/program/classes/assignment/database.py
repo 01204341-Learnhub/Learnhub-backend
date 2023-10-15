@@ -331,6 +331,29 @@ def unsubmit_submission(class_id: str, assignment_id: str, student_id: str):
 
 
 # REPLY
+def query_list_assingment_replies_by_class(class_id: str) -> Cursor:
+    try:
+        _filter = {"class_id": ObjectId(class_id)}
+        reply_cursor = db_client.assignment_reply_coll.find(_filter)
+        return reply_cursor
+    except InvalidId:
+        raise Exception.bad_request
+
+
+def query_list_assignment_replies_by_assignment(
+    class_id: str, assignment_id: str
+) -> Cursor:
+    try:
+        _filter = {
+            "class_id": ObjectId(class_id),
+            "assignment_id": ObjectId(assignment_id),
+        }
+        reply_cursor = db_client.assignment_reply_coll.find(_filter)
+        return reply_cursor
+    except InvalidId:
+        raise Exception.bad_request
+
+
 def create_assingment_reply(
     class_id: str, assignment_id: str, request: PostAssignmentReplyRequestModel
 ) -> ObjectId:

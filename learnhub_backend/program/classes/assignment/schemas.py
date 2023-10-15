@@ -50,7 +50,7 @@ class ListClassAssignmentsModelBody(BaseModel):
     max_score: float
     submission_count: SubmissionCountModelBody
     text: str
-    # TODO: add replies
+    replies: list[ReplyModelBody]
 
 
 class PostAssignmentReplyRequestModel(BaseModel):

@@ -1,4 +1,6 @@
-from pydantic import TypeAdapter
+from pydantic import HttpUrl, TypeAdapter
+
+from ..database import get_student_by_id, get_teacher_by_id
 
 
 from ....dependencies import (
@@ -6,6 +8,10 @@ from ....dependencies import (
     Exception,
     utc_datetime_now,
     mongo_datetime_to_timestamp,
+    student_type,
+    teacher_type,
+    course_type,
+    class_type,
 )
 
 from .schemas import (
@@ -24,14 +30,17 @@ from .schemas import (
     PostClassAssignmentResponseModel,
     PutAssignmentSubmitRequestModel,
     PutAssignmentSubmitResponseModel,
+    ReplyModelBody,
     StudentModelBody,
     SubmissionCountModelBody,
+    UserReplyModelBody,
 )
 
 from .database import (
     create_assignment,
     create_assingment_reply,
     query_assignments_by_class_id,
+    query_list_assingment_replies_by_class,
     query_list_submission_by_assignment_id,
     query_single_assignment,
     edit_assignment,
@@ -65,6 +74,28 @@ def list_assignment_response(class_id: str) -> ListClassAssignmentsResponseModel
             else:
                 submit_count += 1
 
+        replies: list[ReplyModelBody] = []
+        replies_cur = query_list_assingment_replies_by_class(class_id)
+        for _reply in replies_cur:
+            if _reply["user"]["user_type"] == student_type:
+                _user = get_student_by_id(_reply["user"]["user_id"])
+            elif _reply["user"]["user_type"] == teacher_type:
+                _user = get_teacher_by_id(_reply["user"]["user_id"])
+            else:
+                raise Exception.unprocessable_content
+            replies.append(
+                ReplyModelBody(
+                    text=_reply["text"],
+                    reply_date=mongo_datetime_to_timestamp(_reply["reply_date"]),
+                    user=UserReplyModelBody(
+                        user_id=str(_reply["user"]["user_id"]),
+                        user_type=_reply["user"]["user_type"],
+                        name=_user["fullname"],
+                        profile_pic=HttpUrl(_user["profile_pic"]),
+                    ),
+                )
+            )
+
         assignments.append(
             ListClassAssignmentsModelBody(
                 assignment_id=str(assg_["_id"]),
@@ -78,6 +109,7 @@ def list_assignment_response(class_id: str) -> ListClassAssignmentsResponseModel
                 submission_count=SubmissionCountModelBody(
                     submit_count=submit_count, unsubmit_count=unsubmit_count
                 ),
+                replies=replies,
             )
         )
     return ListClassAssignmentsResponseModel(assignments=assignments)
