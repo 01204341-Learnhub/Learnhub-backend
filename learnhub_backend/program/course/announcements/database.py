@@ -66,7 +66,7 @@ def create_course_announcement(
         )
         announcement_body_to_inserted["attachments"][i][
             "attachment_type"
-        ] = CheckHttpFileType(announcement_body_to_inserted["attachments"][i]["src"])
+        ] = announcement_body_to_inserted["attachments"][i]["attachment_type"]
     response = db_client.announcement_coll.insert_one(announcement_body_to_inserted)
     created_id = response.inserted_id
     return str(created_id)
