@@ -382,8 +382,6 @@ def list_student_basket_response(student_id: str) -> ListStudentBasketResponseMo
             basket[i]["type"] = "class"
             basket[i]["teacher"] = query_teacher_profile(str(cls["teacher_id"]))
             basket[i]["program_pic"] = cls["class_pic"]
-            basket[i]["rating"] = cls["rating"]
-            basket[i]["review_count"] = cls["review_count"]
             basket[i]["difficulty_level"] = cls["difficulty_level"]
             basket[i]["price"] = cls["price"]
 
