@@ -151,7 +151,7 @@ class ListThreadResponseModel(BaseModel):
 
 
 class PostThreadAttachmentModelBody(BaseModel):
-    # attachment_type: str
+    attachment_type: str
     src: str
 
 
