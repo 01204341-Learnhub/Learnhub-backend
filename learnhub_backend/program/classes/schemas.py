@@ -123,12 +123,27 @@ class ListClassStudentsResponseModel(BaseModel):
     students: list[StudentModelBody]
 
 
+# REPLIES
+class UserReplyModelBody(BaseModel):
+    user_id: str
+    type: str
+    name: str
+    profile_pic: HttpUrl
+
+
+class ReplyModelBody(BaseModel):
+    user: UserReplyModelBody
+    reply_date: int
+    text: str
+
+
 # THREADS
 class ListThreadModelBody(BaseModel):
     thread_id: str
     name: str
     teacher: TeacherModelBody
     last_edit: int
+    replies: list[ReplyModelBody]
 
 
 class ListThreadResponseModel(BaseModel):
@@ -161,6 +176,17 @@ class GetThreadResponseModel(BaseModel):
     last_edit: int
     text: str
     attachments: list[AttachmentModelBody]
+    # TODO: add replies
+
+
+class PostThreadReplyRequestModel(BaseModel):
+    user_id: str
+    user_type: str
+    text: str
+
+
+class PostThreadReplyResponseModel(BaseModel):
+    thread_reply_id: str
 
 
 class PatchThreadAttachmentModelBody(BaseModel):

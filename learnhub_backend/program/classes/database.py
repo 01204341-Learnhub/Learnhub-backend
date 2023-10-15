@@ -5,6 +5,7 @@ from bson.errors import InvalidId
 from .schemas import (
     PatchClassRequestModel,
     PostClassRequestModel,
+    PostThreadReplyRequestModel,
     TagModelBody,
     PostThreadRequestModel,
     PatchThreadRequestModel,
@@ -402,3 +403,38 @@ def edit_thread(class_id: str, thread_id: str, thread_body: PatchThreadRequestMo
         return True
     except InvalidId:
         raise Exception.bad_request
+
+
+# REPLY
+def create_thread_reply(
+    class_id: str, thread_id: str, request: PostThreadReplyRequestModel
+) -> ObjectId:
+    body = {
+        "class_id": ObjectId(class_id),
+        "thread_id": ObjectId(thread_id),
+        "user": {
+            "user_id": ObjectId(request.user_id),
+            "type": request.user_type,
+        },
+        "text": request.text,
+    }
+    # validate user_id
+    if request.user_type == student_type:
+        _student_filter = {"_id": ObjectId(request.user_id), "type": student_type}
+        _student = db_client.user_coll.find_one(_student_filter)
+        if _student == None:
+            err = Exception.not_found
+            err.__setattr__("detail", "student not found")
+            raise err
+    elif request.user_type == teacher_type:
+        _teacher_filter = {"_id": ObjectId(request.user_id), "type": teacher_type}
+        _teacher = db_client.user_coll.find_one(_teacher_filter)
+        if _teacher == None:
+            err = Exception.not_found
+            err.__setattr__("detail", "teacher not found")
+            raise err
+
+    result = db_client.thread_reply_coll.insert_one(body)
+    if result.inserted_id == None:
+        raise Exception.internal_server_error
+    return result.inserted_id

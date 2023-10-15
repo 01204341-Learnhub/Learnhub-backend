@@ -13,6 +13,7 @@ from .services import (
     patch_class_request,
     post_class_request,
     list_threads_response,
+    post_thread_reply_request,
     post_thread_request,
     get_thread_response,
     patch_thread_request,
@@ -26,6 +27,8 @@ from .schemas import (
     PostClassRequestModel,
     PostClassResponseModel,
     ListThreadResponseModel,
+    PostThreadReplyRequestModel,
+    PostThreadReplyResponseModel,
     PostThreadRequestModel,
     PostThreadResponseModel,
     GetThreadResponseModel,
@@ -153,4 +156,17 @@ def patch_thread(class_id: str, thread_id: str, thread_body: PatchThreadRequestM
     response_body = patch_thread_request(
         class_id=class_id, thread_id=thread_id, thread_body=thread_body
     )
+    return response_body
+
+
+@router.post(
+    "/{class_id}/threads/{thread_id}/reply",
+    status_code=200,
+    response_model_exclude_none=True,
+    response_model=PostThreadReplyResponseModel,
+)
+def post_thread_reply(
+    class_id: str, thread_id: str, request_body: PostThreadReplyRequestModel
+):
+    response_body = post_thread_reply_request(class_id, thread_id, request_body)
     return response_body

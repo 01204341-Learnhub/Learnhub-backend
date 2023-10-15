@@ -38,6 +38,8 @@ student_type = "student"
 teacher_type = "teacher"
 course_type = "course"
 class_type = "class"
+reply_type_assignment = "reply_assignment"
+reply_type_thread = "reply_thread"
 
 
 # FIX: Doesn't work for youtube video

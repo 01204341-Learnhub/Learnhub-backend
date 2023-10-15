@@ -36,6 +36,7 @@ class ListClassAssignmentsModelBody(BaseModel):
     max_score: float
     submission_count: SubmissionCountModelBody
     text: str
+    # TODO: add replies
 
 
 class ListClassAssignmentsResponseModel(BaseModel):
@@ -51,6 +52,7 @@ class GetClassAssignmentResponseModel(BaseModel):
     max_score: float
     text: str
     attachments: list[AttachmentModelBody]
+    # TODO: add replies
 
 
 class PostClassAssignmentRequestModel(BaseModel):
@@ -60,6 +62,9 @@ class PostClassAssignmentRequestModel(BaseModel):
     text: str
     max_score: float
     attachments: list[AttachmentModelBody]
+
+
+# TODO: add reply endpoint
 
 
 class PostClassAssignmentResponseModel(BaseModel):

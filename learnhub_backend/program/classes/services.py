@@ -9,6 +9,7 @@ from learnhub_backend.dependencies import (
 
 from .database import (
     create_class,
+    create_thread_reply,
     edit_class,
     query_list_classes,
     get_teacher_by_id,
@@ -30,6 +31,8 @@ from .schemas import (
     PostClassResponseModel,
     ListThreadModelBody,
     ListThreadResponseModel,
+    PostThreadReplyRequestModel,
+    PostThreadReplyResponseModel,
     PostThreadRequestModel,
     PostThreadResponseModel,
     GetThreadResponseModel,
@@ -147,3 +150,11 @@ def patch_thread_request(
 ):
     edit_thread(class_id=class_id, thread_id=thread_id, thread_body=thread_body)
     return GenericOKResponse
+
+
+# REPLY
+def post_thread_reply_request(
+    class_id: str, thread_id: str, request: PostThreadReplyRequestModel
+) -> PostThreadReplyResponseModel:
+    thread_reply_id = create_thread_reply(class_id, thread_id, request)
+    return PostThreadReplyResponseModel(thread_reply_id=str(thread_reply_id))
