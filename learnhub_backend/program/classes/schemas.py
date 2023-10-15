@@ -144,7 +144,6 @@ class ListThreadModelBody(BaseModel):
     teacher: TeacherModelBody
     last_edit: int
     replies: list[ReplyModelBody]
-    # TODO: implement replies
 
 
 class ListThreadResponseModel(BaseModel):
@@ -177,7 +176,7 @@ class GetThreadResponseModel(BaseModel):
     last_edit: int
     text: str
     attachments: list[AttachmentModelBody]
-    # TODO: add replies
+    replies: list[ReplyModelBody]
 
 
 class PostThreadReplyRequestModel(BaseModel):

@@ -18,6 +18,7 @@ from .database import (
     query_list_tags_by_id,
     query_class,
     query_list_thread_replies_by_class,
+    query_list_thread_replies_by_thread,
     query_list_threads,
     create_thread,
     query_thread,
@@ -171,10 +172,34 @@ def post_thread_request(class_id: str, thread_body: PostThreadRequestModel):
 
 def get_thread_response(class_id: str, thread_id: str):
     quried_thread = query_thread(class_id=class_id, thread_id=thread_id)
+    if quried_thread == None:
+        raise Exception.not_found
     quried_thread["teacher"] = get_teacher_by_id(str(quried_thread["teacher_id"]))
     quried_thread["last_edit"] = mongo_datetime_to_timestamp(
         quried_thread["last_edit"]
     )  # make timestamp timezone aware that db return utc time
+    reply_cur = query_list_thread_replies_by_thread(class_id, thread_id)
+    replies: list[ReplyModelBody] = []
+    for _reply in reply_cur:
+        if _reply["user"]["user_type"] == student_type:
+            _user = get_student_by_id(_reply["user"]["user_id"])
+        elif _reply["user"]["user_type"] == teacher_type:
+            _user = get_teacher_by_id(_reply["user"]["user_id"])
+        else:
+            raise Exception.unprocessable_content
+        replies.append(
+            ReplyModelBody(
+                text=_reply["text"],
+                reply_date=mongo_datetime_to_timestamp(_reply["reply_date"]),
+                user=UserReplyModelBody(
+                    user_id=str(_reply["user"]["user_id"]),
+                    user_type=_reply["user"]["user_type"],
+                    name=_user["fullname"],
+                    profile_pic=HttpUrl(_user["profile_pic"]),
+                ),
+            )
+        )
+    quried_thread["replies"] = replies
     return GetThreadResponseModel(**quried_thread)
 
 
