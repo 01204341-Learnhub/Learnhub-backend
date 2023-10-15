@@ -344,7 +344,7 @@ def create_thread(class_id: str, thread_body: PostThreadRequestModel):
         for i in range(len(thread_to_insert["attachments"])):
             thread_to_insert["attachments"][i]["attachment_type"] = thread_to_insert[
                 "attachments"
-            ][i]["type"]
+            ][i]["attachment_type"]
 
         result = db_client.thread_coll.insert_one(thread_to_insert)
         return str(result.inserted_id)
