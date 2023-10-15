@@ -255,7 +255,7 @@ def score_submission(class_id: str, assignment_id: str, student_id: str, score: 
         err = Exception.unprocessable_content
         err.__setattr__("detail", "Submission not yet submit")
         raise err
-    set_content = {"score": score}
+    set_content = {"score": score, "status": SubmissionStatus.check}
     result = db_client.assignment_submission_coll.update_one(
         filter, {"$set": set_content}
     )
