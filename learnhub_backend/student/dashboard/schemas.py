@@ -12,6 +12,7 @@ class TeacherModelBody(BaseModel):
 class ClassInfoModelBody(BaseModel):
     class_id: str
     class_name: str
+    class_pic: HttpUrl
 
 
 class CourseInfoModelBody(BaseModel):
