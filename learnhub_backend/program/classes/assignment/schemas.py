@@ -76,7 +76,7 @@ class GetClassAssignmentResponseModel(BaseModel):
     max_score: float
     text: str
     attachments: list[AttachmentModelBody]
-    # TODO: add replies
+    replies: list[ReplyModelBody]
 
 
 class PostClassAssignmentRequestModel(BaseModel):

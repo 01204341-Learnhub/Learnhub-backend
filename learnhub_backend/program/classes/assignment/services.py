@@ -40,6 +40,7 @@ from .database import (
     create_assignment,
     create_assingment_reply,
     query_assignments_by_class_id,
+    query_list_assignment_replies_by_assignment,
     query_list_assingment_replies_by_class,
     query_list_submission_by_assignment_id,
     query_single_assignment,
@@ -122,6 +123,29 @@ def get_assignment_response(
     if assignment == None:
         raise Exception.not_found
     ta = TypeAdapter(list[AttachmentModelBody])
+
+    replies_cur = query_list_assignment_replies_by_assignment(class_id, assignment_id)
+    replies: list[ReplyModelBody] = []
+    for _reply in replies_cur:
+        if _reply["user"]["user_type"] == student_type:
+            _user = get_student_by_id(_reply["user"]["user_id"])
+        elif _reply["user"]["user_type"] == teacher_type:
+            _user = get_teacher_by_id(_reply["user"]["user_id"])
+        else:
+            raise Exception.unprocessable_content
+        replies.append(
+            ReplyModelBody(
+                text=_reply["text"],
+                reply_date=mongo_datetime_to_timestamp(_reply["reply_date"]),
+                user=UserReplyModelBody(
+                    user_id=str(_reply["user"]["user_id"]),
+                    user_type=_reply["user"]["user_type"],
+                    name=_user["fullname"],
+                    profile_pic=HttpUrl(_user["profile_pic"]),
+                ),
+            )
+        )
+
     response_body = GetClassAssignmentResponseModel(
         name=assignment["name"],
         group_name=assignment["group_name"],
@@ -131,6 +155,7 @@ def get_assignment_response(
         max_score=assignment["max_score"],
         text=assignment["text"],
         attachments=ta.validate_python(assignment["attachments"]),
+        replies=replies,
     )
     return response_body
 
