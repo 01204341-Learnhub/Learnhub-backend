@@ -109,14 +109,6 @@ def create_assignment(class_id: str, request: PostClassAssignmentRequestModel) -
 
 def _create_class_students_submission(class_id: str, assignment_id: str):
     # Create all class's student submissions
-    body_template = {
-        "assignment_id": ObjectId(assignment_id),
-        "class_id": ObjectId(class_id),
-        "status": SubmissionStatus.unsubmit,
-        "score": 0,
-        "submission_date": timestamp_to_utc_datetime(0),
-        "attachments": [],
-    }
     bodies = []
 
     student_filter = {
@@ -126,8 +118,15 @@ def _create_class_students_submission(class_id: str, assignment_id: str):
     }
     students_cur = db_client.user_coll.find(student_filter)
     for stu_ in students_cur:
-        body = body_template
-        body["student_id"] = ObjectId(stu_["_id"])
+        body = {
+            "assignment_id": ObjectId(assignment_id),
+            "class_id": ObjectId(class_id),
+            "status": SubmissionStatus.unsubmit,
+            "score": 0,
+            "submission_date": timestamp_to_utc_datetime(0),
+            "attachments": [],
+            "student_id": ObjectId(stu_["_id"]),
+        }
         bodies.append(body)
     if len(bodies) == 0:
         return
