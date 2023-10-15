@@ -20,6 +20,20 @@ class AttachmentPatchModelBody(BaseModel):
     src: str
 
 
+# REPLIES
+class UserReplyModelBody(BaseModel):
+    user_id: str
+    user_type: str
+    name: str
+    profile_pic: HttpUrl
+
+
+class ReplyModelBody(BaseModel):
+    user: UserReplyModelBody
+    reply_date: int
+    text: str
+
+
 # ASSIGNMENTS
 class SubmissionCountModelBody(BaseModel):
     submit_count: int
@@ -37,6 +51,16 @@ class ListClassAssignmentsModelBody(BaseModel):
     submission_count: SubmissionCountModelBody
     text: str
     # TODO: add replies
+
+
+class PostAssignmentReplyRequestModel(BaseModel):
+    user_id: str
+    user_type: str
+    text: str
+
+
+class PostAssignmentReplyResponseModel(BaseModel):
+    assignment_reply_id: str
 
 
 class ListClassAssignmentsResponseModel(BaseModel):
@@ -62,9 +86,6 @@ class PostClassAssignmentRequestModel(BaseModel):
     text: str
     max_score: float
     attachments: list[AttachmentModelBody]
-
-
-# TODO: add reply endpoint
 
 
 class PostClassAssignmentResponseModel(BaseModel):

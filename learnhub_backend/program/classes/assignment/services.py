@@ -18,6 +18,8 @@ from .schemas import (
     ListClassAssignmentsResponseModel,
     PatchAssignmentRequestModel,
     PatchAssignmentSubmissionScoreRequestModel,
+    PostAssignmentReplyRequestModel,
+    PostAssignmentReplyResponseModel,
     PostClassAssignmentRequestModel,
     PostClassAssignmentResponseModel,
     PutAssignmentSubmitRequestModel,
@@ -28,6 +30,7 @@ from .schemas import (
 
 from .database import (
     create_assignment,
+    create_assingment_reply,
     query_assignments_by_class_id,
     query_list_submission_by_assignment_id,
     query_single_assignment,
@@ -188,3 +191,13 @@ def patch_assignment_unsubmit_request(
 ):
     unsubmit_submission(class_id, assignment_id, student_id)
     return GenericOKResponse
+
+
+# REPLY
+def post_assignment_reply_request(
+    class_id: str, assignment_id: str, request: PostAssignmentReplyRequestModel
+) -> PostAssignmentReplyResponseModel:
+    assignment_reply_id = create_assingment_reply(class_id, assignment_id, request)
+    return PostAssignmentReplyResponseModel(
+        assignment_reply_id=str(assignment_reply_id)
+    )
