@@ -36,3 +36,9 @@ DB_QUIZ_RESULT_COLLECTION = config(
     "DB_QUIZ_RESULT_COLLECTION", default="quizzes_result"
 )
 DB_THREAD_COLLECTION = config("DB_THREAD_COLLECTION", default="threads")
+DB_THREAD_REPLY_COLLECTION = config(
+    "DB_THREAD_REPLY_COLLECTION", default="thread_replies"
+)
+DB_ASSIGNMENT_REPLY_COLLECTION = config(
+    "DB_ASSIGNMENT_REPLY_COLLECTION", default="assignment_replies"
+)

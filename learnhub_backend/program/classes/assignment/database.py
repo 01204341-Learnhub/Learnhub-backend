@@ -6,12 +6,16 @@ from bson.errors import InvalidId
 from ....dependencies import (
     Exception,
     student_type,
+    teacher_type,
+    class_type,
+    course_type,
     utc_datetime_now,
     timestamp_to_utc_datetime,
 )
 
 from .schemas import (
     PatchAssignmentRequestModel,
+    PostAssignmentReplyRequestModel,
     PostClassAssignmentRequestModel,
     PutAssignmentSubmitRequestModel,
 )
@@ -322,5 +326,67 @@ def unsubmit_submission(class_id: str, assignment_id: str, student_id: str):
         )
         if result.matched_count == 0:
             raise Exception.not_found
+    except InvalidId:
+        raise Exception.bad_request
+
+
+# REPLY
+def query_list_assingment_replies_by_class(class_id: str) -> Cursor:
+    try:
+        _filter = {"class_id": ObjectId(class_id)}
+        reply_cursor = db_client.assignment_reply_coll.find(_filter)
+        return reply_cursor
+    except InvalidId:
+        raise Exception.bad_request
+
+
+def query_list_assignment_replies_by_assignment(
+    class_id: str, assignment_id: str
+) -> Cursor:
+    try:
+        _filter = {
+            "class_id": ObjectId(class_id),
+            "assignment_id": ObjectId(assignment_id),
+        }
+        reply_cursor = db_client.assignment_reply_coll.find(_filter)
+        return reply_cursor
+    except InvalidId:
+        raise Exception.bad_request
+
+
+def create_assingment_reply(
+    class_id: str, assignment_id: str, request: PostAssignmentReplyRequestModel
+) -> ObjectId:
+    try:
+        body = {
+            "class_id": ObjectId(class_id),
+            "assignment_id": ObjectId(assignment_id),
+            "user": {
+                "user_id": ObjectId(request.user_id),
+                "user_type": request.user_type,
+            },
+            "text": request.text,
+            "reply_date": utc_datetime_now(),
+        }
+        # validate user_id
+        if request.user_type == student_type:
+            _student_filter = {"_id": ObjectId(request.user_id), "type": student_type}
+            _student = db_client.user_coll.find_one(_student_filter)
+            if _student == None:
+                err = Exception.not_found
+                err.__setattr__("detail", "student not found")
+                raise err
+        elif request.user_type == teacher_type:
+            _teacher_filter = {"_id": ObjectId(request.user_id), "type": teacher_type}
+            _teacher = db_client.user_coll.find_one(_teacher_filter)
+            if _teacher == None:
+                err = Exception.not_found
+                err.__setattr__("detail", "teacher not found")
+                raise err
+
+        result = db_client.assignment_reply_coll.insert_one(body)
+        if result.inserted_id == None:
+            raise Exception.internal_server_error
+        return result.inserted_id
     except InvalidId:
         raise Exception.bad_request

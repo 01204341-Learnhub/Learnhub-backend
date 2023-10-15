@@ -14,6 +14,8 @@ from .schemas import (
     ListClassAssignmentsResponseModel,
     PatchAssignmentRequestModel,
     PatchAssignmentSubmissionScoreRequestModel,
+    PostAssignmentReplyRequestModel,
+    PostAssignmentReplyResponseModel,
     PostClassAssignmentRequestModel,
     PostClassAssignmentResponseModel,
     PutAssignmentSubmitRequestModel,
@@ -28,6 +30,7 @@ from .services import (
     patch_assignment_request,
     patch_assignment_submission_score_request,
     patch_assignment_unsubmit_request,
+    post_assignment_reply_request,
     post_assignment_request,
     put_assignment_submit_request,
 )
@@ -168,4 +171,17 @@ def patch_assignment_unsubmit(class_id: str, assignment_id: str, student_id: str
     response_body = patch_assignment_unsubmit_request(
         class_id, assignment_id, student_id
     )
+    return response_body
+
+
+@router.post(
+    "/{class_id}/assignments/{assignment_id}/reply",
+    status_code=200,
+    response_model_exclude_none=True,
+    response_model=PostAssignmentReplyResponseModel,
+)
+def post_assignment_reply(
+    class_id: str, assignment_id: str, request_body: PostAssignmentReplyRequestModel
+):
+    response_body = post_assignment_reply_request(class_id, assignment_id, request_body)
     return response_body
