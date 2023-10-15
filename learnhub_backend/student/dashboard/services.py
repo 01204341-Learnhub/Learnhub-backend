@@ -9,6 +9,7 @@ from learnhub_backend.dependencies import (
     Exception,
     class_type,
     course_type,
+    mongo_datetime_to_timestamp,
     student_type,
     teacher_type,
     get_timestamp_from_datetime,
@@ -91,8 +92,8 @@ def get_student_dashboard_response(student_id: str) -> GetStudentDashboard:
                     teacher=teacher,
                     schedules=[
                         ClassScheduleModelBody(
-                            start=get_timestamp_from_datetime(_sched["start"]),
-                            end=get_timestamp_from_datetime(_sched["end"]),
+                            start=mongo_datetime_to_timestamp(_sched["start"]),
+                            end=mongo_datetime_to_timestamp(_sched["end"]),
                         )
                         for _sched in class_["schedules"]
                     ],

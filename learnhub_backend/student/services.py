@@ -35,6 +35,7 @@ from .database import (
 
 from .schemas import (
     ClassInfoModelBody,
+    ClassScheduleModelBody,
     GetStudentBasketItemResponseModel,
     GetStudentCourseResponseModel,
     GetStudentPaymentMethodResponseModel,
@@ -239,6 +240,13 @@ def list_student_classes_response(student_id: str) -> ListStudentClassResponseMo
                 class_ended_date=mongo_datetime_to_timestamp(
                     class_["class_ended_date"]
                 ),
+                schedules=[
+                    ClassScheduleModelBody(
+                        start=mongo_datetime_to_timestamp(_sched["start"]),
+                        end=mongo_datetime_to_timestamp(_sched["end"]),
+                    )
+                    for _sched in class_["schedules"]
+                ],
                 teacher=TeacherModelBody(**teacher),
             )
         )

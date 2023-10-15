@@ -97,6 +97,7 @@ class ListStudentClassModelBody(BaseModel):
     status: str
     progress: float
     class_ended_date: int
+    schedules: list[ClassScheduleModelBody]
     teacher: TeacherModelBody
 
 
