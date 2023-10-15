@@ -80,7 +80,9 @@ def get_student_dashboard_response(student_id: str) -> GetStudentDashboard:
 
             teacher = _get_teacher_info(str(class_["teacher_id"]))
             class_info = ClassInfoModelBody(
-                class_id=str(class_["_id"]), class_name=class_["name"]
+                class_id=str(class_["_id"]),
+                class_name=class_["name"],
+                class_pic=HttpUrl(class_["class_pic"]),
             )
 
             classes.append(
@@ -109,7 +111,9 @@ def get_student_dashboard_response(student_id: str) -> GetStudentDashboard:
                     assignment_name=assg_["name"],
                     assignment_id=str(assg_["_id"]),
                     class_info=ClassInfoModelBody(
-                        class_id=str(class_["_id"]), class_name=class_["name"]
+                        class_id=str(class_["_id"]),
+                        class_name=class_["name"],
+                        class_pic=HttpUrl(class_["class_pic"]),
                     ),
                     due_date=get_timestamp_from_datetime(assg_["due_date"]),
                     status=assg_["status"],
