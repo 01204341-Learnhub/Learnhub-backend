@@ -126,7 +126,7 @@ class ListClassStudentsResponseModel(BaseModel):
 # REPLIES
 class UserReplyModelBody(BaseModel):
     user_id: str
-    type: str
+    user_type: str
     name: str
     profile_pic: HttpUrl
 
@@ -144,6 +144,7 @@ class ListThreadModelBody(BaseModel):
     teacher: TeacherModelBody
     last_edit: int
     replies: list[ReplyModelBody]
+    # TODO: implement replies
 
 
 class ListThreadResponseModel(BaseModel):

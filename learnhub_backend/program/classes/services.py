@@ -11,11 +11,13 @@ from .database import (
     create_class,
     create_thread_reply,
     edit_class,
+    get_student_by_id,
     query_list_classes,
     get_teacher_by_id,
     query_list_students_by_class,
     query_list_tags_by_id,
     query_class,
+    query_list_thread_replies_by_class,
     query_list_threads,
     create_thread,
     query_thread,
@@ -37,10 +39,18 @@ from .schemas import (
     PostThreadResponseModel,
     GetThreadResponseModel,
     PatchThreadRequestModel,
+    ReplyModelBody,
     StudentModelBody,
+    UserReplyModelBody,
 )
 
-from ...dependencies import Exception
+from ...dependencies import (
+    Exception,
+    student_type,
+    teacher_type,
+    class_type,
+    course_type,
+)
 
 
 # CLASSES
@@ -122,9 +132,32 @@ def list_threads_response(class_id: str, skip: int, limit: int):
     thread_cursor = query_list_threads(class_id=class_id, skip=skip, limit=limit)
     threads = []
     for thread in thread_cursor:
+        replies: list[ReplyModelBody] = []
+        replies_cur = query_list_thread_replies_by_class(class_id)
+        for _reply in replies_cur:
+            if _reply["user"]["user_type"] == student_type:
+                _user = get_student_by_id(_reply["user"]["user_id"])
+            elif _reply["user"]["user_type"] == teacher_type:
+                _user = get_teacher_by_id(_reply["user"]["user_id"])
+            else:
+                raise Exception.unprocessable_content
+            replies.append(
+                ReplyModelBody(
+                    text=_reply["text"],
+                    reply_date=mongo_datetime_to_timestamp(_reply["reply_date"]),
+                    user=UserReplyModelBody(
+                        user_id=str(_reply["user"]["user_id"]),
+                        user_type=_reply["user"]["user_type"],
+                        name=_user["fullname"],
+                        profile_pic=HttpUrl(_user["profile_pic"]),
+                    ),
+                )
+            )
+
         thread["thread_id"] = str(thread["_id"])
         thread["teacher"] = get_teacher_by_id(str(thread["teacher_id"]))
         thread["last_edit"] = mongo_datetime_to_timestamp(thread["last_edit"])
+        thread["replies"] = replies
         threads.append(thread)
 
     ta = TypeAdapter(list[ListThreadModelBody])

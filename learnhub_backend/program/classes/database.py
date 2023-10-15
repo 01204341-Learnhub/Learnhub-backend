@@ -25,12 +25,28 @@ from ...dependencies import (
 
 def get_teacher_by_id(teacher_id: str):
     try:
-        teacher = db_client.user_coll.find_one({"_id": ObjectId(teacher_id)})
+        teacher = db_client.user_coll.find_one(
+            {"_id": ObjectId(teacher_id), "type": teacher_type}
+        )
         if teacher is None:
             raise Exception.not_found
         teacher["teacher_id"] = str(teacher["_id"])
         teacher["teacher_name"] = teacher["fullname"]
         return teacher
+    except InvalidId:
+        raise Exception.bad_request
+
+
+def get_student_by_id(student_id: str):
+    try:
+        student = db_client.user_coll.find_one(
+            {"_id": ObjectId(student_id), "type": student_type}
+        )
+        if student is None:
+            raise Exception.not_found
+        student["student_id"] = str(["_id"])
+        student["student_name"] = student["fullname"]
+        return student
     except InvalidId:
         raise Exception.bad_request
 
@@ -406,35 +422,57 @@ def edit_thread(class_id: str, thread_id: str, thread_body: PatchThreadRequestMo
 
 
 # REPLY
+def query_list_thread_replies_by_class(class_id: str) -> Cursor:
+    try:
+        _filter = {"class_id": ObjectId(class_id)}
+        reply_cursor = db_client.thread_reply_coll.find(_filter)
+        return reply_cursor
+    except InvalidId:
+        raise Exception.bad_request
+
+
+def query_list_thread_replies_by_thread(class_id: str, thread_id: str) -> Cursor:
+    try:
+        _filter = {"class_id": ObjectId(class_id), "thread_id": ObjectId(thread_id)}
+        reply_cursor = db_client.thread_reply_coll.find(_filter)
+        return reply_cursor
+    except InvalidId:
+        raise Exception.bad_request
+
+
 def create_thread_reply(
     class_id: str, thread_id: str, request: PostThreadReplyRequestModel
 ) -> ObjectId:
-    body = {
-        "class_id": ObjectId(class_id),
-        "thread_id": ObjectId(thread_id),
-        "user": {
-            "user_id": ObjectId(request.user_id),
-            "type": request.user_type,
-        },
-        "text": request.text,
-    }
-    # validate user_id
-    if request.user_type == student_type:
-        _student_filter = {"_id": ObjectId(request.user_id), "type": student_type}
-        _student = db_client.user_coll.find_one(_student_filter)
-        if _student == None:
-            err = Exception.not_found
-            err.__setattr__("detail", "student not found")
-            raise err
-    elif request.user_type == teacher_type:
-        _teacher_filter = {"_id": ObjectId(request.user_id), "type": teacher_type}
-        _teacher = db_client.user_coll.find_one(_teacher_filter)
-        if _teacher == None:
-            err = Exception.not_found
-            err.__setattr__("detail", "teacher not found")
-            raise err
+    try:
+        body = {
+            "class_id": ObjectId(class_id),
+            "thread_id": ObjectId(thread_id),
+            "user": {
+                "user_id": ObjectId(request.user_id),
+                "user_type": request.user_type,
+            },
+            "text": request.text,
+            "reply_date": utc_datetime_now(),
+        }
+        # validate user_id
+        if request.user_type == student_type:
+            _student_filter = {"_id": ObjectId(request.user_id), "type": student_type}
+            _student = db_client.user_coll.find_one(_student_filter)
+            if _student == None:
+                err = Exception.not_found
+                err.__setattr__("detail", "student not found")
+                raise err
+        elif request.user_type == teacher_type:
+            _teacher_filter = {"_id": ObjectId(request.user_id), "type": teacher_type}
+            _teacher = db_client.user_coll.find_one(_teacher_filter)
+            if _teacher == None:
+                err = Exception.not_found
+                err.__setattr__("detail", "teacher not found")
+                raise err
 
-    result = db_client.thread_reply_coll.insert_one(body)
-    if result.inserted_id == None:
-        raise Exception.internal_server_error
-    return result.inserted_id
+        result = db_client.thread_reply_coll.insert_one(body)
+        if result.inserted_id == None:
+            raise Exception.internal_server_error
+        return result.inserted_id
+    except InvalidId:
+        raise Exception.bad_request
