@@ -12,7 +12,7 @@ class ListCourseAnnouncementsResponseModel(BaseModel):
 
 
 class AttachmentPostModelBody(BaseModel):
-    # attachment_type: str
+    attachment_type: str
     src: HttpUrl
 
 
