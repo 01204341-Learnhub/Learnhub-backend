@@ -24,6 +24,7 @@ class ListCoursesModelBody(BaseModel):
     review_count: int
     difficulty_level: str
     price: float
+    monthly_sales: int
 
 
 class ListCoursesResponseModel(BaseModel):

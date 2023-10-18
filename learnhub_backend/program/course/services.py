@@ -1,4 +1,4 @@
-from pydantic import TypeAdapter
+from pydantic import HttpUrl, TypeAdapter
 
 from learnhub_backend.dependencies import GenericOKResponse
 from learnhub_backend.student.database import query_student
@@ -6,6 +6,7 @@ from learnhub_backend.student.database import query_student
 from .database import (
     create_course,
     query_course,
+    query_list_popular_courses,
     query_list_tags_by_id,
     query_teacher_by_id,
     query_list_courses,
@@ -59,17 +60,23 @@ from ...dependencies import (
 
 # COURSE
 def list_courses_response(skip: int = 0, limit: int = 100):
+    popular_courses = query_list_popular_courses()
+
     queried_courses = query_list_courses(skip, limit)
     list_courses_response = list()
     course_response = dict()
     for course in queried_courses:
-        course_response["course_id"] = course["course_id"]
+        course_response["course_id"] = str(course["_id"])
         course_response["name"] = course["name"]
         course_response["rating"] = course["rating"]
         course_response["review_count"] = course["review_count"]
         course_response["price"] = course["price"]
-        course_response["course_pic"] = course["course_pic"]
+        course_response["course_pic"] = HttpUrl(course["course_pic"])
         course_response["difficulty_level"] = course["difficulty_level"]
+        if str(course["_id"]) in popular_courses:
+            course_response["monthly_sales"] = popular_courses[str(course["_id"])]
+        else:
+            course_response["monthly_sales"] = 0
 
         # teacher
         teacher = query_teacher_by_id(course["teacher_id"])
