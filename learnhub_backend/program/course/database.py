@@ -1,3 +1,4 @@
+from pymongo.cursor import Cursor
 from pymongo.results import InsertOneResult
 from bson.objectid import ObjectId
 from bson.errors import InvalidId
@@ -54,16 +55,40 @@ def query_list_tags_by_id(ids: list[str | ObjectId]):
 
 
 # COURSE
-def query_list_courses(skip: int = 0, limit: int = 100) -> list:
+def query_list_courses(skip: int = 0, limit: int = 100) -> Cursor:
     try:
         courses_cursor = db_client.course_coll.find(skip=skip, limit=limit)
-        courses = []
-        for course in courses_cursor:
-            course["course_id"] = str(course["_id"])
-            courses.append(course)
-        return courses
+        return courses_cursor
     except InvalidId:
         raise Exception.bad_request
+
+
+def query_list_popular_courses() -> dict[str, int]:
+    now = utc_datetime_now()
+    last_month = now.replace(month=now.month - 1)
+    transaction_filter = {
+        "purchase_list": {
+            "$elemMatch": {
+                "type": course_type,
+            }
+        },
+        "purchase_time": {"$gte": last_month},
+    }
+    transactions_cur = db_client.transaction_coll.find(transaction_filter)
+
+    popular_courses: dict[str, int] = {}
+
+    for _transac in transactions_cur:
+        for _pur in _transac["purchase_list"]:
+            if (
+                _pur["type"] == course_type
+                and str(_pur["program_id"]) not in popular_courses
+            ):
+                popular_courses[str(_pur["program_id"])] = 1
+            elif _pur["type"] == course_type:
+                popular_courses[str(_pur["program_id"])] += 1
+
+    return popular_courses
 
 
 def query_course(course_id: str):
