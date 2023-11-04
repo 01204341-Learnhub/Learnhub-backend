@@ -67,7 +67,12 @@ from .schemas import (
     courseChapterModelBody,
 )
 
-from ..dependencies import Exception, mongo_datetime_to_timestamp
+from ..dependencies import (
+    Exception,
+    mongo_datetime_to_timestamp,
+    utc_datetime_now,
+    utc_datetime,
+)
 
 
 # STUDENTS
@@ -374,6 +379,11 @@ def list_student_basket_response(student_id: str) -> ListStudentBasketResponseMo
     for i, item in enumerate(basket):
         if item["type"] == "course":
             course = query_course(item["program_id"])
+            if (
+                False
+            ):  # TODO: check if this course is buyable from status but i don't how many status are there
+                remove_student_basket_item(student_id, item["basket_item_id"])
+                continue
             basket[i]["name"] = course["name"]
             basket[i]["type"] = "course"
             basket[i]["teacher"] = query_teacher_profile(str(course["teacher_id"]))
@@ -386,6 +396,9 @@ def list_student_basket_response(student_id: str) -> ListStudentBasketResponseMo
 
         elif item["type"] == "class":
             cls = query_class(item["program_id"])
+            if utc_datetime_now() > utc_datetime(cls["registration_ended_date"]):  #
+                remove_student_basket_item(student_id, item["basket_item_id"])
+                continue
             basket[i]["name"] = cls["name"]
             basket[i]["type"] = "class"
             basket[i]["teacher"] = query_teacher_profile(str(cls["teacher_id"]))
