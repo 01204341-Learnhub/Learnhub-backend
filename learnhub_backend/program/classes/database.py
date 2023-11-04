@@ -212,11 +212,6 @@ def edit_class(class_id: str, request: PatchClassRequestModel):
                 "_id": ObjectId(class_id),
                 "tags": ObjectId(request.tag.tag_id),
             }
-            _class_tag_check_result = db_client.class_coll.find_one(_class_tag_filter)
-            if _class_tag_check_result != None:
-                err = Exception.unprocessable_content
-                err.__setattr__("detail", "duplicate class's tag")
-                raise err
 
             tag_filter = {"_id": ObjectId(request.tag.tag_id)}
             tag = db_client.tag_coll.find_one(tag_filter)
@@ -226,8 +221,16 @@ def edit_class(class_id: str, request: PatchClassRequestModel):
                 raise err
 
             if request.tag.op == "add":
+                _class_tag_check_result = db_client.class_coll.find_one(
+                    _class_tag_filter
+                )
+                if _class_tag_check_result != None:
+                    err = Exception.unprocessable_content
+                    err.__setattr__("detail", "duplicate class's tag")
+                    raise err
                 push_content["tags"] = ObjectId(request.tag.tag_id)
             elif request.tag.op == "remove":
+                pull_content["tags"] = dict()
                 pull_content["tags"]["$in"] = [ObjectId(request.tag.tag_id)]
 
         # schedules
