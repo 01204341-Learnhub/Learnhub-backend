@@ -200,13 +200,6 @@ def edit_course(course_id: str, course_body: PatchCourseRequestModel):
                 "_id": ObjectId(course_id),
                 "tags": ObjectId(course_body.tag.tag_id),
             }
-            _course_tag_check_result = db_client.course_coll.find_one(
-                _course_tag_filter
-            )
-            if _course_tag_check_result != None:
-                err = Exception.unprocessable_content
-                err.__setattr__("detail", "duplicate course's tag")
-                raise err
 
             tag_filter = {"_id": ObjectId(course_body.tag.tag_id)}
             tag = db_client.tag_coll.find_one(tag_filter)
@@ -216,8 +209,16 @@ def edit_course(course_id: str, course_body: PatchCourseRequestModel):
                 raise err
 
             if course_body.tag.op == "add":
+                _course_tag_check_result = db_client.course_coll.find_one(
+                    _course_tag_filter
+                )
+                if _course_tag_check_result != None:
+                    err = Exception.unprocessable_content
+                    err.__setattr__("detail", "duplicate course's tag")
+                    raise err
                 push_content["tags"] = ObjectId(course_body.tag.tag_id)
             elif course_body.tag.op == "remove":
+                pull_content["tags"] = dict()
                 pull_content["tags"]["$in"] = [ObjectId(course_body.tag.tag_id)]
 
         # mongo doesn't allow multi operation edit
