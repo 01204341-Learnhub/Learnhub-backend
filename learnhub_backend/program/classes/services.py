@@ -61,6 +61,8 @@ def list_classes_response(skip: int, limit: int) -> ListClassesResponseModel:
     for class_ in classes_corsor:
         if utc_datetime(class_["registration_ended_date"]) < utc_datetime_now():
             continue  # continue if you can't buy class anymore
+        elif class_["student_count"] >= class_["max_student"]:
+            continue  # student limit reached
         class_["class_id"] = str(class_["_id"])
         class_["teacher"] = get_teacher_by_id(str(class_["teacher_id"]))
         class_["tags"] = query_list_tags_by_id(class_["tags"])

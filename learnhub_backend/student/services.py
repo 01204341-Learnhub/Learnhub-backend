@@ -396,7 +396,10 @@ def list_student_basket_response(student_id: str) -> ListStudentBasketResponseMo
 
         elif item["type"] == "class":
             cls = query_class(item["program_id"])
-            if utc_datetime_now() > utc_datetime(cls["registration_ended_date"]):  #
+            if (
+                utc_datetime_now() > utc_datetime(cls["registration_ended_date"])
+                or cls["student_count"] >= cls["max_student"]
+            ):  # 
                 remove_student_basket_item(student_id, item["basket_item_id"])
                 continue
             basket[i]["name"] = cls["name"]
