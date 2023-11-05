@@ -55,7 +55,7 @@ def query_list_tags_by_id(ids: list[str | ObjectId]):
 
 
 # COURSE
-def query_list_courses(skip: int = 0, limit: int = 100) -> Cursor:
+def query_list_courses(skip, limit) -> Cursor:
     try:
         courses_cursor = db_client.course_coll.find(skip=skip, limit=limit)
         return courses_cursor

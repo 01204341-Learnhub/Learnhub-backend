@@ -59,7 +59,7 @@ from ...dependencies import (
 
 
 # COURSE
-def list_courses_response(skip: int = 0, limit: int = 100):
+def list_courses_response(skip, limit):
     popular_courses = query_list_popular_courses()
 
     queried_courses = query_list_courses(skip, limit)
