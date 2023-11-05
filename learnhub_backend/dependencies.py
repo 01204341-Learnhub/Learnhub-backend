@@ -6,7 +6,7 @@ import mimetypes
 import httpx
 
 
-def common_pagination_parameters(skip: int = 0, limit: int = 100):
+def common_pagination_parameters(skip: int = 0, limit: int = 10000):
     return {"skip": skip, "limit": limit}
 
 
